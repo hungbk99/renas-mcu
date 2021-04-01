@@ -1,0 +1,20 @@
+****************************************************************************
+                              AHB_config
+****************************************************************************
+ File Name: 	connect_gen.pl
+ Project Name:	AHB_Gen
+ Email:         quanghungbk1999@gmail.com
+ Version    Date      Author      Description
+ v0.0       29/11/2020 Quang Hung  First Creation, this version does not support
+                                   hsplit & hretry
+****************************************************************************
+                              AHB_config
+****************************************************************************
+AHB_Gen Decoder Setting
+SLAVE ADDRESS MAP
+AHB_Gen Arbiter Setting
+AHB Crossbar
+4
+3
+2
+7

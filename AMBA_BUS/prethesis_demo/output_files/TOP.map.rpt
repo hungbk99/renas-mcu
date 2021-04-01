@@ -1,0 +1,1078 @@
+Analysis & Synthesis report for TOP
+Sun Dec 13 13:53:07 2020
+Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. General Register Statistics
+  9. Parameter Settings for User Entity Instance: AHB_bus:DUT
+ 10. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_1:DEC_master_1
+ 11. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_1:MUX_master_1
+ 12. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_2:DEC_master_2
+ 13. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_2:MUX_master_2
+ 14. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_3:DEC_master_3
+ 15. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_3:MUX_master_3
+ 16. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_kemee:DEC_kemee
+ 17. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_kemee:MUX_kemee
+ 18. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1
+ 19. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|BR_Req_Detect:BRRD
+ 20. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[0].PG
+ 21. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[1].PG
+ 22. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[2].PG
+ 23. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Dynamic_Prior_Mask:DPM
+ 24. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Req_Collect:RC
+ 25. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_1:MUX_slave_1
+ 26. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2
+ 27. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2|Fixed_Prior_Mask:FPM
+ 28. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_2:MUX_slave_2
+ 29. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3
+ 30. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3|Fixed_Prior_Mask:FPA
+ 31. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_3:MUX_slave_3
+ 32. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4
+ 33. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4|Fixed_Prior_Mask:FPA
+ 34. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_4:MUX_slave_4
+ 35. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5
+ 36. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5|Fixed_Prior_Mask:FPM
+ 37. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_5:MUX_slave_5
+ 38. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_6:ARB_slave_6
+ 39. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_6:MUX_slave_6
+ 40. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7
+ 41. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|BR_Req_Detect:BRRD
+ 42. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Prior_Gen:PG_gen[0].PG
+ 43. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Prior_Gen:PG_gen[1].PG
+ 44. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Dynamic_Prior_Mask:DPM
+ 45. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Req_Collect:RC
+ 46. Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_7:MUX_slave_7
+ 47. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|BR_Req_Detect:BRRD"
+ 48. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5|Fixed_Prior_Mask:FPM"
+ 49. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4|Fixed_Prior_Mask:FPA"
+ 50. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3|Fixed_Prior_Mask:FPA"
+ 51. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2|Fixed_Prior_Mask:FPM"
+ 52. Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|BR_Req_Detect:BRRD"
+ 53. Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_kemee:DEC_kemee"
+ 54. Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_3:DEC_master_3"
+ 55. Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_2:DEC_master_2"
+ 56. Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_1:DEC_master_1"
+ 57. Port Connectivity Checks: "AHB_bus:DUT"
+ 58. Post-Synthesis Netlist Statistics for Top Partition
+ 59. Elapsed Time Per Partition
+ 60. Analysis & Synthesis Messages
+ 61. Analysis & Synthesis Suppressed Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 2018  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details.
+
+
+
++-------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                  ;
++---------------------------------+---------------------------------------------+
+; Analysis & Synthesis Status     ; Successful - Sun Dec 13 13:53:07 2020       ;
+; Quartus Prime Version           ; 18.1.0 Build 625 09/12/2018 SJ Lite Edition ;
+; Revision Name                   ; TOP                                         ;
+; Top-level Entity Name           ; TOP                                         ;
+; Family                          ; Cyclone V                                   ;
+; Logic utilization (in ALMs)     ; N/A                                         ;
+; Total registers                 ; 0                                           ;
+; Total pins                      ; 2                                           ;
+; Total virtual pins              ; 0                                           ;
+; Total block memory bits         ; 0                                           ;
+; Total DSP Blocks                ; 0                                           ;
+; Total HSSI RX PCSs              ; 0                                           ;
+; Total HSSI PMA RX Deserializers ; 0                                           ;
+; Total HSSI TX PCSs              ; 0                                           ;
+; Total HSSI PMA TX Serializers   ; 0                                           ;
+; Total PLLs                      ; 0                                           ;
+; Total DLLs                      ; 0                                           ;
++---------------------------------+---------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                             ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                          ; Setting            ; Default Value      ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+; Device                                                                          ; 5CGTFD9E5F35C7     ;                    ;
+; Top-level entity name                                                           ; TOP                ; TOP                ;
+; Family name                                                                     ; Cyclone V          ; Cyclone V          ;
+; Use smart compilation                                                           ; Off                ; Off                ;
+; Enable parallel Assembler and Timing Analyzer during compilation                ; On                 ; On                 ;
+; Enable compact report table                                                     ; Off                ; Off                ;
+; Restructure Multiplexers                                                        ; Auto               ; Auto               ;
+; MLAB Add Timing Constraints For Mixed-Port Feed-Through Mode Setting Don't Care ; Off                ; Off                ;
+; Create Debugging Nodes for IP Cores                                             ; Off                ; Off                ;
+; Preserve fewer node names                                                       ; On                 ; On                 ;
+; Intel FPGA IP Evaluation Mode                                                   ; Enable             ; Enable             ;
+; Verilog Version                                                                 ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                                    ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                        ; Auto               ; Auto               ;
+; Safe State Machine                                                              ; Off                ; Off                ;
+; Extract Verilog State Machines                                                  ; On                 ; On                 ;
+; Extract VHDL State Machines                                                     ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                               ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                      ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                                  ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                         ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                       ; On                 ; On                 ;
+; Parallel Synthesis                                                              ; On                 ; On                 ;
+; DSP Block Balancing                                                             ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                              ; On                 ; On                 ;
+; Power-Up Don't Care                                                             ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                                    ; Off                ; Off                ;
+; Remove Duplicate Registers                                                      ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                            ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                          ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                           ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                       ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                            ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                             ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                                  ; Off                ; Off                ;
+; Optimization Technique                                                          ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                              ; 70                 ; 70                 ;
+; Auto Carry Chains                                                               ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                            ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                           ; Off                ; Off                ;
+; Auto ROM Replacement                                                            ; On                 ; On                 ;
+; Auto RAM Replacement                                                            ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                      ; On                 ; On                 ;
+; Auto Shift Register Replacement                                                 ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                                 ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                                   ; On                 ; On                 ;
+; Strict RAM Replacement                                                          ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                               ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                           ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                              ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                                   ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                             ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                               ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                         ; On                 ; On                 ;
+; Report Parameter Settings                                                       ; On                 ; On                 ;
+; Report Source Assignments                                                       ; On                 ; On                 ;
+; Report Connectivity Checks                                                      ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                              ; Off                ; Off                ;
+; Synchronization Register Chain Length                                           ; 3                  ; 3                  ;
+; Power Optimization During Synthesis                                             ; Normal compilation ; Normal compilation ;
+; HDL message level                                                               ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                                 ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                        ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                              ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                       ; 100                ; 100                ;
+; Clock MUX Protection                                                            ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                     ; Off                ; Off                ;
+; Block Design Naming                                                             ; Auto               ; Auto               ;
+; SDC constraint protection                                                       ; Off                ; Off                ;
+; Synthesis Effort                                                                ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal                    ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                            ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                              ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                     ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                          ; On                 ; On                 ;
+; Automatic Parallel Synthesis                                                    ; On                 ; On                 ;
+; Partial Reconfiguration Bitstream ID                                            ; Off                ; Off                ;
++---------------------------------------------------------------------------------+--------------------+--------------------+
+
+
++------------------------------------------+
+; Parallel Compilation                     ;
++----------------------------+-------------+
+; Processors                 ; Number      ;
++----------------------------+-------------+
+; Number detected on machine ; 4           ;
+; Maximum allowed            ; 2           ;
+;                            ;             ;
+; Average used               ; 1.00        ;
+; Maximum used               ; 1           ;
+;                            ;             ;
+; Usage by Processor         ; % Time Used ;
+;     Processor 1            ; 100.0%      ;
++----------------------------+-------------+
+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                             ;
++--------------------------------------------+-----------------+------------------------------+----------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path           ; Used in Netlist ; File Type                    ; File Name with Absolute Path                                               ; Library ;
++--------------------------------------------+-----------------+------------------------------+----------------------------------------------------------------------------+---------+
+; Sample/AHB_package.sv                      ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_package.sv                      ;         ;
+; Sample/AHB_arbiter_package.sv              ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv              ;         ;
+; Gen_Result/mux/AHB_si_mux_master_3.sv      ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_3.sv      ;         ;
+; Gen_Result/mux/AHB_si_mux_master_2.sv      ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_2.sv      ;         ;
+; Gen_Result/mux/AHB_si_mux_master_1.sv      ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_1.sv      ;         ;
+; Gen_Result/mux/AHB_si_mux_kemee.sv         ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_kemee.sv         ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_7.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_7.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_6.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_6.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_5.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_5.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_4.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_4.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_3.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_3.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_2.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_2.sv       ;         ;
+; Gen_Result/mux/AHB_mi_mux_slave_1.sv       ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_1.sv       ;         ;
+; Gen_Result/decoder/AHB_decoder_master_3.sv ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_3.sv ;         ;
+; Gen_Result/decoder/AHB_decoder_master_2.sv ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_2.sv ;         ;
+; Gen_Result/decoder/AHB_decoder_master_1.sv ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_1.sv ;         ;
+; Gen_Result/decoder/AHB_decoder_kemee.sv    ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_kemee.sv    ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_7.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_6.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_5.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_4.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_4.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_3.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_3.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_2.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv  ;         ;
+; Gen_Result/arbiter/AHB_arbiter_slave_1.sv  ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv  ;         ;
+; Gen_Result/TOP.sv                          ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv                          ;         ;
+; Gen_Result/AHB_bus.sv                      ; yes             ; User SystemVerilog HDL File  ; D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv                      ;         ;
++--------------------------------------------+-----------------+------------------------------+----------------------------------------------------------------------------+---------+
+
+
++-----------------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary         ;
++---------------------------------------------+-------+
+; Resource                                    ; Usage ;
++---------------------------------------------+-------+
+; Estimate of Logic utilization (ALMs needed) ; 0     ;
+;                                             ;       ;
+; Combinational ALUT usage for logic          ; 0     ;
+;     -- 7 input functions                    ; 0     ;
+;     -- 6 input functions                    ; 0     ;
+;     -- 5 input functions                    ; 0     ;
+;     -- 4 input functions                    ; 0     ;
+;     -- <=3 input functions                  ; 0     ;
+;                                             ;       ;
+; Dedicated logic registers                   ; 0     ;
+;                                             ;       ;
+; I/O pins                                    ; 2     ;
+;                                             ;       ;
+; Total DSP Blocks                            ; 0     ;
+;                                             ;       ;
+; Maximum fan-out node                        ; hclk  ;
+; Maximum fan-out                             ; 1     ;
+; Total fan-out                               ; 2     ;
+; Average fan-out                             ; 0.50  ;
++---------------------------------------------+-------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                    ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+; Compilation Hierarchy Node ; Combinational ALUTs ; Dedicated Logic Registers ; Block Memory Bits ; DSP Blocks ; Pins ; Virtual Pins ; Full Hierarchy Name ; Entity Name ; Library Name ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+; |TOP                       ; 0 (0)               ; 0 (0)                     ; 0                 ; 0          ; 2    ; 0            ; |TOP                ; TOP         ; work         ;
++----------------------------+---------------------+---------------------------+-------------------+------------+------+--------------+---------------------+-------------+--------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 0     ;
+; Number of registers using Synchronous Clear  ; 0     ;
+; Number of registers using Synchronous Load   ; 0     ;
+; Number of registers using Asynchronous Clear ; 0     ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 0     ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++----------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT ;
++----------------+-------+---------------------------------+
+; Parameter Name ; Value ; Type                            ;
++----------------+-------+---------------------------------+
+; SI_PAYLOAD     ; 78    ; Signed Integer                  ;
+; MI_PAYLOAD     ; 34    ; Signed Integer                  ;
++----------------+-------+---------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_1:DEC_master_1 ;
++--------------------+-------+---------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                          ;
++--------------------+-------+---------------------------------------------------------------+
+; AHB_ADDR_WIDTH     ; 32    ; Signed Integer                                                ;
+; MASTER_X_SLAVE_NUM ; 4     ; Signed Integer                                                ;
++--------------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_1:MUX_master_1 ;
++----------------+-------+---------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                          ;
++----------------+-------+---------------------------------------------------------------+
+; CHANNEL_NUM    ; 4     ; Signed Integer                                                ;
+; PAYLOAD        ; 34    ; Signed Integer                                                ;
++----------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_2:DEC_master_2 ;
++--------------------+-------+---------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                          ;
++--------------------+-------+---------------------------------------------------------------+
+; AHB_ADDR_WIDTH     ; 32    ; Signed Integer                                                ;
+; MASTER_X_SLAVE_NUM ; 3     ; Signed Integer                                                ;
++--------------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_2:MUX_master_2 ;
++----------------+-------+---------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                          ;
++----------------+-------+---------------------------------------------------------------+
+; CHANNEL_NUM    ; 3     ; Signed Integer                                                ;
+; PAYLOAD        ; 34    ; Signed Integer                                                ;
++----------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_master_3:DEC_master_3 ;
++--------------------+-------+---------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                          ;
++--------------------+-------+---------------------------------------------------------------+
+; AHB_ADDR_WIDTH     ; 32    ; Signed Integer                                                ;
+; MASTER_X_SLAVE_NUM ; 2     ; Signed Integer                                                ;
++--------------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_master_3:MUX_master_3 ;
++----------------+-------+---------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                          ;
++----------------+-------+---------------------------------------------------------------+
+; CHANNEL_NUM    ; 2     ; Signed Integer                                                ;
+; PAYLOAD        ; 34    ; Signed Integer                                                ;
++----------------+-------+---------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_decoder_kemee:DEC_kemee ;
++--------------------+-------+---------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                    ;
++--------------------+-------+---------------------------------------------------------+
+; AHB_ADDR_WIDTH     ; 32    ; Signed Integer                                          ;
+; MASTER_X_SLAVE_NUM ; 7     ; Signed Integer                                          ;
++--------------------+-------+---------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++----------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_kemee:MUX_kemee ;
++----------------+-------+---------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                    ;
++----------------+-------+---------------------------------------------------------+
+; CHANNEL_NUM    ; 7     ; Signed Integer                                          ;
+; PAYLOAD        ; 34    ; Signed Integer                                          ;
++----------------+-------+---------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1 ;
++---------------------+-------+------------------------------------------------------------+
+; Parameter Name      ; Value ; Type                                                       ;
++---------------------+-------+------------------------------------------------------------+
+; SLAVE_X_PRIOR_LEVEL ; 3     ; Signed Integer                                             ;
+; SLAVE_X_PRIOR_BIT   ; 2     ; Signed Integer                                             ;
+; SLAVE_X_MASTER_NUM  ; 3     ; Signed Integer                                             ;
++---------------------+-------+------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|BR_Req_Detect:BRRD ;
++----------------+-------+------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                               ;
++----------------+-------+------------------------------------------------------------------------------------+
+; REQ_NUM        ; 3     ; Signed Integer                                                                     ;
++----------------+-------+------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[0].PG ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_BIT      ; 2     ; Signed Integer                                                                         ;
+; PRIOR_LEVEL    ; 3     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[1].PG ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_BIT      ; 2     ; Signed Integer                                                                         ;
+; PRIOR_LEVEL    ; 3     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[2].PG ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_BIT      ; 2     ; Signed Integer                                                                         ;
+; PRIOR_LEVEL    ; 3     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Dynamic_Prior_Mask:DPM ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_LEVEL    ; 3     ; Signed Integer                                                                         ;
+; REQ_NUM        ; 3     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Req_Collect:RC ;
++----------------+-------+--------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                           ;
++----------------+-------+--------------------------------------------------------------------------------+
+; PRIOR_LEVEL    ; 3     ; Signed Integer                                                                 ;
+; REQ_NUM        ; 3     ; Signed Integer                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_1:MUX_slave_1 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 3     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2 ;
++---------------------+-------+------------------------------------------------------------+
+; Parameter Name      ; Value ; Type                                                       ;
++---------------------+-------+------------------------------------------------------------+
+; SLAVE_X_PRIOR_LEVEL ; 2     ; Signed Integer                                             ;
+; SLAVE_X_PRIOR_BIT   ; 1     ; Signed Integer                                             ;
+; SLAVE_X_MASTER_NUM  ; 2     ; Signed Integer                                             ;
++---------------------+-------+------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2|Fixed_Prior_Mask:FPM ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; REQ_NUM        ; 2     ; Signed Integer                                                                       ;
++----------------+-------+--------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_2:MUX_slave_2 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 2     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3 ;
++--------------------+-------+-------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                        ;
++--------------------+-------+-------------------------------------------------------------+
+; SLAVE_X_MASTER_NUM ; 2     ; Signed Integer                                              ;
++--------------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3|Fixed_Prior_Mask:FPA ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; REQ_NUM        ; 2     ; Signed Integer                                                                       ;
++----------------+-------+--------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_3:MUX_slave_3 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 2     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4 ;
++--------------------+-------+-------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                        ;
++--------------------+-------+-------------------------------------------------------------+
+; SLAVE_X_MASTER_NUM ; 2     ; Signed Integer                                              ;
++--------------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4|Fixed_Prior_Mask:FPA ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; REQ_NUM        ; 2     ; Signed Integer                                                                       ;
++----------------+-------+--------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_4:MUX_slave_4 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 2     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5 ;
++---------------------+-------+------------------------------------------------------------+
+; Parameter Name      ; Value ; Type                                                       ;
++---------------------+-------+------------------------------------------------------------+
+; SLAVE_X_PRIOR_LEVEL ; 2     ; Signed Integer                                             ;
+; SLAVE_X_PRIOR_BIT   ; 1     ; Signed Integer                                             ;
+; SLAVE_X_MASTER_NUM  ; 4     ; Signed Integer                                             ;
++---------------------+-------+------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5|Fixed_Prior_Mask:FPM ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------------+
+; REQ_NUM        ; 4     ; Signed Integer                                                                       ;
++----------------+-------+--------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_5:MUX_slave_5 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 4     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_6:ARB_slave_6 ;
++--------------------+-------+-------------------------------------------------------------+
+; Parameter Name     ; Value ; Type                                                        ;
++--------------------+-------+-------------------------------------------------------------+
+; SLAVE_X_MASTER_NUM ; 1     ; Signed Integer                                              ;
++--------------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_6:MUX_slave_6 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 1     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7 ;
++---------------------+-------+------------------------------------------------------------+
+; Parameter Name      ; Value ; Type                                                       ;
++---------------------+-------+------------------------------------------------------------+
+; SLAVE_X_PRIOR_LEVEL ; 2     ; Signed Integer                                             ;
+; SLAVE_X_PRIOR_BIT   ; 1     ; Signed Integer                                             ;
+; SLAVE_X_MASTER_NUM  ; 2     ; Signed Integer                                             ;
++---------------------+-------+------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|BR_Req_Detect:BRRD ;
++----------------+-------+------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                               ;
++----------------+-------+------------------------------------------------------------------------------------+
+; REQ_NUM        ; 2     ; Signed Integer                                                                     ;
++----------------+-------+------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Prior_Gen:PG_gen[0].PG ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_BIT      ; 1     ; Signed Integer                                                                         ;
+; PRIOR_LEVEL    ; 2     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Prior_Gen:PG_gen[1].PG ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_BIT      ; 1     ; Signed Integer                                                                         ;
+; PRIOR_LEVEL    ; 2     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++-----------------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Dynamic_Prior_Mask:DPM ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                                   ;
++----------------+-------+----------------------------------------------------------------------------------------+
+; PRIOR_LEVEL    ; 2     ; Signed Integer                                                                         ;
+; REQ_NUM        ; 2     ; Signed Integer                                                                         ;
++----------------+-------+----------------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++---------------------------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Req_Collect:RC ;
++----------------+-------+--------------------------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                                           ;
++----------------+-------+--------------------------------------------------------------------------------+
+; PRIOR_LEVEL    ; 2     ; Signed Integer                                                                 ;
+; REQ_NUM        ; 2     ; Signed Integer                                                                 ;
++----------------+-------+--------------------------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------+
+; Parameter Settings for User Entity Instance: AHB_bus:DUT|AHB_mux_slave_7:MUX_slave_7 ;
++----------------+-------+-------------------------------------------------------------+
+; Parameter Name ; Value ; Type                                                        ;
++----------------+-------+-------------------------------------------------------------+
+; CHANNEL_NUM    ; 2     ; Signed Integer                                              ;
+; PAYLOAD        ; 78    ; Signed Integer                                              ;
++----------------+-------+-------------------------------------------------------------+
+Note: In order to hide this table in the UI and the text report file, please set the "Show Parameter Settings in Synthesis Report" option in "Analysis and Synthesis Settings -> More Settings" to "Off".
+
+
++--------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|BR_Req_Detect:BRRD" ;
++----------+-------+----------+--------------------------------------------------------------+
+; Port     ; Type  ; Severity ; Details                                                      ;
++----------+-------+----------+--------------------------------------------------------------+
+; hlast[1] ; Input ; Info     ; Stuck at GND                                                 ;
++----------+-------+----------+--------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5|Fixed_Prior_Mask:FPM" ;
++-------------+-------+----------+-------------------------------------------------------------+
+; Port        ; Type  ; Severity ; Details                                                     ;
++-------------+-------+----------+-------------------------------------------------------------+
+; hlast[3..1] ; Input ; Info     ; Stuck at GND                                                ;
++-------------+-------+----------+-------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4|Fixed_Prior_Mask:FPA" ;
++----------+-------+----------+----------------------------------------------------------------+
+; Port     ; Type  ; Severity ; Details                                                        ;
++----------+-------+----------+----------------------------------------------------------------+
+; hlast[1] ; Input ; Info     ; Stuck at GND                                                   ;
++----------+-------+----------+----------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3|Fixed_Prior_Mask:FPA" ;
++----------+-------+----------+----------------------------------------------------------------+
+; Port     ; Type  ; Severity ; Details                                                        ;
++----------+-------+----------+----------------------------------------------------------------+
+; hlast[1] ; Input ; Info     ; Stuck at GND                                                   ;
++----------+-------+----------+----------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2|Fixed_Prior_Mask:FPM" ;
++----------+-------+----------+----------------------------------------------------------------+
+; Port     ; Type  ; Severity ; Details                                                        ;
++----------+-------+----------+----------------------------------------------------------------+
+; hlast[1] ; Input ; Info     ; Stuck at GND                                                   ;
++----------+-------+----------+----------------------------------------------------------------+
+
+
++--------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|BR_Req_Detect:BRRD" ;
++-------------+-------+----------+-----------------------------------------------------------+
+; Port        ; Type  ; Severity ; Details                                                   ;
++-------------+-------+----------+-----------------------------------------------------------+
+; hlast[2..1] ; Input ; Info     ; Stuck at GND                                              ;
++-------------+-------+----------+-----------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_kemee:DEC_kemee"                                                       ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port            ; Type   ; Severity ; Details                                                                             ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; default_slv_sel ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_3:DEC_master_3"                                                 ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port            ; Type   ; Severity ; Details                                                                             ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; default_slv_sel ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_2:DEC_master_2"                                                 ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port            ; Type   ; Severity ; Details                                                                             ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; default_slv_sel ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT|AHB_decoder_master_1:DEC_master_1"                                                 ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port            ; Type   ; Severity ; Details                                                                             ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; default_slv_sel ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "AHB_bus:DUT"                                                                                   ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; Port            ; Type   ; Severity ; Details                                                                             ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+; master_1_in     ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hprior_master_1 ; Input  ; Info     ; Stuck at GND                                                                        ;
+; master_1_out    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; master_2_in     ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hprior_master_2 ; Input  ; Info     ; Stuck at GND                                                                        ;
+; master_2_out    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; master_3_in     ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hprior_master_3 ; Input  ; Info     ; Stuck at GND                                                                        ;
+; master_3_out    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; kemee_in        ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hprior_kemee    ; Input  ; Info     ; Stuck at GND                                                                        ;
+; kemee_out       ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_1_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_1    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_1_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_2_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_2    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_2_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_3_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_3    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_3_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_4_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_4    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_4_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_5_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_5    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_5_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_6_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_6    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_6_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_7_in      ; Input  ; Info     ; Stuck at GND                                                                        ;
+; hsel_slave_7    ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
+; slave_7_out     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed. ;
++-----------------+--------+----------+-------------------------------------------------------------------------------------+
+
+
++-----------------------------------------------------+
+; Post-Synthesis Netlist Statistics for Top Partition ;
++-------------------+---------------------------------+
+; Type              ; Count                           ;
++-------------------+---------------------------------+
+; boundary_port     ; 2                               ;
+;                   ;                                 ;
+; Max LUT depth     ; 0.00                            ;
+; Average LUT depth ; 0.00                            ;
++-------------------+---------------------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:00     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus Prime Analysis & Synthesis
+    Info: Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
+    Info: Processing started: Sun Dec 13 13:52:48 2020
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off AHB_GEN -c TOP
+Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+Info (20030): Parallel compilation is enabled and will use 2 of the 2 processors detected
+Info (12021): Found 1 design units, including 0 entities, in source file sample/ahb_package.sv
+    Info (12022): Found design unit 1: AHB_package (SystemVerilog) File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_package.sv Line: 9
+Info (12021): Found 5 design units, including 5 entities, in source file sample/ahb_arbiter_package.sv
+    Info (12023): Found entity 1: Prior_Gen File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 16
+    Info (12023): Found entity 2: Dynamic_Prior_Mask File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 50
+    Info (12023): Found entity 3: Req_Collect File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 102
+    Info (12023): Found entity 4: Fixed_Prior_Mask File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 128
+    Info (12023): Found entity 5: BR_Req_Detect File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 164
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_si_mux_master_3.sv
+    Info (12023): Found entity 1: AHB_mux_master_3 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_3.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_si_mux_master_2.sv
+    Info (12023): Found entity 1: AHB_mux_master_2 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_2.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_si_mux_master_1.sv
+    Info (12023): Found entity 1: AHB_mux_master_1 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_master_1.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_si_mux_kemee.sv
+    Info (12023): Found entity 1: AHB_mux_kemee File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_si_mux_kemee.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_7.sv
+    Info (12023): Found entity 1: AHB_mux_slave_7 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_7.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_6.sv
+    Info (12023): Found entity 1: AHB_mux_slave_6 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_6.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_5.sv
+    Info (12023): Found entity 1: AHB_mux_slave_5 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_5.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_4.sv
+    Info (12023): Found entity 1: AHB_mux_slave_4 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_4.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_3.sv
+    Info (12023): Found entity 1: AHB_mux_slave_3 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_3.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_2.sv
+    Info (12023): Found entity 1: AHB_mux_slave_2 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_2.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/mux/ahb_mi_mux_slave_1.sv
+    Info (12023): Found entity 1: AHB_mux_slave_1 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/mux/AHB_mi_mux_slave_1.sv Line: 11
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/decoder/ahb_decoder_master_3.sv
+    Info (12023): Found entity 1: AHB_decoder_master_3 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_3.sv Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/decoder/ahb_decoder_master_2.sv
+    Info (12023): Found entity 1: AHB_decoder_master_2 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_2.sv Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/decoder/ahb_decoder_master_1.sv
+    Info (12023): Found entity 1: AHB_decoder_master_1 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_master_1.sv Line: 18
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/decoder/ahb_decoder_kemee.sv
+    Info (12023): Found entity 1: AHB_decoder_kemee File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/decoder/AHB_decoder_kemee.sv Line: 18
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_7.sv(227): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 227
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_7.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_7 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_6.sv(225): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv Line: 225
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_6.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_6 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_5.sv(227): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv Line: 227
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_5.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_5 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_4.sv(225): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_4.sv Line: 225
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_4.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_4 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_4.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_3.sv(225): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_3.sv Line: 225
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_3.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_3 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_3.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_2.sv(227): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv Line: 227
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_2.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_2 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv Line: 16
+Warning (10229): Verilog HDL Expression warning at AHB_arbiter_slave_1.sv(227): truncated literal to match 3 bits File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 227
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/arbiter/ahb_arbiter_slave_1.sv
+    Info (12023): Found entity 1: AHB_arbiter_slave_1 File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 16
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/top.sv
+    Info (12023): Found entity 1: TOP File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 10
+Info (12021): Found 1 design units, including 1 entities, in source file gen_result/ahb_bus.sv
+    Info (12023): Found entity 1: AHB_bus File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 14
+Info (12127): Elaborating entity "TOP" for the top level hierarchy
+Warning (10030): Net "master_1_in.haddr" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.hsize" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.hburst" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.hprot" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.htrans" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.hwdata" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "hprior_master_1[0]" at TOP.sv(17) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 17
+Warning (10030): Net "master_2_in.haddr" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.hsize" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.hburst" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.hprot" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.htrans" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.hwdata" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "hprior_master_2[0]" at TOP.sv(20) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 20
+Warning (10030): Net "master_3_in.haddr" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.hsize" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.hburst" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.hprot" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.htrans" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.hwdata" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "hprior_master_3[0]" at TOP.sv(23) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 23
+Warning (10030): Net "kemee_in.haddr" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.hsize" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.hburst" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.hprot" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.htrans" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.hwdata" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "hprior_kemee[0]" at TOP.sv(26) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 26
+Warning (10030): Net "slave_1_in.hrdata" at TOP.sv(29) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 29
+Warning (10030): Net "slave_2_in.hrdata" at TOP.sv(32) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 32
+Warning (10030): Net "slave_3_in.hrdata" at TOP.sv(35) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 35
+Warning (10030): Net "slave_4_in.hrdata" at TOP.sv(38) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 38
+Warning (10030): Net "slave_5_in.hrdata" at TOP.sv(41) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 41
+Warning (10030): Net "slave_6_in.hrdata" at TOP.sv(44) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 44
+Warning (10030): Net "slave_7_in.hrdata" at TOP.sv(47) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 47
+Warning (10030): Net "master_1_in.hwrite" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_1_in.hmastlock" at TOP.sv(16) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 16
+Warning (10030): Net "master_2_in.hwrite" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_2_in.hmastlock" at TOP.sv(19) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 19
+Warning (10030): Net "master_3_in.hwrite" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "master_3_in.hmastlock" at TOP.sv(22) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 22
+Warning (10030): Net "kemee_in.hwrite" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "kemee_in.hmastlock" at TOP.sv(25) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 25
+Warning (10030): Net "slave_1_in.hreadyout" at TOP.sv(29) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 29
+Warning (10030): Net "slave_1_in.hresp" at TOP.sv(29) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 29
+Warning (10030): Net "slave_2_in.hreadyout" at TOP.sv(32) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 32
+Warning (10030): Net "slave_2_in.hresp" at TOP.sv(32) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 32
+Warning (10030): Net "slave_3_in.hreadyout" at TOP.sv(35) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 35
+Warning (10030): Net "slave_3_in.hresp" at TOP.sv(35) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 35
+Warning (10030): Net "slave_4_in.hreadyout" at TOP.sv(38) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 38
+Warning (10030): Net "slave_4_in.hresp" at TOP.sv(38) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 38
+Warning (10030): Net "slave_5_in.hreadyout" at TOP.sv(41) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 41
+Warning (10030): Net "slave_5_in.hresp" at TOP.sv(41) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 41
+Warning (10030): Net "slave_6_in.hreadyout" at TOP.sv(44) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 44
+Warning (10030): Net "slave_6_in.hresp" at TOP.sv(44) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 44
+Warning (10030): Net "slave_7_in.hreadyout" at TOP.sv(47) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 47
+Warning (10030): Net "slave_7_in.hresp" at TOP.sv(47) has no driver or initial value, using a default initial value '0' File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 47
+Info (12128): Elaborating entity "AHB_bus" for hierarchy "AHB_bus:DUT" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 51
+Warning (10036): Verilog HDL or VHDL warning at AHB_bus.sv(81): object "hprior_slave_1" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 81
+Warning (10036): Verilog HDL or VHDL warning at AHB_bus.sv(96): object "hprior_slave_3" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 96
+Warning (10036): Verilog HDL or VHDL warning at AHB_bus.sv(103): object "hprior_slave_4" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 103
+Warning (10036): Verilog HDL or VHDL warning at AHB_bus.sv(119): object "hprior_slave_6" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 119
+Warning (10036): Verilog HDL or VHDL warning at AHB_bus.sv(125): object "hprior_slave_7" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 125
+Info (12128): Elaborating entity "AHB_decoder_master_1" for hierarchy "AHB_bus:DUT|AHB_decoder_master_1:DEC_master_1" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 136
+Info (12128): Elaborating entity "AHB_mux_master_1" for hierarchy "AHB_bus:DUT|AHB_mux_master_1:MUX_master_1" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 144
+Info (12128): Elaborating entity "AHB_decoder_master_2" for hierarchy "AHB_bus:DUT|AHB_decoder_master_2:DEC_master_2" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 152
+Info (12128): Elaborating entity "AHB_mux_master_2" for hierarchy "AHB_bus:DUT|AHB_mux_master_2:MUX_master_2" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 160
+Info (12128): Elaborating entity "AHB_decoder_master_3" for hierarchy "AHB_bus:DUT|AHB_decoder_master_3:DEC_master_3" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 168
+Info (12128): Elaborating entity "AHB_mux_master_3" for hierarchy "AHB_bus:DUT|AHB_mux_master_3:MUX_master_3" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 176
+Info (12128): Elaborating entity "AHB_decoder_kemee" for hierarchy "AHB_bus:DUT|AHB_decoder_kemee:DEC_kemee" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 184
+Info (12128): Elaborating entity "AHB_mux_kemee" for hierarchy "AHB_bus:DUT|AHB_mux_kemee:MUX_kemee" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 192
+Info (12128): Elaborating entity "AHB_arbiter_slave_1" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 204
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_1.sv(108): truncated value with size 32 to match size of target (2) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 108
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_1.sv(130): truncated value with size 32 to match size of target (2) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 130
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_1.sv(224): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 224
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_1.sv(244): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 244
+Info (12128): Elaborating entity "BR_Req_Detect" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|BR_Req_Detect:BRRD" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 146
+Info (12128): Elaborating entity "Prior_Gen" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Prior_Gen:PG_gen[0].PG" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 167
+Info (12128): Elaborating entity "Dynamic_Prior_Mask" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Dynamic_Prior_Mask:DPM" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 180
+Info (12128): Elaborating entity "Req_Collect" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_1:ARB_slave_1|Req_Collect:RC" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_1.sv Line: 191
+Info (12128): Elaborating entity "AHB_mux_slave_1" for hierarchy "AHB_bus:DUT|AHB_mux_slave_1:MUX_slave_1" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 212
+Info (12128): Elaborating entity "AHB_arbiter_slave_2" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 223
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_2.sv(224): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv Line: 224
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_2.sv(244): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv Line: 244
+Info (12128): Elaborating entity "Fixed_Prior_Mask" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_2:ARB_slave_2|Fixed_Prior_Mask:FPM" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_2.sv Line: 100
+Info (12128): Elaborating entity "AHB_mux_slave_2" for hierarchy "AHB_bus:DUT|AHB_mux_slave_2:MUX_slave_2" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 231
+Info (12128): Elaborating entity "AHB_arbiter_slave_3" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_3:ARB_slave_3" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 241
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_3.sv(222): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_3.sv Line: 222
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_3.sv(242): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_3.sv Line: 242
+Info (12128): Elaborating entity "AHB_mux_slave_3" for hierarchy "AHB_bus:DUT|AHB_mux_slave_3:MUX_slave_3" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 249
+Info (12128): Elaborating entity "AHB_arbiter_slave_4" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_4:ARB_slave_4" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 259
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_4.sv(222): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_4.sv Line: 222
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_4.sv(242): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_4.sv Line: 242
+Info (12128): Elaborating entity "AHB_mux_slave_4" for hierarchy "AHB_bus:DUT|AHB_mux_slave_4:MUX_slave_4" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 267
+Info (12128): Elaborating entity "AHB_arbiter_slave_5" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 278
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_5.sv(224): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv Line: 224
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_5.sv(244): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv Line: 244
+Info (12128): Elaborating entity "Fixed_Prior_Mask" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_5:ARB_slave_5|Fixed_Prior_Mask:FPM" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_5.sv Line: 100
+Info (12128): Elaborating entity "AHB_mux_slave_5" for hierarchy "AHB_bus:DUT|AHB_mux_slave_5:MUX_slave_5" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 286
+Info (12128): Elaborating entity "AHB_arbiter_slave_6" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_6:ARB_slave_6" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 296
+Warning (10036): Verilog HDL or VHDL warning at AHB_arbiter_slave_6.sv(38): object "hlast" assigned a value but never read File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv Line: 38
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_6.sv(222): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv Line: 222
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_6.sv(242): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_6.sv Line: 242
+Info (12128): Elaborating entity "AHB_mux_slave_6" for hierarchy "AHB_bus:DUT|AHB_mux_slave_6:MUX_slave_6" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 304
+Info (12128): Elaborating entity "AHB_arbiter_slave_7" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 314
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_7.sv(108): truncated value with size 32 to match size of target (1) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 108
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_7.sv(130): truncated value with size 32 to match size of target (1) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 130
+Warning (10958): SystemVerilog warning at AHB_arbiter_slave_7.sv(224): unique or priority keyword makes case statement complete File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 224
+Warning (10230): Verilog HDL assignment warning at AHB_arbiter_slave_7.sv(244): truncated value with size 32 to match size of target (4) File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 244
+Info (12128): Elaborating entity "BR_Req_Detect" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|BR_Req_Detect:BRRD" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 146
+Info (12128): Elaborating entity "Prior_Gen" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Prior_Gen:PG_gen[0].PG" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 167
+Info (12128): Elaborating entity "Dynamic_Prior_Mask" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Dynamic_Prior_Mask:DPM" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 180
+Info (12128): Elaborating entity "Req_Collect" for hierarchy "AHB_bus:DUT|AHB_arbiter_slave_7:ARB_slave_7|Req_Collect:RC" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/arbiter/AHB_arbiter_slave_7.sv Line: 191
+Info (12128): Elaborating entity "AHB_mux_slave_7" for hierarchy "AHB_bus:DUT|AHB_mux_slave_7:MUX_slave_7" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/AHB_bus.sv Line: 322
+Info (144001): Generated suppressed messages file D:/Project/AMBA_BUS/AHB_GEN_201/output_files/TOP.map.smsg
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 2 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "hclk" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 12
+    Warning (15610): No output dependent on input pin "hreset_n" File: D:/Project/AMBA_BUS/AHB_GEN_201/Gen_Result/TOP.sv Line: 14
+Info (21057): Implemented 2 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 2 input pins
+    Info (21059): Implemented 0 output pins
+Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 92 warnings
+    Info: Peak virtual memory: 4821 megabytes
+    Info: Processing ended: Sun Dec 13 13:53:07 2020
+    Info: Elapsed time: 00:00:19
+    Info: Total CPU time (on all processors): 00:00:41
+
+
++------------------------------------------+
+; Analysis & Synthesis Suppressed Messages ;
++------------------------------------------+
+The suppressed messages can be found in D:/Project/AMBA_BUS/AHB_GEN_201/output_files/TOP.map.smsg.
+
+

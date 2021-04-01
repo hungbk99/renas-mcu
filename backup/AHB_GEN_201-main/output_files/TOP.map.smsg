@@ -1,0 +1,1 @@
+Warning (10268): Verilog HDL information at AHB_arbiter_package.sv(32): always construct contains both blocking and non-blocking assignments File: D:/Project/AMBA_BUS/AHB_GEN_201/Sample/AHB_arbiter_package.sv Line: 32

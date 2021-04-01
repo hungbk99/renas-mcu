@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+#======================================================================================
+# File Name: 		mux_gen.pl
+# Project Name:	AHB_Gen
+# Email:         quanghungbk1999@gmail.com
+# Version    Date      Author      Description
+# v0.0       22/11/2020 Quang Hung  First Creation, this version does not support
+#                                   hsplit & hretry
+#======================================================================================
+
+use 5.016;
+use warnings;
+use strict;
+
+use Spreadsheet::Read qw(ReadData);
+my $sample = '../Sample/AHB_decoder.sv';
+my $AHB_config = '../Input/AHB_config.xlsx';
+my $dest = '../Gen_Result/decoder/AHB_decoder_';
+my $data = ReadData(${AHB_config});
+#say "A1 " . $data->[2]{A1};
+my $spe = "@";
+
+print ("****************************************************************************\n");
+print ("                              AHB_config\n");
+print ("****************************************************************************\n");
+print (" File Name: 	mux_gen.pl\n");
+print (" Project Name:	AHB_Gen\n");
+print (" Email:         quanghungbk1999${spe}gmail.com\n");
+print (" Version    Date      Author      Description\n");
+print (" v0.0       22/11/2020 Quang Hung  First Creation, this version does not support\n");
+print ("                                   hsplit & hretry\n");
+print ("****************************************************************************\n");
+print ("                              AHB_config\n");
+print ("****************************************************************************\n");
+
+my $sheet_1_name = say $data->[1]{A1};
+my $sheet_3_name = say $data->[2]{A1};
+my @sheet_1_data = Spreadsheet::Read::rows($data->[1]);
+my @sheet_3_data = Spreadsheet::Read::rows($data->[2]);
+my $addr_width;

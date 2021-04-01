@@ -1,0 +1,74 @@
+# Reading C:/questasim64_10.2c/tcl/vsim/pref.tcl 
+# //  Questa Sim-64
+# //  Version 10.2c Unknown Platform Jul 19 2013
+# //
+# //  Copyright 1991-2013 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+# //  WHICH IS THE PROPERTY OF MENTOR GRAPHICS CORPORATION OR ITS
+# //  LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+# //
+# do AHB_GEN_run_msim_rtl_verilog.do 
+# vmap altera_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/altera_ver
+# Copying C:/questasim64_10.2c/win64/../modelsim.ini to modelsim.ini
+# Modifying modelsim.ini
+# ** Warning: Copied C:/questasim64_10.2c/win64/../modelsim.ini to modelsim.ini.
+#          Updated modelsim.ini.
+# vmap lpm_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/lpm_ver
+# Modifying modelsim.ini
+# vmap sgate_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/sgate_ver
+# Modifying modelsim.ini
+# vmap altera_mf_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/altera_mf_ver
+# Modifying modelsim.ini
+# vmap altera_lnsim_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/altera_lnsim_ver
+# Modifying modelsim.ini
+# vmap cyclonev_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/cyclonev_ver
+# Modifying modelsim.ini
+# vmap cyclonev_hssi_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/cyclonev_hssi_ver
+# Modifying modelsim.ini
+# vmap cyclonev_pcie_hip_ver D:/Project/AMBA_BUS/AHB_GEN_201/test/verilog_libs/cyclonev_pcie_hip_ver
+# Modifying modelsim.ini
+# if {[file exists rtl_work]} {
+# 	vdel -lib rtl_work -all
+# }
+# vlib rtl_work
+# vmap work rtl_work
+# Modifying modelsim.ini
+# 
+# vlog -sv -work work +incdir+D:/Project/AMBA_BUS/AHB_201/Sample {D:/Project/AMBA_BUS/AHB_201/Sample/AHB_package.sv}
+# QuestaSim-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+# -- Compiling package AHB_package
+# 
+# Top level modules:
+# 	--none--
+# vlog -sv -work work +incdir+D:/Project/AMBA_BUS/AHB_201/Sample {D:/Project/AMBA_BUS/AHB_201/Sample/AHB_arbiter_package.sv}
+# QuestaSim-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+# -- Compiling package AHB_arbiter_package_sv_unit
+# -- Importing package AHB_package
+# -- Compiling module Prior_Gen
+# -- Compiling module Dynamic_Prior_Mask
+# -- Compiling module Req_Collect
+# -- Compiling module Fixed_Prior_Mask
+# -- Compiling module BR_Req_Detect
+# 
+# Top level modules:
+# 	Prior_Gen
+# 	Dynamic_Prior_Mask
+# 	Req_Collect
+# 	Fixed_Prior_Mask
+# 	BR_Req_Detect
+# vlog -sv -work work +incdir+D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux {D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux/AHB_si_mux_master_3.sv}
+# QuestaSim-64 vlog 10.2c Compiler 2013.07 Jul 19 2013
+# -- Compiling package AHB_si_mux_master_3_sv_unit
+# -- Importing package AHB_package
+# -- Compiling module AHB_mux_master_3
+# ** Error: D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux/AHB_si_mux_master_3.sv(33): (vlog-2110) Illegal reference to net "payload_out".
+# 
+# ** Error: D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux/AHB_si_mux_master_3.sv(37): (vlog-2110) Illegal reference to net "payload_out".
+# 
+# ** Error: C:/questasim64_10.2c/win64/vlog failed.
+# Error in macro ./AHB_GEN_run_msim_rtl_verilog.do line 18
+# C:/questasim64_10.2c/win64/vlog failed.
+#     while executing
+# "vlog -sv -work work +incdir+D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux {D:/Project/AMBA_BUS/AHB_201/Gen_Result/mux/AHB_si_mux_master_3.sv}"

@@ -1,0 +1,103 @@
+// Copyright (C) 2018  Intel Corporation. All rights reserved.
+// Your use of Intel Corporation's design tools, logic functions 
+// and other software and tools, and its AMPP partner logic 
+// functions, and any output files from any of the foregoing 
+// (including device programming or simulation files), and any 
+// associated documentation or information are expressly subject 
+// to the terms and conditions of the Intel Program License 
+// Subscription Agreement, the Intel Quartus Prime License Agreement,
+// the Intel FPGA IP License Agreement, or other applicable license
+// agreement, including, without limitation, that your use is for
+// the sole purpose of programming logic devices manufactured by
+// Intel and sold by Intel or its authorized distributors.  Please
+// refer to the applicable agreement for further details.
+
+// VENDOR "Altera"
+// PROGRAM "Quartus Prime"
+// VERSION "Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition"
+
+// DATE "12/12/2020 17:39:07"
+
+// 
+// Device: Altera 5CGXFC9E7F35C8 Package FBGA1152
+// 
+
+// 
+// This Verilog file should be used for QuestaSim (SystemVerilog) only
+// 
+
+`timescale 1 ps/ 1 ps
+
+module TOP (
+	hclk,
+	hreset_n);
+input 	hclk;
+input 	hreset_n;
+
+// Design Ports Information
+// hclk	=>  Location: PIN_H29,	 I/O Standard: 2.5 V,	 Current Strength: Default
+// hreset_n	=>  Location: PIN_A8,	 I/O Standard: 2.5 V,	 Current Strength: Default
+
+
+wire gnd;
+wire vcc;
+wire unknown;
+
+assign gnd = 1'b0;
+assign vcc = 1'b1;
+assign unknown = 1'bx;
+
+tri1 devclrn;
+tri1 devpor;
+tri1 devoe;
+wire hclk_ainput_o;
+wire hreset_n_ainput_o;
+wire a_aQUARTUS_CREATED_GND_aI_combout;
+
+
+// Location: IOIBUF_X121_Y93_N38
+cyclonev_io_ibuf hclk_ainput(
+	.i(hclk),
+	.ibar(gnd),
+	.dynamicterminationcontrol(gnd),
+	.o(hclk_ainput_o));
+// synopsys translate_off
+defparam hclk_ainput.bus_hold = "false";
+defparam hclk_ainput.simulate_z_as = "z";
+// synopsys translate_on
+
+// Location: IOIBUF_X37_Y115_N18
+cyclonev_io_ibuf hreset_n_ainput(
+	.i(hreset_n),
+	.ibar(gnd),
+	.dynamicterminationcontrol(gnd),
+	.o(hreset_n_ainput_o));
+// synopsys translate_off
+defparam hreset_n_ainput.bus_hold = "false";
+defparam hreset_n_ainput.simulate_z_as = "z";
+// synopsys translate_on
+
+// Location: LABCELL_X106_Y82_N0
+cyclonev_lcell_comb a_aQUARTUS_CREATED_GND_aI(
+// Equation(s):
+
+	.dataa(gnd),
+	.datab(gnd),
+	.datac(gnd),
+	.datad(gnd),
+	.datae(gnd),
+	.dataf(gnd),
+	.datag(gnd),
+	.cin(gnd),
+	.sharein(gnd),
+	.combout(a_aQUARTUS_CREATED_GND_aI_combout),
+	.sumout(),
+	.cout(),
+	.shareout());
+// synopsys translate_off
+defparam a_aQUARTUS_CREATED_GND_aI.extended_lut = "off";
+defparam a_aQUARTUS_CREATED_GND_aI.lut_mask = 64'h0000000000000000;
+defparam a_aQUARTUS_CREATED_GND_aI.shared_arith = "off";
+// synopsys translate_on
+
+endmodule

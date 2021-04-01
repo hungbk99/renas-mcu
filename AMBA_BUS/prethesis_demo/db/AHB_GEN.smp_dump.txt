@@ -1,0 +1,7 @@
+
+State Machine - |AHB_decoder_kemee|dfsm_current_state
+Name dfsm_current_state.DFSM_ERROR dfsm_current_state.DFSM_SLVSEL dfsm_current_state.DFSM_DECODE dfsm_current_state.DFSM_IDLE 
+dfsm_current_state.DFSM_IDLE 0 0 0 0 
+dfsm_current_state.DFSM_DECODE 0 0 1 1 
+dfsm_current_state.DFSM_SLVSEL 0 1 0 1 
+dfsm_current_state.DFSM_ERROR 1 0 0 1 
