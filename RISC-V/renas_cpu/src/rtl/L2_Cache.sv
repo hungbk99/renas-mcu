@@ -895,24 +895,24 @@ module	cc_dirty_handshake
 )
 (
 	output	logic	[SLOT-1:0][DATA_LENGTH-1:0]	dirty_data_sync,
-	output 	logic	[ADDR_LENGTH-1:0]			dirty_addr_sync,
-	output 	logic								dirty_req_sync,
-//	output 	logic 								dirty_req_ena,
-//	output 	logic								dirty_ack,
-	input 	[DATA_LENGTH-1:0]					dirty_data1,
-	input 	[DATA_LENGTH-1:0]					dirty_data2,
-	input 	[ADDR_LENGTH-1:0]					dirty_addr,
-	input 										dirty_req,
-	input 										update,
-//	input 										dirty_solve,
-	input 										cache_clk,
-	input 										clk_l2,
-	input 										rst_n
+	output 	logic	[ADDR_LENGTH-1:0]			      dirty_addr_sync,
+	output 	logic								              dirty_req_sync,
+//	output 	logic 								          dirty_req_ena,
+//	output 	logic								            dirty_ack,
+	input 	[DATA_LENGTH-1:0]					        dirty_data1,
+	input 	[DATA_LENGTH-1:0]					        dirty_data2,
+	input 	[ADDR_LENGTH-1:0]					        dirty_addr,
+	input 										                dirty_req,
+	input 										                update,
+//	input 									                dirty_solve,
+	input 										                cache_clk,
+	input 										                clk_l2,
+	input 										                rst_n
 );
 
-	logic	[SLOT-1:0][DATA_LENGTH-1:0]			dirty_data;
-	logic										dirty_req_ena_raw,
-												dirty_req_sync_1;
+	logic	[SLOT-1:0][DATA_LENGTH-1:0]			    dirty_data;
+	logic										                  dirty_req_ena_raw,
+												                    dirty_req_sync_1;
 	logic 	[$clog2(CACHE_BLOCK_SIZE/4)-1:0]	addr;
 	
 	always_ff @(posedge cache_clk)
@@ -987,15 +987,15 @@ module 	cc_wb_handshake
 )
 (
 	output	logic	[DATA_LENGTH+TAG_LENGTH-1:0]	wb_data_sync,
-//	output 											wb_ack,
-	output	logic									wb_req_ena,
-													wb_req_sync,
-	input 	[DATA_LENGTH+TAG_LENGTH-1:0]			wb_data,
-	input 											wb_req,	
-													clk_l2,
-													rst_n	
+//	output 											              wb_ack,
+	output	logic									              wb_req_ena,
+													                    wb_req_sync,
+	input 	[DATA_LENGTH+TAG_LENGTH-1:0]			  wb_data,
+	input 											                wb_req,	
+													                    clk_l2,
+													                    rst_n	
 );
-	logic									wb_req_ena_raw;
+	logic									                      wb_req_ena_raw;
 	
 	always_ff @(posedge clk_l2 or negedge rst_n)
 	begin

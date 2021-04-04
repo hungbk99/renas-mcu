@@ -1,9 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 // File Name: 		DL1_Controller.sv
 // Module Name:		renas Data Cache Controller 		
-// Project Name:	renas
-// Author:	 		hungbk99
-// University:     	DP S192	HCMUT
+// Project Name:	renas mcu
+// Copyright (C) 	Le Quang Hung 
+// Ho Chi Minh University of Technology
+// Email: 			quanghungbk1999@gmail.com  
+// Ver    Date        Author    Description
+// v0.0   14.03.2021  hungbk99  Reused from renas cpu
+//                              Remove L2 Cache 
+//                              Remove support for inclusive cache
+//        15.03.2021  hungbk99  Add support for AHB interface
 //////////////////////////////////////////////////////////////////////////////////
 
 import 	renas_package::*;
@@ -11,68 +17,68 @@ import	renas_user_parameters::*;
 module	DL1_Controller
 (
 //	CPU
-	output 	logic	[INST_LENGTH-1:0]					data_out,
-	output 	logic	[PC_LENGTH-1:0]						alu_out_up,
-	input 	logic 	[PC_LENGTH-1:0]						alu_out,	
-	output 	logic 										DCC_halt,
-	input												cpu_read,
-	input 												cpu_write,		
-	input 												L2_full_flag,
+	output 	logic	[INST_LENGTH-1:0]					          data_out,
+	output 	logic	[PC_LENGTH-1:0]						          alu_out_up,
+	input 	logic 	[PC_LENGTH-1:0]					          alu_out,	
+	output 	logic 										                DCC_halt,
+	input												                      cpu_read,
+	input 												                    cpu_write,		
+	input 												                    L2_full_flag,
 //	Dirty Handshake
-	output 	logic 										dirty_trigger,
-	output 	logic 										dirty_replace,
+	output 	logic 										                dirty_trigger,
+	output 	logic 										                dirty_replace,
 	output	logic 	[$clog2(CACHE_BLOCK_SIZE/8)-1:0]	dirty_word_sel,
-	input 	logic 										dirty_done,
+	input 	logic 										                dirty_done,
 //	VC	
-	output 	logic 										update_vc,
-	input 	[DATA_LENGTH-1:0]							VC_data,	
-	input 												vc_hit,	
-//	output	logic 										block_write,
+	output 	logic 										                update_vc,
+	input 	[DATA_LENGTH-1:0]							            VC_data,	
+	input 												                    vc_hit,	
+//	output	logic 										              block_write,
 //	output 	logic	[$clog2(CACHE_BLOCK_SIZE/8)-1:0]	block_write_addr,
 
 //	DCACHE
-	input 	[DATA_LENGTH-1:0]							DL1_data,
-	input 	[DCACHE_WAY-1:0]							replace_way_new,
-	input 	[DCACHE_WAY-1:0]							dcache_valid,
-	input 	[DCACHE_WAY-1:0]							dcache_dirty,
-														inclusive_inst_way_hit,
-														inclusive_data_way_hit,
-														inclusive_way_dirty,
-	input 												dcache_hit,
-														inst_replace_sync,
-														data_replace_sync,
-	input 	[DATA_LENGTH-1:0]							update_data,
-	output 	logic 	[$clog2(DCACHE_LINE)-1:0]			inclusive_index,			
-	output 	logic 										change_index_sel,
-														inst_replace_solve,
-														data_replace_solve,	
-														inclusive_dirty_sel,
-//														replace_sel,
-	input 	[$clog2(DCACHE_LINE)-1:0]					inst_index_inclusive,
-														data_index_inclusive,	
-	output 	logic 										inst_replace_dl1_ack_trigger,
-														data_replace_dl1_ack_trigger,	
-	output 	logic	[DCACHE_WAY-1:0]					l2_clear_way,													
-//	output	logic 	[DCACHE_WAY-1:0]					write_way,
-	output 	logic 	[DCACHE_WAY-1:0]					replace_way,	
+	input 	[DATA_LENGTH-1:0]							            DL1_data,
+	input 	[DCACHE_WAY-1:0]							            replace_way_new,
+	input 	[DCACHE_WAY-1:0]							            dcache_valid,
+	input 	[DCACHE_WAY-1:0]							            dcache_dirty,
+														                        inclusive_inst_way_hit,
+														                        inclusive_data_way_hit,
+														                        inclusive_way_dirty,
+	input 										         		            dcache_hit,
+														                        inst_replace_sync,
+														                        data_replace_sync,
+	input 	[DATA_LENGTH-1:0]							            update_data,
+	output 	logic 	[$clog2(DCACHE_LINE)-1:0]		    	inclusive_index,			
+	output 	logic 										                change_index_sel,
+														                        inst_replace_solve,
+														                        data_replace_solve,	
+														                        inclusive_dirty_sel,
+//													                       	replace_sel,
+	input 	[$clog2(DCACHE_LINE)-1:0]				        	inst_index_inclusive,
+														                        data_index_inclusive,	
+	output 	logic 										                inst_replace_dl1_ack_trigger,
+														                        data_replace_dl1_ack_trigger,	
+	output 	logic	[DCACHE_WAY-1:0]					          l2_clear_way,													
+//	output	logic 	[DCACHE_WAY-1:0]					      write_way,
+	output 	logic 	[DCACHE_WAY-1:0]					        replace_way,	
 //	Replace Handshake	
-	output 	logic 										update_trigger,
-	input 												update,
+	output 	logic 			                							update_trigger,
+	input 											                    	update,
 //	WB
-	output 	logic 										wb_trigger,
-														wb_write,
-														wb_read,														
-	input 												wb_full,
-														wb_empty,
-														wb_overflow,
-														wb_underflow,
-														wb_done,
-														wb_hit,
-	input 	[DATA_LENGTH-1:0]							wb_hit_data,
-	input												wb_read_tag_hit,
+	output 	logic 					                					wb_trigger,
+														                        wb_write,
+														                        wb_read,														
+	input 										                        wb_full,
+														                        wb_empty,
+														                        wb_overflow,
+														                        wb_underflow,
+														                        wb_done,
+														                        wb_hit,
+	input 	[DATA_LENGTH-1:0]							            wb_hit_data,
+	input												                      wb_read_tag_hit,
 //	System	
-	input 												cache_clk,
-	input 												rst_n
+	input 												                    cache_clk,
+	input 												                    rst_n
 );
 
 //================================================================================	
@@ -111,35 +117,35 @@ module	DL1_Controller
 	}	WB_state, WB_next_state;
 	
 	logic 	[DCACHE_WAY-1:0]	replace_way_buf,
-								write_way_buf;	
-	logic 	dirty,
-			valid,
-			miss,
-			miss_read,
-			miss_write,
-			DCC_halt_raw,
-			update_req_raw,
-			update_req_raw1,
-			update_req_raw2,
-			dirty_req_raw,
-			dirty_req_raw1,
-			dirty_req_raw2,
-			wb_req_raw,
-			wb_req_raw1,
-			wb_req_raw2,			
-			wb_read_raw,
-			wb_read_raw1,
-			wb_read_raw2,
-			L2_dirty_replace,
-//			L2_replace_halt,
-			L2_dirty_req,
-			inclusive_inst_hit,
-			inclusive_data_hit,
-			inst_inclusive_dirty,
-			data_inclusive_dirty;
+								            write_way_buf;	
+	logic 	                  dirty,
+			                      valid,
+			                      miss,
+			                      miss_read,
+			                      miss_write,
+			                      DCC_halt_raw,
+			                      update_req_raw,
+			                      update_req_raw1,
+			                      update_req_raw2,
+			                      dirty_req_raw,
+			                      dirty_req_raw1,
+			                      dirty_req_raw2,
+			                      wb_req_raw,
+			                      wb_req_raw1,
+			                      wb_req_raw2,			
+			                      wb_read_raw,
+			                      wb_read_raw1,
+			                      wb_read_raw2,
+			                      L2_dirty_replace,
+//		                      	L2_replace_halt,
+			                      L2_dirty_req,
+			                      inclusive_inst_hit,
+			                      inclusive_data_hit,
+			                      inst_inclusive_dirty,
+			                      data_inclusive_dirty;
 			
-	logic 	[TAG_LENGTH-1:0]					tag,
-												tag_up;
+	logic 	[TAG_LENGTH-1:0]	tag,
+												    tag_up;
 												
 //================================================================================	
 	assign	dirty = |(dcache_dirty & replace_way_new); 
@@ -563,6 +569,13 @@ module	DL1_Controller
 	assign 	wb_read = !wb_read_raw2 && wb_read_raw1;	
 	assign 	dirty_trigger = !dirty_req_raw2 && dirty_req_raw1;
 
-	assign 	data_out = ((alu_out[DATA_LENGTH-1:BYTE_OFFSET+WORD_OFFSET] == alu_out_up[DATA_LENGTH-1:BYTE_OFFSET+WORD_OFFSET])&&update) ? update_data : (dcache_hit ? DL1_data : (vc_hit ? VC_data : (wb_hit ? wb_hit_data : '0)));
+	//Hung_mod_03.04.2021 assign 	data_out = ((alu_out[DATA_LENGTH-1:BYTE_OFFSET+WORD_OFFSET] == alu_out_up[DATA_LENGTH-1:BYTE_OFFSET+WORD_OFFSET])&&update) 
+  //Hung_mod_03.04.2021 ? update_data : (dcache_hit ? DL1_data : (vc_hit ? VC_data : (wb_hit ? wb_hit_data : '0)));
+  //Renas cpu support AHB interface 
+  //  + all transastion would be a WRAP8 burst
+  //  + only the folllow address after the previous fetched address of the current missing block can be use directly for data
+  //RVS192 can immediately fetch any word in the current missing block -> directly used for data 
+	assign 	data_out = ((alu_out == alu_out_up)&&update) 
+  ? update_data : (dcache_hit ? DL1_data : (vc_hit ? VC_data : (wb_hit ? wb_hit_data : '0)));
 	
 endmodule	

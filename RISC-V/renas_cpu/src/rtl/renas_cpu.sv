@@ -9,7 +9,11 @@
 // v0.0   14.03.2021  hungbk99  Reused from renas cpu
 //                              Remove L2 Cache 
 //                              Remove support for inclusive cache
-//        15.03.2021  hungbk99  Add support for AHB interface                      
+//        15.03.2021  hungbk99  Add support for AHB interface
+//        03.04.2021  hungbk99  Add support for peripheral access
+//                              Add navigator: choosing destination for data
+//        04.04.2021  hungbk99  WB Buffer would not use ahb interface
+//                              -> directly connected instead
 //////////////////////////////////////////////////////////////////////////////////
 
 `include"renas_user_define.h"
@@ -22,14 +26,38 @@ import	renas_user_parameters::*;
 
 module 	renas_top
 (
-  output  icache_itf_type_s inst_ahb_itf, //Hung_add_15_03
-  output  dcache_itf_type_s data_ahb_itf, //Hung_add_15_03
-	input 	                  external_halt,
-			                      clk,
-			                      cache_clk, //Delay clock used for Cache
-			                      //Hung_mod_14_03 clk_l2,
-			                      //Hung_mod_14_03 mem_clk,
-			                      rst_n
+  //INST-AHB bus
+  output  mas_send_type           iahb_out_1,
+  output  mas_send_type           iahb_out_2,
+  input   slv_send_type           iahb_in_1,
+  input   slv_send_type           iahb_in_2,
+  //Interrupt Handler
+  output logic                    inst_dec_err,
+  //DATA-AHB bus
+  output  mas_send_type                         dahb_out_1,
+  output  mas_send_type                         dahb_out_2,
+  output  mas_send_type                         peri_ahb_out,
+  input   slv_send_type                         dahb_in_1,
+  input   slv_send_type                         dahb_in_2,
+  input   slv_send_type                         peri_ahb_in,
+  //Interrupt Handler
+  output logic                                  data_dec_err,
+  //output  icache_itf_type_s                     inst_ahb_itf, //Hung_add_15_03
+  //output  logic                                 inst_dec_err,
+  //output  dcache_itf_type_s                     data_ahb_itf, //Hung_add_15_03
+  //output  logic                                 data_dec_err,
+  //output  logic                                 peri_dec_err,
+	//WB Buffer
+  output 	logic [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_data,	
+	output	logic 											          wb_req,
+	input 												                wb_ack,	
+	input 												                full_flag,
+	input 	                                      external_halt,
+			                                          clk,
+			                                          cache_clk, //Delay clock used for Cache
+			                                          //Hung_mod_14_03 clk_l2,
+			                                          //Hung_mod_14_03 mem_clk,
+			                                          rst_n
 );
 
 //====================================================================
@@ -121,10 +149,10 @@ module 	renas_top
 	logic 	 											                    dirty_req;
 	logic												                      dirty_ack;
 	logic 	 											                    dirty_replace;	
-	logic 	[2*DATA_LENGTH-BYTE_OFFSET-1:0]				    wb_data;	
-	logic		 										                      wb_req;
-	logic 												                    wb_ack;	
-	logic 												                    full_flag;
+	//Hung_mod_04.04.2021 logic 	[2*DATA_LENGTH-BYTE_OFFSET-1:0]				    wb_data;	
+	//Hung_mod_04.04.2021 logic		 										                      wb_req;
+	//Hung_mod_04.04.2021 logic 												                    wb_ack;	
+	//Hung_mod_04.04.2021 logic 												                    full_flag;
 	logic 												                    inst_replace_dl1_ack,
 														                        data_replace_dl1_ack;		
 //	To both IL1 and DL1
@@ -143,7 +171,35 @@ module 	renas_top
 	logic 												                    inst_read_req,
 														                        data_read_req,
 														                        data_write_req;
-														
+//=============================Navigator===============================	         
+//=====================================================================	
+  logic peri_read;
+  logic peri_write;
+  logic peri_access;
+  localparam PERI_BOUNDARY = 32'h011C;
+	//Hung_mod_03.04.2021 .cpu_read(o_pp_ex_mem.control_signals.cpu_read),
+	//Hung_mod_03.04.2021 .cpu_write(o_pp_ex_mem.control_signals.cpu_write),
+
+  assign peri_access = (o_pp_ex_mem.alu_out <= PERI_BOUNDARY) ? 1'b1 : 1'b0;
+    
+  always_comb begin
+    peri_read = 1'b0;
+    peri_write = 1'b0;
+    mem_read = 1'b0;
+    mem_write = 1'b0;
+    if(o_pp_ex_mem.control_signals.cpu_read) begin
+      if(peri_access) 
+        peri_read = 1'b1;
+      else  
+        mem_read = 1'b1;
+    end
+
+    if(o_pp_ex_mem.control_signals.cpu_write) begin
+      if(peri_access) 
+        peri_write = 1'b1;
+      else
+        mem_write = 1'b1;
+  end
 //====================================================================
 //===========================Halt Control=============================
 	assign 	pc_halt = DCC_halt || ICC_halt || FW_halt || external_halt;
@@ -388,8 +444,10 @@ module 	renas_top
 */
 	DL1_Cache	DL1_DUT
 	(
-	.cpu_read(o_pp_ex_mem.control_signals.cpu_read),
-	.cpu_write(o_pp_ex_mem.control_signals.cpu_write),
+	//Hung_mod_03.04.2021 .cpu_read(o_pp_ex_mem.control_signals.cpu_read),
+	//Hung_mod_03.04.2021 .cpu_write(o_pp_ex_mem.control_signals.cpu_write),
+  .cpu_read(mem_read),
+  .cpu_write(mem_write),
 	.data_write(i_pp_mem_wb.mem_out),
 	.data_read(data_r),
 	.alu_out(o_pp_ex_mem.alu_out),
@@ -429,7 +487,7 @@ module 	renas_top
 	assign data_replace_check = '0;  //Hung_add_14_03 remove support for inclusive //cache
 	assign inst_addr_replace  = '0;  //Hung_add_14_03 remove support for inclusive //////cache
 	assign data_addr_replace  = '0;  //Hung_add_14_03 remove support for inclusive //////cache 															
-//===========================AHB Interface=============================	         ////
+//===========================AHB Interface=============================	         
 //=====================================================================	
   
 
@@ -444,21 +502,289 @@ module ahb_inst_interface
 (
   //IL1 Cache
   output  cache_update_type       IL2_out,
-  input                           pc_up,
-                                  inst_updata_req,
+  input                           pc,
+                                  inst_update_req,
   //AHB bus
-  mas_send_type                   iahb_out,
-  slv_send_type                   iahb_in,
+  output  mas_send_type           iahb_out_1,
+  output  mas_send_type           iahb_out_2,
+  input   slv_send_type           iahb_in_1,
+  input   slv_send_type           iahb_in_2,
+  //Interrupt Handler
+  output logic                    inst_dec_err,
   //System
   input                           cache_clk,
   input                           rst_n
 );
+//---------------------------------------------------------------------
+//Internal Signals
+//---------------------------------------------------------------------
+  logic [2:0]   trans_count; 
+  htrans_type   htrans_current_state, 
+                htrans_next_state;
+  logic         hlast,
+                trans_enable;
+  logic [2:0]   wrap_addr;
+//---------------------------------------------------------------------
+//AHB-INST
+//---------------------------------------------------------------------
+  assign iahb_out_1.hwrite = 0;
+  assign iahb_out_1.hburst = WRAP8; 
+  assign iahb_out_1.htrans = htrans_current_state;
+  assign iahb_out_1.haddr = {pc[31:6], 1'b0, wrap_addr, 2'b0};
+  assign iahb_out_1.hsize = 3'b010;
+  assign iahb_out_1.hmastlock = 1'b0;
+  assign iahb_out_1.hprot = 4'h0;
+  assign iahb_out_1.hwdata = '0;
 
-  assign iahb_out.hwrite = 0;
-  assign iahb_out.hburst = WRAP8; 
+  assign iahb_out_2.hwrite = 0;
+  assign iahb_out_2.hburst = WRAP8; 
+  assign iahb_out_2.htrans = htrans_current_state;
+  assign iahb_out_2.haddr = {pc[31:6], 1'b1, wrap_addr, 2'b0};
+  assign iahb_out_2.hsize = 3'b010;
+  assign iahb_out_2.hmastlock = 1'b0;
+  assign iahb_out_2.hprot = 4'h0;
+  assign iahb_out_2.hwdata = '0;
 
+  assign IL2_out.update = iahb_in_1.hreadyout && iahb_in_2.hreadyout;
+  assign IL2_out.addr_update = wrap_addr;
+  assign IL2_out.w1_update = iahb_in_1.hrdata;
+  assign IL2_out.w2_update = iahb_in_2.hrdata;
+
+  always_ff @(posedge cache_clk, negedge rst_n)
+  begin
+    if(!rst_n) begin
+      trans_count <= '0;
+      wrap_addr <= '0;
+    end
+    else if(hlast)
+    begin
+      trans_count <= '0;
+      wrap_addr <= pc[4:2];
+    end
+    else if(trans_enable && IL2_out.update) //Timing problem???
+    begin
+      trans_count <= trans_count + 1;
+      wrap_addr <= wrap_addr + 1;
+    end
+  end
+
+  assign hlast = (trans_count == 7) ? 1'b1 : 1'b0;
+
+  always_ff @(posedge cache_clk, negedge rst_n)
+  begin
+    if(!rst_n)
+      htrans_current_state <= IDLE;
+    else
+      htrans_current_state <= htrans_next_state;
+  end
+
+  always_comb begin
+    inst_dec_err = 1'b0;
+    trans_enable = 1'b0;
+    unique case(htrans_current_state)
+      IDLE: begin
+        if(inst_update_req)
+          htrans_next_state = NONSEQ;
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      BUSY: begin
+      //Does not support this yet...
+      end
+      NONSEQ: begin
+        trans_enable = 1'b1;
+        if(iahb_in_1.hreadyout ^ iahb_in_2.hreadyout)
+          inst_dec_err = 1'b1;
+        else if (iahb_in_1.hreadyout && iahb_in_2.hreadyout)
+          htrans_next_state = SEQ;
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      SEQ: begin
+        trans_enable = 1'b1;
+        if(iahb_in_1.hreadyout ^ iahb_in_2.hreadyout)
+          inst_dec_err = 1'b1;
+        else if((iahb_in_1.hreadyout && iahb_in_1.hresp) || (iahb_in_1.hreadyout && iahb_in_1.hresp)) begin
+          htrans_next_state = IDLE;
+          inst_dec_err = 1'b1;
+        end
+        else if((iahb_in_1.hreadyout && !iahb_in_1.hresp) && (iahb_in_1.hreadyout && !iahb_in_1.hresp)) begin
+        begin
+          if(hlast && inst_update_req) //Debug
+            htrans_next_state = NONSEQ;
+          else if(hlast && !inst_update_req)
+            htrans_next_state = IDLE;
+          else
+            htrans_next_state = htrans_current_state;
+        end
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      default: htrans_next_state = htrans_current_state;
+    endcase
+  end
 
 endmodule: ahb_inst_interface
+
+//=====================================================================	
+// AHB-DATA Interface: 
+//  * WRAP8 only when access memory
+//  * SINGLE only when access spi
+//=====================================================================	
+
+module ahb_data_interface
+(
+  //IL1 Cache
+  output  cache_update_type                         DL2_out,
+  input                                             alu_out,
+                                                    data_update_req,
+  input                                             //mem_read,
+                                                    //mem_write,
+                                                    peri_read,
+                                                    peri_write,
+                                                    dirty_req
+                                                    dirty_replace
+  output                                            dirty_ack,
+	input [DATA_LENGTH-1:0]								            dirty_data1,
+	input [DATA_LENGTH-1:0]								            dirty_data2,
+	input [DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-1:0]		dl1_dirty_addr,	
+  //AHB bus
+  output  mas_send_type                             dahb_out_1,
+  output  mas_send_type                             dahb_out_2,
+  output  mas_send_type                             peri_ahb_out,
+  input   slv_send_type                             dahb_in_1,
+  input   slv_send_type                             dahb_in_2,
+  input   slv_send_type                             peri_ahb_in,
+  //Interrupt Handler
+  output logic                                      data_dec_err,
+  //System
+  input                                             cache_clk,
+  input                                             rst_n
+);
+//---------------------------------------------------------------------
+//Internal Signals
+//---------------------------------------------------------------------
+  logic [2:0]   trans_count; 
+  htrans_type   htrans_current_state, 
+                htrans_next_state;
+  logic         hlast,
+                trans_enable;
+  logic [2:0]   wrap_addr;
+  logic         direction;
+  logic         addr_sample;
+//---------------------------------------------------------------------
+//AHB-INST
+//---------------------------------------------------------------------
+  assign dahb_out_1.hwrite = direction;
+  assign dahb_out_1.hburst = WRAP8; 
+  assign dahb_out_1.htrans = htrans_current_state;
+  assign dahb_out_1.haddr = {alu_out[31:6], 1'b0, wrap_addr, 2'b0};
+  assign dahb_out_1.hsize = 3'b010;
+  assign dahb_out_1.hmastlock = 1'b0;
+  assign dahb_out_1.hprot = 4'h0;
+  assign dahb_out_1.hwdata = dirty_data1;
+
+  assign dahb_out_2.hwrite = direction;
+  assign dahb_out_2.hburst = WRAP8; 
+  assign dahb_out_2.htrans = htrans_current_state;
+  assign dahb_out_2.haddr = {alu_out[31:6], 1'b1, wrap_addr, 2'b0};
+  assign dahb_out_2.hsize = 3'b010;
+  assign dahb_out_2.hmastlock = 1'b0;
+  assign dahb_out_2.hprot = 4'h0;
+  assign dahb_out_2.hwdata = dirty_data2;
+
+  assign DL2_out.update = ~dirty_replace & dahb_in_1.hreadyout & dahb_in_2.hreadyout;
+  assign DL2_out.addr_update = wrap_addr;
+  assign DL2_out.w1_update = dahb_in_1.hrdata;
+  assign DL2_out.w2_update = dahb_in_2.hrdata;
+  
+  always_ff @(posedge cache_clk, negedge rst_n)
+  begin
+    if(!rst_n) begin
+      trans_count <= '0;
+      wrap_addr <= '0;
+      direction <= 1'b0;
+    end
+    else if(hlast || addr_sample)
+    begin
+      trans_count <= '0;
+      if(!dirty_replace) 
+      begin
+        wrap_addr <= alu_out[4:2];
+        direction <= 1'b1;
+      end
+      else begin
+        dirty_replace <= '0;
+        direction <= 1'b0;
+      end
+    end
+    else if(trans_enable && dahb_in.hreadyout) //Timing problem???
+    begin
+      trans_count <= trans_count + 1;
+      wrap_addr <= wrap_addr + 1;
+    end
+  end
+
+  assign hlast = (trans_count == 7) ? 1'b1 : 1'b0;
+
+  always_ff @(posedge cache_clk, negedge rst_n)
+  begin
+    if(!rst_n)
+      htrans_current_state <= IDLE;
+    else
+      htrans_current_state <= htrans_next_state;
+  end
+
+  always_comb begin
+    data_dec_err = 1'b0;
+    trans_enable = 1'b0;
+    addr_sample = 1'b0;
+    unique case(htrans_current_state)
+      IDLE: begin
+        if(data_update_req) begin
+          htrans_next_state = NONSEQ;
+          addr_sample = 1'b1;
+        end
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      BUSY: begin
+      //Does not support this yet...
+      end
+      NONSEQ: begin
+        trans_enable = 1'b1;
+        if(dahb_in_1.hreadyout ^ dahb_in_2.hreadyout)
+          data_dec_err = 1'b1;
+        else if (dahb_in_1.hreadyout && dahb_in_2.hreadyout)
+          htrans_next_state = SEQ;
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      SEQ: begin
+        trans_enable = 1'b1;
+        if(dahb_in_1.hreadyout ^ dahb_in_2.hreadyout)
+          data_dec_err = 1'b1;
+        else if((dahb_in_1.hreadyout && dahb_in_1.hresp) || (dahb_in_1.hreadyout && dahb_in_1.hresp)) begin
+          htrans_next_state = IDLE;
+          data_dec_err = 1'b1;
+        end
+        else if((dahb_in_1.hreadyout && !dahb_in_1.hresp) && (dahb_in_1.hreadyout && !dahb_in_1.hresp)) begin
+        begin
+          if(hlast && data_update_req) //Debug
+            htrans_next_state = NONSEQ;
+          else if(hlast && !data_update_req)
+            htrans_next_state = IDLE;
+          else
+            htrans_next_state = htrans_current_state;
+        end
+        else
+          htrans_next_state = htrans_current_state;
+      end
+      default: htrans_next_state = htrans_current_state;
+    endcase
+  end
+
+endmodule: ahb_data_interface
 
 //=============================Simulation==============================	
 //=====================================================================	

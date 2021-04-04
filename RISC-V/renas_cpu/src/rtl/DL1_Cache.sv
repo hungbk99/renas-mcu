@@ -9,7 +9,7 @@
 // v0.0   14.03.2021  hungbk99  Reused from renas cpu
 //                              Remove L2 Cache 
 //                              Remove support for inclusive cache
-//        15.03.2021  hungbk99  Add support for AHB interface                      
+//        15.03.2021  hungbk99  Add support for AHB interface
 //////////////////////////////////////////////////////////////////////////////////
 
 `include"renas_user_define.h"
@@ -36,6 +36,7 @@ module	DL1_Cache
 	output 	logic 													                  dirty_replace,
 //	Replace handshake	
 	input 	cache_update_type 										            DL2_out,
+	output 	logic 													                  data_update_req,
 	output 	logic													                    inst_replace_dl1_ack,
 																	                          data_replace_dl1_ack,
 	input														                          inst_replace_req,
@@ -44,7 +45,6 @@ module	DL1_Cache
 																	                          L2_data_dl1_ack,
 	input 	[L2_TAG_LENGTH+$clog2(L2_CACHE_LINE)-1:0]			  	inst_addr_replace,
 																  	                        data_addr_replace,																		
-	output 	logic 													                  data_update_req,
 	output 	logic 	[DATA_LENGTH-1:0]								          alu_out_up,
 //	Write Buffer
 	output 	[2*DATA_LENGTH-BYTE_OFFSET-1:0]							      wb_data,
@@ -483,15 +483,18 @@ module	DL1_Cache
 			dirty_req <= dirty_trigger;
 	end
 	
-	always_ff @(posedge cache_clk or negedge rst_n)
-	begin
-		if(!rst_n)
-			dirty_done_raw <= '0;
-		else 
-			dirty_done_raw <= dirty_ack;
-	end
-	
-	assign 	dirty_done = !dirty_ack && dirty_done_raw;
+	//Hung_mod_04.04.2021 always_ff @(posedge cache_clk or negedge rst_n)
+	//Hung_mod_04.04.2021 begin
+	//Hung_mod_04.04.2021 	if(!rst_n)
+	//Hung_mod_04.04.2021 		dirty_done_raw <= '0;
+	//Hung_mod_04.04.2021 	else 
+	//Hung_mod_04.04.2021 		dirty_done_raw <= dirty_ack;
+	//Hung_mod_04.04.2021 end
+	//Hung_mod_04.04.2021 
+	//Hung_mod_04.04.2021 assign 	dirty_done = !dirty_ack && dirty_done_raw;
+  //Hung_add_04.04.2021 
+  assign dirty_done = 1'b1;
+  //Hung_add_04.04.2021 
 	assign 	dirty_replace_way = dcache_dirty & replace_way_new;		
 
 	always_comb	begin

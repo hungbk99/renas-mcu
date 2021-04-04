@@ -12,9 +12,9 @@ module	DualPort_SRAM
 #(parameter	SRAM_LENGTH = 8, parameter SRAM_DEPTH =16)
 (
 	output 	logic 	[SRAM_LENGTH-1:0]	data_out1, data_out2,	
-	input	[SRAM_LENGTH-1:0]			data_in1, data_in2,	
-	input	[$clog2(SRAM_DEPTH)-1:0]	addr1, addr2,
-	input	wen1, wen2, clk
+	input	[SRAM_LENGTH-1:0]			      data_in1, data_in2,	
+	input	[$clog2(SRAM_DEPTH)-1:0]	  addr1, addr2,
+	input	                            wen1, wen2, clk
 );
 
 	logic	[SRAM_LENGTH-1:0]	SRAM	[SRAM_DEPTH-1:0];

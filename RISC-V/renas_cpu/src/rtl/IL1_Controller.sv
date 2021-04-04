@@ -15,7 +15,7 @@ import	renas_user_parameters::*;
 module	IL1_Controller
 (
 	output 	logic	[INST_LENGTH-1:0]			      inst_fetch,
-	output 	logic	[PC_LENGTH-1:0]				      pc_up,
+	output 	logic	[PC_LENGTH-1:0]				      pc_up,        //This should be an internal signal
 	output 	logic [ICACHE_WAY-1:0]			      replace_way,
 												                    l2_clear_way,
 	output 	logic 	      							      ICC_halt,
