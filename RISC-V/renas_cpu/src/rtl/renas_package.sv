@@ -12,7 +12,9 @@
 //        15.03.2021  hungbk99  Add support for AHB interface                      
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+`include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
+`include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
+`include"D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
 package	renas_package;
 	import renas_user_parameters::*;
   import AHB_package::*;

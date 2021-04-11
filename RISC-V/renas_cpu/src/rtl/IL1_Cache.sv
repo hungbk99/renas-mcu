@@ -32,8 +32,8 @@ module	IL1_Cache
 	input  	cache_update_type 			                  IL2_out, 
 	input												                      inst_replace_req, //Remove support for inclusive cache
 														                        data_replace_req, //Remove support for inclusive cache
-	input 	[L2_TAG_LENGTH+$clog2(L2_CACHE_LINE)-1:0]	inst_addr_replace //Remove support for inclusive cache,
-														                        data_addr_replace //Remove support for inclusive cache,		
+	input 	[L2_TAG_LENGTH+$clog2(L2_CACHE_LINE)-1:0]	inst_addr_replace, //Remove support for inclusive cache,
+														                        data_addr_replace, //Remove support for inclusive cache,		
 	input 												                    L2_inst_il1_ack,  //Remove support for inclusive cache 
 														                        L2_data_il1_ack,  //Remove support for inclusive cache 
 //	System	
@@ -353,11 +353,11 @@ module	IL1_Cache
 //================================================================================	
 //	Simulate
 `ifdef 	SIMULATE
-	include "RANDOM.sv";
-	include "ALRU.sv";
-	include "Victim_Cache.sv";
-	include "DualPort_SRAM.sv";	
-	include "IL1_Controller.sv"; 
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/RANDOM.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/ALRU.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Victim_Cache.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"	
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/IL1_Controller.sv" 
 `endif
 	
 endmodule		

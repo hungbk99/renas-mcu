@@ -1,0 +1,79 @@
+//////////////////////////////////////////////////////////////////////////////////
+// File Name: 		x2p_top.sv
+// Function:		  AHB to APB interconnect
+// Project Name:	renas mcu
+// Copyright (C) 	Le Quang Hung 
+// Ho Chi Minh University of Technology
+// Email: 			quanghungbk1999@gmail.com  
+// Ver    Date        Author    Description
+// v0.0   04.04.2021  hungbk99  First creation
+//////////////////////////////////////////////////////////////////////////////////
+
+import apb_package::*;
+import AHB_package::*;
+module x2p_top
+(
+  input                              hsel_slave_peri,  
+  input   AHB_package::mas_send_type master_peri_out,
+  output  AHB_package::slv_send_type master_peri_in,
+  output  apb_package::master_s_type apb_peri_out,
+  input   apb_package::slave_s_type  apb_peri_in;
+  output  apb_package::master_s_type apb_gpio_out,
+  input   apb_package::slave_s_type  apb_gpio_in;
+  input                              ahb_clk
+  input                              apb_clk,
+                                     rst_n
+);
+//--------------------------------------------------------------------------------
+// Internal signals
+//--------------------------------------------------------------------------------
+  localparam  GPIO_LOW  = 0x0000;
+  localparam  GPIO_HIGH = 0x0020;
+  localparam  SPI_LOW   = 0x0100;
+  localparam  SPI_HIGH  = 0x011C;
+  logic                       gpio_sel,
+                              spi_sel,
+                              ahb_hsel,
+                              apb_hsel,
+                              apb_samp_ack;
+                              
+  AHB_package::mas_send_type  ahb_master_sample;
+  AHB_package::mas_send_type  apb_master_sample;
+//--------------------------------------------------------------------------------
+// X2P Core
+//--------------------------------------------------------------------------------
+//Sample
+  always_ff @(posedge ahb_clk, posedge rst_n) 
+  begin
+    if(!rst_n) begin
+      ahb_master_sample <= '0;
+      ahb_hsel <= 1'b0;
+    end
+    else begin
+      ahb_master_sample <= master_peri_out;
+      if(ahb_hsel == 1'b1) 
+        ahb_hsel <= !apb_samp_ack;
+      else
+        ahb_hsel <= hsel_slave_peri;
+    end
+  end
+
+  always_ff @(posedge apb_clk, posedge rst_n)
+  begin
+    if(!rst_n)
+      apb_master_sample <= '0;
+    else
+  end
+// Decoder
+  always_comb begin
+    gpio_sel = 1'b0;
+    spi_sel = 1'b0;
+    if((ahb_master_sample.haddr >= GPIO_LOW) && (ahb_master_sample.haddr <= GPIO_HIGH))
+      gpio_sel = 1'b1;
+    else if ((ahb_master_sample.haddr >= SPI_LOW) && (ahb_master_sample.haddr <= SPI_HIGH))
+      spi_sel = 1'b1;
+  end
+
+ 
+endmodule: x2p_top
+

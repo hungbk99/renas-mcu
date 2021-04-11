@@ -14,18 +14,21 @@
 //                              Add navigator: choosing destination for data
 //        04.04.2021  hungbk99  WB Buffer would not use ahb interface
 //                              -> directly connected instead
+//        10.04.2021  hungbk99  Add support for WB buffer                      
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+`include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
+import  AHB_package::*;
 
 //=====================================================================	
 // Top module for renas cpu
 //=====================================================================	
 
-module 	renas_top
+module 	renas_cpu
 (
+  //-------------------------------------------------------------------
   //INST-AHB bus
   output  mas_send_type           iahb_out_1,
   output  mas_send_type           iahb_out_2,
@@ -33,6 +36,7 @@ module 	renas_top
   input   slv_send_type           iahb_in_2,
   //Interrupt Handler
   output logic                    inst_dec_err,
+  //-------------------------------------------------------------------
   //DATA-AHB bus
   output  mas_send_type                         dahb_out_1,
   output  mas_send_type                         dahb_out_2,
@@ -47,6 +51,7 @@ module 	renas_top
   //output  dcache_itf_type_s                     data_ahb_itf, //Hung_add_15_03
   //output  logic                                 data_dec_err,
   //output  logic                                 peri_dec_err,
+  //-------------------------------------------------------------------
 	//WB Buffer
   output 	logic [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_data,	
 	output	logic 											          wb_req,
@@ -199,6 +204,7 @@ module 	renas_top
         peri_write = 1'b1;
       else
         mem_write = 1'b1;
+    end
   end
 //====================================================================
 //===========================Halt Control=============================
@@ -489,10 +495,19 @@ module 	renas_top
 	assign data_addr_replace  = '0;  //Hung_add_14_03 remove support for inclusive //////cache 															
 //===========================AHB Interface=============================	         
 //=====================================================================	
-  
+  ahb_inst_interface  ahb_inst_itf 
+  (
+	  .pc(pc_fetch),
+    .*
+  );
 
+  ahb_data_interface  ahb_data_itf
+  (
+	  .alu_out(o_pp_ex_mem.alu_out),
+	  .*
+  );
 
-endmodule: renas_top	
+endmodule: renas_cpu	
 
 //=====================================================================	
 // AHB-INST Interface: WRAP8 only
@@ -502,8 +517,8 @@ module ahb_inst_interface
 (
   //IL1 Cache
   output  cache_update_type       IL2_out,
-  input                           pc,
-                                  inst_update_req,
+  input   [PC_LENGTH-1:0]         pc,
+  input                           inst_update_req,
   //AHB bus
   output  mas_send_type           iahb_out_1,
   output  mas_send_type           iahb_out_2,
@@ -531,7 +546,7 @@ module ahb_inst_interface
   assign iahb_out_1.hburst = WRAP8; 
   assign iahb_out_1.htrans = htrans_current_state;
   assign iahb_out_1.haddr = {pc[31:6], 1'b0, wrap_addr, 2'b0};
-  assign iahb_out_1.hsize = 3'b010;
+  assign iahb_out_1.hsize = WORD;
   assign iahb_out_1.hmastlock = 1'b0;
   assign iahb_out_1.hprot = 4'h0;
   assign iahb_out_1.hwdata = '0;
@@ -540,7 +555,7 @@ module ahb_inst_interface
   assign iahb_out_2.hburst = WRAP8; 
   assign iahb_out_2.htrans = htrans_current_state;
   assign iahb_out_2.haddr = {pc[31:6], 1'b1, wrap_addr, 2'b0};
-  assign iahb_out_2.hsize = 3'b010;
+  assign iahb_out_2.hsize = WORD;
   assign iahb_out_2.hmastlock = 1'b0;
   assign iahb_out_2.hprot = 4'h0;
   assign iahb_out_2.hwdata = '0;
@@ -581,6 +596,7 @@ module ahb_inst_interface
   always_comb begin
     inst_dec_err = 1'b0;
     trans_enable = 1'b0;
+    htrans_next_state = IDLE;
     unique case(htrans_current_state)
       IDLE: begin
         if(inst_update_req)
@@ -602,14 +618,15 @@ module ahb_inst_interface
       end
       SEQ: begin
         trans_enable = 1'b1;
-        if(iahb_in_1.hreadyout ^ iahb_in_2.hreadyout)
+        if(iahb_in_1.hreadyout ^ iahb_in_2.hreadyout) begin
           inst_dec_err = 1'b1;
+          htrans_next_state = htrans_current_state;
+        end
         else if((iahb_in_1.hreadyout && iahb_in_1.hresp) || (iahb_in_1.hreadyout && iahb_in_1.hresp)) begin
           htrans_next_state = IDLE;
           inst_dec_err = 1'b1;
         end
         else if((iahb_in_1.hreadyout && !iahb_in_1.hresp) && (iahb_in_1.hreadyout && !iahb_in_1.hresp)) begin
-        begin
           if(hlast && inst_update_req) //Debug
             htrans_next_state = NONSEQ;
           else if(hlast && !inst_update_req)
@@ -620,7 +637,6 @@ module ahb_inst_interface
         else
           htrans_next_state = htrans_current_state;
       end
-      default: htrans_next_state = htrans_current_state;
     endcase
   end
 
@@ -636,14 +652,14 @@ module ahb_data_interface
 (
   //IL1 Cache
   output  cache_update_type                         DL2_out,
-  input                                             alu_out,
-                                                    data_update_req,
+  input   [DATA_LENGTH-1:0]                         alu_out,
+  input                                             data_update_req,
   input                                             //mem_read,
                                                     //mem_write,
                                                     peri_read,
                                                     peri_write,
-                                                    dirty_req
-                                                    dirty_replace
+                                                    dirty_req,
+                                                    dirty_replace,
   output                                            dirty_ack,
 	input [DATA_LENGTH-1:0]								            dirty_data1,
 	input [DATA_LENGTH-1:0]								            dirty_data2,
@@ -679,7 +695,7 @@ module ahb_data_interface
   assign dahb_out_1.hburst = WRAP8; 
   assign dahb_out_1.htrans = htrans_current_state;
   assign dahb_out_1.haddr = {alu_out[31:6], 1'b0, wrap_addr, 2'b0};
-  assign dahb_out_1.hsize = 3'b010;
+  assign dahb_out_1.hsize = WORD;
   assign dahb_out_1.hmastlock = 1'b0;
   assign dahb_out_1.hprot = 4'h0;
   assign dahb_out_1.hwdata = dirty_data1;
@@ -688,7 +704,7 @@ module ahb_data_interface
   assign dahb_out_2.hburst = WRAP8; 
   assign dahb_out_2.htrans = htrans_current_state;
   assign dahb_out_2.haddr = {alu_out[31:6], 1'b1, wrap_addr, 2'b0};
-  assign dahb_out_2.hsize = 3'b010;
+  assign dahb_out_2.hsize = WORD;
   assign dahb_out_2.hmastlock = 1'b0;
   assign dahb_out_2.hprot = 4'h0;
   assign dahb_out_2.hwdata = dirty_data2;
@@ -714,11 +730,14 @@ module ahb_data_interface
         direction <= 1'b1;
       end
       else begin
-        dirty_replace <= '0;
+        //Debug dirty_replace <= '0;
+        //Hung_mod_10.04.2021
+        wrap_addr <= '0;
+        //Hung_mod_10.04.2021
         direction <= 1'b0;
       end
     end
-    else if(trans_enable && dahb_in.hreadyout) //Timing problem???
+    else if(trans_enable && dahb_in_1.hreadyout && dahb_in_2.hreadyout) //Timing problem???
     begin
       trans_count <= trans_count + 1;
       wrap_addr <= wrap_addr + 1;
@@ -739,6 +758,7 @@ module ahb_data_interface
     data_dec_err = 1'b0;
     trans_enable = 1'b0;
     addr_sample = 1'b0;
+    htrans_next_state = IDLE; 
     unique case(htrans_current_state)
       IDLE: begin
         if(data_update_req) begin
@@ -754,7 +774,10 @@ module ahb_data_interface
       NONSEQ: begin
         trans_enable = 1'b1;
         if(dahb_in_1.hreadyout ^ dahb_in_2.hreadyout)
+        begin
           data_dec_err = 1'b1;
+          htrans_next_state = htrans_current_state;
+        end
         else if (dahb_in_1.hreadyout && dahb_in_2.hreadyout)
           htrans_next_state = SEQ;
         else
@@ -769,7 +792,6 @@ module ahb_data_interface
           data_dec_err = 1'b1;
         end
         else if((dahb_in_1.hreadyout && !dahb_in_1.hresp) && (dahb_in_1.hreadyout && !dahb_in_1.hresp)) begin
-        begin
           if(hlast && data_update_req) //Debug
             htrans_next_state = NONSEQ;
           else if(hlast && !data_update_req)
@@ -789,14 +811,23 @@ endmodule: ahb_data_interface
 //=============================Simulation==============================	
 //=====================================================================	
 //	`ifdef SIMULATE
-		include"BPU.sv";
-		include"register_file.sv";
-		include"decoder.sv";
-		include"alu_renas.sv";
-		include"branch_handling.sv";
-		include"forwarding_unit.sv";
-		include"datagen.sv";
-		include"IL1_Cache.sv";
-		include"DL1_Cache.sv";
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/BPU.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/register_file.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/decoder.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/alu_renas.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/branch_handling.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/forwarding_unit.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/datagen.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/RANDOM.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/ALRU.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Victim_Cache.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"	
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/IL1_Controller.sv" 
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/IL1_Cache.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DL1_Controller.sv" 
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Configurable_Mux_Write.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Configurable_Multiplexer.sv"
+	`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Write_Buffer.sv"
+		`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DL1_Cache.sv"
 //Hung_mod_1.4.2021		include"L2_cache.sv";
 //	`endif

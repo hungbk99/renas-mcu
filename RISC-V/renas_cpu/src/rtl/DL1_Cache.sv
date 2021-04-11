@@ -12,7 +12,7 @@
 //        15.03.2021  hungbk99  Add support for AHB interface
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+`include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 module	DL1_Cache
@@ -171,6 +171,7 @@ module	DL1_Cache
 //	assign 	read_index = inclusive_dirty_sel ? inclusive_index : DL1_index;				//	add wen2 to solve write bug
 //	assign 	replace_index = replace_sel ? DL1_up_index : DL1_index;
 
+  //Unsafe latch -> ???
 	always_latch begin
 		if(inclusive_dirty_sel)
 			read_index <= inclusive_index;
@@ -179,6 +180,7 @@ module	DL1_Cache
 		else
 			read_index <= DL1_index;
 	end
+  
 
 //	Solving data_write bug 
 	always_ff @(posedge cache_clk)
@@ -581,18 +583,19 @@ module	DL1_Cache
 	end
 //================================================================================	
 `ifdef 	SIMULATE
-	include "RANDOM.sv";
-	include "ALRU.sv";
-	include "Victim_Cache.sv";
-	include "DualPort_SRAM.sv";	
-	include "DL1_Controller.sv"; 
-	include "Configurable_Mux_Write.sv";
-	include "Configurable_Multiplexer.sv";
-	include "Write_Buffer.sv";
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/RANDOM.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/ALRU.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Victim_Cache.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"	
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DL1_Controller.sv" 
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Configurable_Mux_Write.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Configurable_Multiplexer.sv"
+	//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/Write_Buffer.sv"
 	
-	initial begin
-		$readmemh("WBL2.txt", DL1_WB.WB);			
-	end	
+	//initial begin
+	//	//Hung_mod_10.04.2021 $readmemh("WBL2.txt", DL1_WB.WB);			
+	//	$readmemh("L2WB.txt", DL1_WB.WB);			
+	//end	
 `endif
 	
 endmodule
