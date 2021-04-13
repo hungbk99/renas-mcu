@@ -83,8 +83,55 @@ class apb_monitor extends uvm_monitor;
   extern virtual function void build_phase(uvm_phase phase);
   extern virtual function void connect_phase(uvm_phase phase);
   extern virtual task run_phase(uvm_phase phase);
+  extern virtual task collect_trans();
   extern virtual task peek(output bit reset);
   extern virtual function perform_check();
   extern virtual function perform_coverage();
 endclass: apb_monitor
 
+
+//--------------------------------------------------------------------------------
+
+function void apb_monitor::build_phase(uvm_phase phase);
+  super.build_phase(phase)
+  if(!uvm_config_db#(apb_config)::get(this, "", "cfg", cfg))
+    `uvm_error("[NOCONFIG]", {"apb_config has not been set for:", get_full_name()})
+  //Create Objects & TLM ports
+  trans_collected = apb_transaction::type_id::create("trans_collected");
+  write_mon_port = new("write_mon_port", this);
+  peek_mon_port = new("peek_mon_port", this);
+endfunction: build_phase
+
+//--------------------------------------------------------------------------------
+
+function void apb_monitor::connect_phase(uvm_phase phase);
+  super.connect_phase(phase);
+  if(!uvm_config_db#(virtual apb_if)::get(this, "", "cfg", cfg))
+    `uvm_error("[NOVIF]", {"interface must be set for", get_full_name(), ".vif"})
+endfunction: connect_phase
+
+//--------------------------------------------------------------------------------
+
+task apb_monitor::run_phase(uvm_phase phase);
+  super.run_phase(phase);
+  forever begin
+    fork
+      collect_trans();
+    join
+  end
+endtask: run_phase
+
+//--------------------------------------------------------------------------------
+
+task apb_monitor::collect_trans();
+  forever begin
+    @(posedge vif.pclk iff (vif.penable && vif.psel && vif.pready));
+    trans_collected.paddr  = vif.paddr;
+    trans_collected.pprot  = vif.pprot;
+    trans_collected.pstrb  = vif.pstrb;
+    trans_collected.pwrite = vif.pwrite
+    trans_collected.prdata = vif.prdata;
+    trans_collected.pwdata = vif.pwdata;
+    write_mon_port.write(trans_collected);
+  end
+endtask: collect_trans
