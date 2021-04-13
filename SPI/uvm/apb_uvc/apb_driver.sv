@@ -55,10 +55,29 @@ endfunction: connect_phase
 
 //--------------------------------------------------------------------------------
 
+function void apb_driver::pre_reset_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  vif.preset_n <= 1'b1;
+  #1;
+  phase.drop_objection(this);
+endfunction: pre_reset_phase
+
+//--------------------------------------------------------------------------------
+
+function void apb_driver::reset_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  vif.preset_n <= 1'b0;
+  #13
+  vif.preset_n <= 1'b1;
+  phase.drop_objection(this);
+endfunction: reset_phase
+
+//--------------------------------------------------------------------------------
+
 task apb_driver::run_phase(uvm_phase phase);
   reset();
   @(posedge vif.preset_n)
-  `uvm_info("[APB DRIVER]","[reset releasing...]", UVM_MEDIUM)
+  `uvm_info("[APB DRyyIVER]","[reset releasing...]", UVM_MEDIUM)
   forever begin
     fork 
       begin
@@ -99,4 +118,42 @@ endtask: reset
 
 //--------------------------------------------------------------------------------
 
-task apb_driver::
+task apb_driver::drive_transfer(apb_transaction trans);
+  `uvm_info("[APB Driver]", "[New transaction ...]", UVM_MEDIUM)
+  if(trans.transmit_delay > 0) begin
+    repeat(trans.transmit_delay) @(posedge vif.pclk);
+  end
+  `uvm_info("[APB Driver]", "[Transfering ...]", UVM_MEDIUM)
+  drive_address_phase(trans);
+  drive_data_phase(trans);
+  `uvm_info("[APB Driver]", "[Transaction finished ...]", UVM_MEDIUM)
+endtask: drive_transfer
+
+//--------------------------------------------------------------------------------
+
+task apb_driver::drive_address_phase(apb_transaction trans);
+  vif.paddr   <= trans.paddr;
+  vif.pwrite  <= trans.pwrite;
+  vif.penable <= 1'b0;
+  vif.psel    <= 1'b1;
+  vif.pprot   <= trans.pprot;
+  if(trans.pwrite == APB_READ)
+    vif.pstrb   <= '0;
+  else begin
+    vif.pstrb   <= trans.pstrb;
+    vif.pwdata  <= trans.pwdata;
+  end
+  @(posedge vif.pclk)
+endtask: drive_address_phase
+
+//--------------------------------------------------------------------------------
+
+task apb_driver::drive_data_phase(apb_transaction trans);
+  vif.penable <= 1'b1;
+  @(posedge vif.pclk iff vif.pready);
+  if(vif.pwrite == APB_READ) 
+    trans.prdata <= vif.prdata;
+  vif.penable <= 1'b0;
+  vif.psel <= 1'b0;
+endtask: drive_data_phase
+
