@@ -135,3 +135,9 @@ task apb_monitor::collect_trans();
     write_mon_port.write(trans_collected);
   end
 endtask: collect_trans
+
+//--------------------------------------------------------------------------------
+
+task apb_monitor::peek(output bit reset);
+  reset = vif.preset_n;
+endtask: peek
