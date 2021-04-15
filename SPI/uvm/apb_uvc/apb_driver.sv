@@ -17,7 +17,7 @@ class apb_driver extends uvm_driver #(apb_transaction);
   apb_config            cfg;
 
   `uvm_component_utils_begin(apb_driver)
-    `uvm_object_field(cfg, UVM_DEFAULT)
+    `uvm_field_object(cfg, UVM_DEFAULT)
   `uvm_component_utils_end
  
   //Constructor
