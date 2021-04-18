@@ -18,6 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 `include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
+`include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_package.sv"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 import  AHB_package::*;
@@ -30,12 +31,12 @@ module 	renas_cpu
 (
   //-------------------------------------------------------------------
   //INST-AHB bus
-  output  mas_send_type           iahb_out_1,
-  output  mas_send_type           iahb_out_2,
-  input   slv_send_type           iahb_in_1,
-  input   slv_send_type           iahb_in_2,
+  output  mas_send_type                         iahb_out_1,
+  output  mas_send_type                         iahb_out_2,
+  input   slv_send_type                         iahb_in_1,
+  input   slv_send_type                         iahb_in_2,
   //Interrupt Handler
-  output logic                    inst_dec_err,
+  output logic                                  inst_dec_err,
   //-------------------------------------------------------------------
   //DATA-AHB bus
   output  mas_send_type                         dahb_out_1,
@@ -57,6 +58,7 @@ module 	renas_cpu
 	output	logic 											          wb_req,
 	input 												                wb_ack,	
 	input 												                full_flag,
+  //-------------------------------------------------------------------
 	input 	                                      external_halt,
 			                                          clk,
 			                                          cache_clk, //Delay clock used for Cache

@@ -14,10 +14,10 @@
 
 `include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
 `include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
-`include"D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
+//`include"D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
 package	renas_package;
 	import renas_user_parameters::*;
-  import AHB_package::*;
+  //import AHB_package::*;
   //	export renas_user_define_package::*;
 	
 	parameter 	PC_LENGTH = 32;
@@ -27,7 +27,8 @@ package	renas_package;
 	parameter 	CONTROL_ADDR_LENGTH = 9;
 	parameter 	BYTE_OFFSET = 2;
 	parameter	  WORD_OFFSET = $clog2(CACHE_BLOCK_SIZE/4);
-	parameter	  MEM_LINE = 2**11;		//	64KB: 32K data, 32K inst
+	//RVS192 parameter	  MEM_LINE = 2**11;		//	64KB: 32K data, 32K inst
+	parameter	  MEM_LINE = 32'h0001_03ff; //1K INST : 3K DATA 
 	parameter 	REGISTER_FILE_DEPTH = 32;
 
 //	Controller data type
