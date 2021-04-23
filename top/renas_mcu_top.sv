@@ -9,6 +9,7 @@
 // v0.0   10.04.2021  hungbk99  First Creation
 //////////////////////////////////////////////////////////////////////////////////
 
+`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
 `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
 `include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_cpu.sv"
 `include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
@@ -41,7 +42,8 @@ module renas_mcu_top
   slv_send_type                         dahb_in_2;
   slv_send_type                         peri_ahb_in;
   //Interrupt Handler
-  logic                                 data_dec_err;
+  logic                                 data_dec_err,
+                                        peri_dec_err;
   //-------------------------------------------------------------------
 	//WB Buffer
   logic [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_data;	
@@ -105,7 +107,7 @@ module renas_mcu_top
     .*
   );
 
-  AHB_bus
+  AHB_bus ahb_matrix
   (
   //#INTERFACEGEN#
   //#SI#
@@ -135,7 +137,7 @@ module renas_mcu_top
     .*
   );
 
-  renas_memory
+  renas_memory  mmem
   (
     .*
   );

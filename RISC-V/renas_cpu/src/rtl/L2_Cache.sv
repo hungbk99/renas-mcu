@@ -8,7 +8,7 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+//`include"renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 module	L2_Cache

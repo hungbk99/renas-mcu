@@ -19,7 +19,7 @@ module Testbench();
 
   renas_mcu_top dut
   (
-    .* 
+    .*
   );
 
 	initial begin

@@ -5,7 +5,7 @@
 // Author:	 		hungbk99
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 	`ifdef	HYBRID_BP
 	`define GBP_GEN;
 	`define LBP_GEN;
@@ -17,7 +17,7 @@
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	BPU
-//	#(`include"RVS192_user_parameters.h")
+//	#(//`include"RVS192_user_parameters.h")
 //	import	RVS192_user_parameters::*;	
 (
 	output	br_check_type	br_check_fetch,

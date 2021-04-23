@@ -6,7 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	IL1_Cache
@@ -344,14 +344,6 @@ module	IL1_Cache
 		end
 	end
 //================================================================================	
-//	Simulate
-`ifdef 	SIMULATE
-	include "RANDOM.sv";
-	include "ALRU.sv";
-	include "Victim_Cache.sv";
-	include "DualPort_SRAM.sv";	
-	include "IL1_Controller.sv"; 
-`endif
 	
 endmodule		
 

@@ -8,7 +8,7 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	Memory
@@ -150,26 +150,27 @@ module	Memory
 //================================================================================	
 //	Simulate
 `ifdef 	SIMULATE
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test1.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test2.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test3.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test4.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test5.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test6.txt";
-//	parameter DATA = "D:/RISC-V/testbench/pipeline_test7.txt";
-//	parameter DATA = "D:/RISC-V/testbench/forwarding_test.txt";
-//	parameter DATA = "D:/RISC-V/testbench/factorial_test.txt";		// maximum factorial = 12!
-//	parameter DATA = "D:/RISC-V/testbench/factorial_opt.txt";
-//	parameter DATA = "D:/RISC-V/testbench/arrangment.txt";
-//	parameter DATA = "D:/RISC-V/testbench/arrangement_fix.txt";
-//	parameter DATA = "D:/RISC-V/testbench/inner_loop.txt";
-//	parameter DATA = "D:/RISC-V/testbench/larger_inner_loop.txt";
-//	parameter DATA = "D:/RISC-V/testbench/inner_loop1.txt";
-//	parameter DATA = "D:/RISC-V/testbench/larger_inner_loop1.txt";
-	parameter DATA = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test1.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test2.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test3.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test4.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test5.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test6.txt";
+//	parameter INST = "D:/RISC-V/testbench/pipeline_test7.txt";
+//	parameter INST = "D:/RISC-V/testbench/forwarding_test.txt";
+//	parameter INST = "D:/RISC-V/testbench/factorial_test.txt";		// maximum factorial = 12!
+//	parameter INST = "D:/RISC-V/testbench/factorial_opt.txt";
+//	parameter INST = "D:/RISC-V/testbench/arrangment.txt";
+//	parameter INST = "D:/RISC-V/testbench/arrangement_fix.txt";
+//	parameter INST = "D:/RISC-V/testbench/inner_loop.txt";
+//	parameter INST = "D:/RISC-V/testbench/larger_inner_loop.txt";
+//	parameter INST = "D:/RISC-V/testbench/inner_loop1.txt";
+//	parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
+	parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
+	parameter DATA = "D:/RISC-V/testbench/data_memory_file.txt";
 	initial begin
-		$readmemh(DATA, MEM, 32'h0000_0400, 32'h0000_07ff);
-		$readmemh("data_memory_file.txt", MEM, 32'h0000_0000, 32'h0000_03ff);
+		$readmemh(INST, MEM, 32'h0000_0400, 32'h0000_07ff);
+		$readmemh(DATA, MEM, 32'h0000_0000, 32'h0000_03ff);
 	end
 `endif
 		

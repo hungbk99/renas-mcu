@@ -6,7 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+//`include"renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 module	Write_Buffer_L2

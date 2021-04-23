@@ -1,0 +1,23 @@
+Sun Jun 07 16:56:27 ICT 2020
+Trace back: wrong # args: should be "mti_popupinternal menu w"
+    while executing
+"mti_popupinternal .projectpopup_popup "
+    ("after" script)
+  <2:C:/questasim64_10.2c/tcl/tk8.5/bgerror.tcl:92: ::tkerror {wrong # args: should be "mti_popupinternal menu w"}
+  <1:eval:1: ::tk::dialog::error::bgerror {wrong # args: should be "mti_popupinternal menu w"}
+Sat Jul 11 21:07:13 ICT 2020
+Trace back: Bad sequence in.main_pane.memory.interior.cs.body.list.lwchildsite.clipper.canvas.sfchildsite.tree, aborting query. (2)
+    while executing
+"$itk_component(tree) insertquery end """
+    (object "::.main_pane.memory.interior.cs.body.list" method "::vsimwidgets::Hierarchy::requery" body line 3)
+    invoked from within
+"requery"
+    (object "::.main_pane.memory.interior.cs.body.list" method "::FlatMemlist::UpdateFlatMemList" body line 8)
+    invoked from within
+"$list UpdateFlatMemList"
+    (procedure "Memview::delayedUpdateMemoryList" line 5)
+    invoked from within
+"Memview::delayedUpdateMemoryList"
+    ("after" script)
+  <2:C:/questasim64_10.2c/tcl/tk8.5/bgerror.tcl:92: ::tkerror {Bad sequence in.main_pane.memory.interior.cs.body.list.lwchildsite.clipper.canvas.sfchildsite.tree, aborting query. (2)}
+  <1:eval:1: ::tk::dialog::error::bgerror {Bad sequence in.main_pane.memory.interior.cs.body.list.lwchildsite.clipper.canvas.sfchildsite.tree, aborting query. (2)}

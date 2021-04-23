@@ -14,7 +14,8 @@
 //                              Add navigator: choosing destination for data
 //        04.04.2021  hungbk99  WB Buffer would not use ahb interface
 //                              -> directly connected instead
-//        10.04.2021  hungbk99  Add support for WB buffer                      
+//        10.04.2021  hungbk99  Add support for WB buffer                     
+//        21.04.2021  hungbk99  Modify AHB-DATA Interface
 //////////////////////////////////////////////////////////////////////////////////
 
 `include"D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
@@ -47,6 +48,7 @@ module 	renas_cpu
   input   slv_send_type                         peri_ahb_in,
   //Interrupt Handler
   output logic                                  data_dec_err,
+                                                peri_dec_err, //Hung_add_21.04.2021
   //output  icache_itf_type_s                     inst_ahb_itf, //Hung_add_15_03
   //output  logic                                 inst_dec_err,
   //output  dcache_itf_type_s                     data_ahb_itf, //Hung_add_15_03
@@ -82,7 +84,8 @@ module 	renas_cpu
 									            pc_halt,
 //									          ICC_halt,
 //									          DCC_halt,
-									            FW_halt;
+									            FW_halt,
+                              peri_halt;  //Hung_add_21.04.2021
 
 	control_type_ex					    raw_control_signals;
 
@@ -102,7 +105,9 @@ module 	renas_cpu
 									            alu_in2,
 //									rs2_out_fix,
 									            data_r,
-									            data_in;
+									            data_in,
+                              data_dmem,
+                              data_peri;
 		
 	logic 	[1:0]					      fw_sel_1,
 									            fw_sel_2,
@@ -183,6 +188,10 @@ module 	renas_cpu
   logic peri_read;
   logic peri_write;
   logic peri_access;
+  //Hung_add_21.04.2021
+  logic mem_read;
+  logic mem_write;
+  //Hung_add_21.04.2021
   localparam PERI_BOUNDARY = 32'h011C;
 	//Hung_mod_03.04.2021 .cpu_read(o_pp_ex_mem.control_signals.cpu_read),
 	//Hung_mod_03.04.2021 .cpu_write(o_pp_ex_mem.control_signals.cpu_write),
@@ -210,11 +219,16 @@ module 	renas_cpu
   end
 //====================================================================
 //===========================Halt Control=============================
-	assign 	pc_halt = DCC_halt || ICC_halt || FW_halt || external_halt;
+	//Hung_mod_21.04.2021 assign 	pc_halt = DCC_halt || ICC_halt || FW_halt || external_halt;
+	//Hung_mod_21.04.2021 assign 	fetch_dec_halt = pc_halt;
+	//Hung_mod_21.04.2021 assign 	dec_ex_halt = FW_halt || DCC_halt || external_halt;
+	//Hung_mod_21.04.2021 assign 	dec_ex_flush = ICC_halt;
+	//Hung_mod_21.04.2021 assign 	ex_mem_halt =  DCC_halt || external_halt;
+	assign 	pc_halt = (DCC_halt || peri_halt) || ICC_halt || FW_halt || external_halt;
 	assign 	fetch_dec_halt = pc_halt;
-	assign 	dec_ex_halt = FW_halt || DCC_halt || external_halt;
+	assign 	dec_ex_halt = FW_halt || (DCC_halt || peri_halt) || external_halt;
 	assign 	dec_ex_flush = ICC_halt;
-	assign 	ex_mem_halt =  DCC_halt || external_halt;
+	assign 	ex_mem_halt =  (DCC_halt || peri_halt) || external_halt;
 	assign 	ex_mem_flush = FW_halt;
 	
 	always_ff @(posedge clk or negedge rst_n)
@@ -457,14 +471,19 @@ module 	renas_cpu
   .cpu_read(mem_read),
   .cpu_write(mem_write),
 	.data_write(i_pp_mem_wb.mem_out),
-	.data_read(data_r),
+	//Hung_mod_21.04.2021 .data_read(data_r),
+  .data_read(data_dmem),
 	.alu_out(o_pp_ex_mem.alu_out),
 	.inst_replace_req(inst_replace_check),
 	.data_replace_req(data_replace_check),	
 	.L2_full_flag(full_flag),
 	.*
 	);
-	
+
+  //Hung_mod_21.04.2021
+  assign  data_r = peri_access ? data_peri : data_dmem;
+  //Hung_mod_21.04.2021
+  
 	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
 	
 //==========================Write Back Stage===========================	
@@ -505,7 +524,10 @@ module 	renas_cpu
 
   ahb_data_interface  ahb_data_itf
   (
+    .data_peri_out(data_peri),
+    .data_peri_in(i_pp_mem_wb.mem_out),
 	  .alu_out(o_pp_ex_mem.alu_out),
+    .dirty_done(dirty_ack),
 	  .*
   );
 
@@ -541,6 +563,7 @@ module ahb_inst_interface
   logic         hlast,
                 trans_enable;
   logic [2:0]   wrap_addr;
+  logic         sample_req;
 //---------------------------------------------------------------------
 //AHB-INST
 //---------------------------------------------------------------------
@@ -573,7 +596,7 @@ module ahb_inst_interface
       trans_count <= '0;
       wrap_addr <= '0;
     end
-    else if(hlast)
+    else if(hlast || sample_req)
     begin
       trans_count <= '0;
       wrap_addr <= pc[4:2];
@@ -599,8 +622,10 @@ module ahb_inst_interface
     inst_dec_err = 1'b0;
     trans_enable = 1'b0;
     htrans_next_state = IDLE;
+    sample_req = 1'b0;
     unique case(htrans_current_state)
       IDLE: begin
+        sample_req = 1'b1;
         if(inst_update_req)
           htrans_next_state = NONSEQ;
         else
@@ -652,17 +677,23 @@ endmodule: ahb_inst_interface
 
 module ahb_data_interface
 (
-  //IL1 Cache
+  //Hung_add_21.04.2021
+  output [DATA_LENGTH-1:0]                          data_peri_out,
+	input [DATA_LENGTH-1:0]								            data_peri_in,
+  input                                             peri_read,
+                                                    peri_write,
+  output  logic                                     peri_halt,
+  //Hung_add_21.04.2021
+  //DL1 Cache
   output  cache_update_type                         DL2_out,
   input   [DATA_LENGTH-1:0]                         alu_out,
   input                                             data_update_req,
   input                                             //mem_read,
                                                     //mem_write,
-                                                    peri_read,
-                                                    peri_write,
                                                     dirty_req,
                                                     dirty_replace,
-  output                                            dirty_ack,
+  //Hung_mod_21.04.2021output                                            dirty_ack,
+  output logic                                      dirty_done,
 	input [DATA_LENGTH-1:0]								            dirty_data1,
 	input [DATA_LENGTH-1:0]								            dirty_data2,
 	input [DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-1:0]		dl1_dirty_addr,	
@@ -675,6 +706,7 @@ module ahb_data_interface
   input   slv_send_type                             peri_ahb_in,
   //Interrupt Handler
   output logic                                      data_dec_err,
+                                                    peri_dec_err,
   //System
   input                                             cache_clk,
   input                                             rst_n
@@ -690,6 +722,7 @@ module ahb_data_interface
   logic [2:0]   wrap_addr;
   logic         direction;
   logic         addr_sample;
+  logic         peri_direction;
 //---------------------------------------------------------------------
 //AHB-INST
 //---------------------------------------------------------------------
@@ -715,7 +748,54 @@ module ahb_data_interface
   assign DL2_out.addr_update = wrap_addr;
   assign DL2_out.w1_update = dahb_in_1.hrdata;
   assign DL2_out.w2_update = dahb_in_2.hrdata;
-  
+ 
+  //Hung_add_21.04.2021
+  assign dirty_done = hlast && dirty_replace; 
+
+  assign peri_ahb_out.hwrite = peri_direction;
+  assign peri_ahb_out.hburst = SINGLE; 
+  //assign peri_ahb_out.htrans = htrans_current_state;
+  assign peri_ahb_out.haddr = {alu_out[31:2], 2'b0};
+  assign peri_ahb_out.hsize = WORD;
+  assign peri_ahb_out.hmastlock = 1'b0;
+  assign peri_ahb_out.hprot = 4'h0;
+  assign peri_ahb_out.hwdata = data_peri_in;
+  assign data_peri_out = peri_ahb_in.hrdata;
+
+  assign peri_halt = (peri_read | peri_write) & ~peri_ahb_in.hreadyout;
+
+  always_comb begin
+    peri_direction = 1'b0;
+    if(peri_read)
+      peri_direction = 1'b0;
+    else if(peri_write)
+      peri_direction = 1'b1;
+  end
+
+  always_ff @(posedge cache_clk, negedge rst_n)
+  begin
+    if(!rst_n) begin
+      peri_ahb_out.htrans <= IDLE;
+      peri_dec_err <= 1'b1;
+    end
+    else if(peri_read || peri_write)
+    begin 
+      peri_ahb_out.htrans <= NONSEQ;
+      peri_dec_err <= 1'b0;
+      if(peri_ahb_in.hreadyout) begin
+        if(!peri_ahb_in.hresp)
+          peri_ahb_out.htrans <= IDLE;
+        else 
+          peri_dec_err <= 1'b1;
+      end
+    end
+  end
+  //-------------------------------------------------------------------------------------
+  //trans_count: count the number of transastion been sent
+  //wwrap_addr: start at 0 when doing the dirty replace
+  //            start at alu_out when doing the data replace
+  //-------------------------------------------------------------------------------------
+
   always_ff @(posedge cache_clk, negedge rst_n)
   begin
     if(!rst_n) begin
@@ -729,14 +809,16 @@ module ahb_data_interface
       if(!dirty_replace) 
       begin
         wrap_addr <= alu_out[4:2];
-        direction <= 1'b1;
+        //Hung_mod_21.04.2021 direction <= 1'b1;
+        direction <= 1'b0;
       end
       else begin
         //Debug dirty_replace <= '0;
         //Hung_mod_10.04.2021
         wrap_addr <= '0;
         //Hung_mod_10.04.2021
-        direction <= 1'b0;
+        //Hung_mod_21.04.2021 direction <= 1'b0;
+        direction <= 1'b1;
       end
     end
     else if(trans_enable && dahb_in_1.hreadyout && dahb_in_2.hreadyout) //Timing problem???
@@ -763,7 +845,8 @@ module ahb_data_interface
     htrans_next_state = IDLE; 
     unique case(htrans_current_state)
       IDLE: begin
-        if(data_update_req) begin
+        //Hung_mod_21.04.2021 if(data_update_req) begin
+        if(data_update_req || dirty_replace) begin
           htrans_next_state = NONSEQ;
           addr_sample = 1'b1;
         end
@@ -794,9 +877,10 @@ module ahb_data_interface
           data_dec_err = 1'b1;
         end
         else if((dahb_in_1.hreadyout && !dahb_in_1.hresp) && (dahb_in_1.hreadyout && !dahb_in_1.hresp)) begin
-          if(hlast && data_update_req) //Debug
-            htrans_next_state = NONSEQ;
-          else if(hlast && !data_update_req)
+          //Hung_mod_21.04.2021 if(hlast && data_update_req) //Debug
+          //Hung_mod_21.04.2021   htrans_next_state = NONSEQ;
+          //Hung_mod_21.04.2021 else if(hlast && !data_update_req)
+          if(hlast)
             htrans_next_state = IDLE;
           else
             htrans_next_state = htrans_current_state;

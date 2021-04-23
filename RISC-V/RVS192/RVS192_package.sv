@@ -6,7 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 package	RVS192_package;
 	import RVS192_user_parameters::*;
 //	export RVS192_user_define_package::*;

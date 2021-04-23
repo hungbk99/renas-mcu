@@ -8,155 +8,142 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+`ifndef TEST
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"
+`endif
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module 	RVS192
 (
 	input 	external_halt,
-			clk,
-			clk_l1,
-			clk_l2,
-			mem_clk,
-			rst_n
+			    clk,
+			    clk_l1,
+			    clk_l2,
+			    mem_clk,
+			    rst_n
 );
 
 //====================================================================
 //						    Pipelined RVS192
 //====================================================================		
 	logic 	[PC_LENGTH-1:0]			pc_in,
-									pc_fetch,
-									target_predict,
-									target_pc,
-									pc_in_fix,
-									actual_pc;
+									            pc_fetch,
+									            target_predict,
+									            target_pc,
+									            pc_in_fix,
+									            actual_pc;
 
-	logic							pc_sel,
-									pc_fix,
-									pc_halt,
-//									ICC_halt,
-//									DCC_halt,
-									FW_halt;
+	logic							          pc_sel,
+									            pc_fix,
+									            pc_halt,
+//									          ICC_halt,
+//									          DCC_halt,
+									            FW_halt;
 
-	control_type_ex					raw_control_signals;
+	control_type_ex		    			raw_control_signals;
 
-	br_update_type					br_update_ex;
+	br_update_type				    	br_update_ex;
 									
-	logic	[DATA_LENGTH-1:0]		data_wb;
+	logic	[DATA_LENGTH-1:0]		  data_wb;
 
 	logic 	[INST_LENGTH-1:0]		inst;
 
-	logic	[DATA_LENGTH-1:0]		add_result;
+	logic	[DATA_LENGTH-1:0]		  add_result;
 									
-	logic							ge,
-									eq;
+	logic							          ge,
+									            eq;
 									
 	logic 	[DATA_LENGTH-1:0]		branch_cal_out,
-									alu_in1,
-									alu_in2,
-//									rs2_out_fix,
-									data_r,
-									data_in;
+									            alu_in1,
+									            alu_in2,
+//								          	rs2_out_fix,
+									            data_r,
+									            data_in;
 		
-	logic 	[1:0]					fw_sel_1,
-									fw_sel_2,
-									mem_fix;
+	logic 	[1:0]					      fw_sel_1,
+									            fw_sel_2,
+									            mem_fix;
 	
-	pp_fetch_dec_type				i_pp_fetch_dec,
-									o_pp_fetch_dec;
+	pp_fetch_dec_type				    i_pp_fetch_dec,
+									            o_pp_fetch_dec;
 									
-	pp_dec_ex_type					i_pp_dec_ex,
-									o_pp_dec_ex;
+	pp_dec_ex_type					    i_pp_dec_ex,
+									            o_pp_dec_ex;
 									
-	pp_ex_mem_type					i_pp_ex_mem,
-									o_pp_ex_mem;
+	pp_ex_mem_type					    i_pp_ex_mem,
+									            o_pp_ex_mem;
 		
-	pp_mem_wb_type					i_pp_mem_wb,
-									o_pp_mem_wb;
+	pp_mem_wb_type					    i_pp_mem_wb,
+									            o_pp_mem_wb;
 	
-	logic 							fetch_dec_halt,
-									dec_ex_halt,
-									dec_ex_flush,
-									ex_mem_halt,
-									ex_mem_flush,
-									wrong_dl,
-									wrong_dl_1;
+	logic 							        fetch_dec_halt,
+									            dec_ex_halt,
+									            dec_ex_flush,
+									            ex_mem_halt,
+									            ex_mem_flush,
+									            wrong_dl,
+									            wrong_dl_1;
 //================================CACHE===============================
 //====================================================================
 	parameter	L2_TAG_LENGTH = DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-$clog2(L2_CACHE_LINE);
 
 //	CPU
-	logic												ICC_halt;
-//	logic 	[INST_LENGTH-1:0]							inst_fetch;
-//	logic 	[PC_LENGTH-1:0]								pc;
-//	HANDSHAKE			
-//	System	
-//	CPU
-	logic												DCC_halt;
-//	logic 	[DATA_LENGTH-1:0]							data_read;
-//	logic 	[DATA_LENGTH-1:0]							data_write;
-//	logic	[DATA_LENGTH-1:0]							alu_out;
-//	logic												cpu_read;
-//	logic 												cpu_write;	
-//	Dirty handshake		
+	logic												                      ICC_halt;
+	logic												                      DCC_halt;
 //	Replace handshake	
-	logic												inst_replace_req,
-														data_replace_req;	
+	logic												                      inst_replace_req,
+										  				                      data_replace_req;	
 	logic 	[DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-1:0]	dl1_dirty_addr;													
-//	 	logic 	[DATA_LENGTH-1:0]								update_addr;
-//	logic 												update_req;
-//	logic 												update_ack;
 //	Write Buffer
-	logic												L2_full_flag;
-//	 	logic 	[DATA_LENGTH-1:0]		wb_addr;	
+	logic												                      L2_full_flag;
 //	System	
 
 //	Il1 Cache
-	cache_update_type									IL2_out;
-//	output 	logic										inst_update_ack;
-	logic 												inst_update_req;
-	logic 	[PC_LENGTH-1:0]								pc_up;
-	logic 												inst_replace_il1_ack,
-														data_replace_il1_ack;			
-	logic												L2_inst_il1_ack,
-														L2_inst_dl1_ack,
-														L2_data_il1_ack,
-														L2_data_dl1_ack;
+	cache_update_type									                IL2_out;
+	logic 												                    inst_update_req;
+	logic 	[PC_LENGTH-1:0]								            pc_up;
+	logic 										                        inst_replace_il1_ack,
+													                          data_replace_il1_ack;			
+	logic											                        L2_inst_il1_ack,
+														                        L2_inst_dl1_ack,
+														                        L2_data_il1_ack,
+														                        L2_data_dl1_ack;
 //	DL1 Cache
-	cache_update_type									DL2_out;
-//	output 	logic										data_update_ack;
-	logic 												data_update_req;
-	logic 	[PC_LENGTH-1:0]								alu_out_up;	
-	logic	[DATA_LENGTH-1:0]							dirty_data1;
-	logic	[DATA_LENGTH-1:0]							dirty_data2;
-	logic 	[DATA_LENGTH-1:0]							dirty_addr;				// DL1 chi gui tag va index do do phai them bit 0 truoc khi su dung
-	logic 	 											dirty_req;
-	logic												dirty_ack;
-	logic 	 											dirty_replace;	
-	logic 	[2*DATA_LENGTH-BYTE_OFFSET-1:0]				wb_data;	
-	logic		 										wb_req;
-	logic 												wb_ack;	
-	logic 												full_flag;
-	logic 												inst_replace_dl1_ack,
-														data_replace_dl1_ack;		
+	cache_update_type					                				DL2_out;
+	logic 												                    data_update_req;
+	logic 	[PC_LENGTH-1:0]								            alu_out_up;	
+	logic	  [DATA_LENGTH-1:0]							            dirty_data1;
+	logic	  [DATA_LENGTH-1:0]							            dirty_data2;
+	logic 	[DATA_LENGTH-1:0]							            dirty_addr;				// DL1 chi gui tag va index do do phai them bit 0 truoc khi su dung
+	logic 	 											                    dirty_req;
+	logic												                      dirty_ack;
+	logic 	 											                    dirty_replace;	
+	logic 	[2*DATA_LENGTH-BYTE_OFFSET-1:0]				    wb_data;	
+	logic		 										                      wb_req;
+	logic 												                    wb_ack;	
+	logic 												                    full_flag;
+	logic 												                    inst_replace_dl1_ack,
+														                        data_replace_dl1_ack;		
 //	To both IL1 and DL1
-	logic												inst_replace_check,
-														data_replace_check;
+	logic												                      inst_replace_check,
+														                        data_replace_check;
 	logic 	[L2_TAG_LENGTH+$clog2(L2_CACHE_LINE)-1:0]	inst_addr_replace,
-														data_addr_replace;																
+														                        data_addr_replace;																
 //	Mem
 //	System
 	
-	logic 	[INST_LENGTH-1:0]							inst_mem_read;
-	logic 	[DATA_LENGTH-1:0]							data_mem_read;
-	logic												inst_res,		//	Use for synchoronous
-														data_res;
-	logic	[DATA_LENGTH-1:0]							data_mem_write,
-														data_addr;
-	logic 	[PC_LENGTH-1:0]								inst_addr;
-	logic 												inst_read_req,
-														data_read_req,
-														data_write_req;
+	logic 	[INST_LENGTH-1:0]							            inst_mem_read;
+	logic 	[DATA_LENGTH-1:0]							            data_mem_read;
+	logic												                      inst_res,		//	Use for synchoronous
+														                        data_res;
+	logic 	[DATA_LENGTH-1:0]				 			            data_mem_write,
+													             	            data_addr;
+	logic 	[PC_LENGTH-1:0]								            inst_addr;
+	logic 												                    inst_read_req,
+														                        data_read_req,
+														                        data_write_req;
 														
 //====================================================================
 //===========================Halt Control=============================
@@ -435,24 +422,33 @@ module 	RVS192
 	(
 	.*
 	);
-	
-//=============================Simulation==============================	
-//=====================================================================	
-	`ifdef SIMULATE
-		include"BPU.sv";
-//		include"IMEM.sv";
-		include"Register_File.sv";
-		include"Decoder.sv";
-		include"ALU_RVS192.sv";
-		include"Branch_Handling.sv";
-		include"Forwarding_Unit.sv";
-		include"DataGen.sv";
-//		include"DMEM.sv";
-		include"IL1_Cache.sv";
-		include"DL1_Cache.sv";
-		include"L2_cache.sv";
-//		assign 	DCC_halt = 1'b0;
-//		assign 	ICC_halt = 1'b0;
-	`endif
-	
 endmodule	
+	
+//=====================================================================	
+//=====================================================================	
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/BPU.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Register_File.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Decoder.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/ALU_RVS192.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Branch_Handling.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Forwarding_Unit.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Datagen.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/RANDOM.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/ALRU.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Victim_Cache.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/DualPort_SRAM.sv"	
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/IL1_Controller.sv" 
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/IL1_Cache.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/DL1_Controller.sv" 
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/DL1_Cache.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Check_Set_L2.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Write_Buffer_L2.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/L2C_Controller.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/L2_Cache.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Configurable_Mux_Write.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Configurable_Multiplexer.sv"
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/Write_Buffer.sv"
+		`include "D:/Project/renas-mcu/RISC-V/RVS192/Memory.sv"
+//=====================================================================	
+//=====================================================================	
+	

@@ -6,7 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	DL1_Cache
@@ -576,20 +576,18 @@ module	DL1_Cache
 		end
 	end
 //================================================================================	
-`ifdef 	SIMULATE
-	include "RANDOM.sv";
-	include "ALRU.sv";
-	include "Victim_Cache.sv";
-	include "DualPort_SRAM.sv";	
-	include "DL1_Controller.sv"; 
-	include "Configurable_Mux_Write.sv";
-	include "Configurable_Multiplexer.sv";
-	include "Write_Buffer.sv";
+	//include "RANDOM.sv";
+	//include "ALRU.sv";
+	//include "Victim_Cache.sv";
+	//include "DualPort_SRAM.sv";	
+	//include "DL1_Controller.sv"; 
+	//include "Configurable_Mux_Write.sv";
+	//include "Configurable_Multiplexer.sv";
+	//include "Write_Buffer.sv";
 	
 	initial begin
 		$readmemh("WBL2.txt", DL1_WB.WB);			
 	end	
-`endif
 	
 endmodule
 

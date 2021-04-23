@@ -13,7 +13,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-`include"renas_user_define.h"
+//`include"renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 module	alu_renas

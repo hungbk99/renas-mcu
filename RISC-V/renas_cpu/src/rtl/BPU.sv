@@ -5,7 +5,7 @@
 // Author:	 		hungbk99
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
-//`include"renas_user_define.h"
+////`include"renas_user_define.h"
 	`ifdef	HYBRID_BP
 	`define GBP_GEN;
 	`define LBP_GEN;

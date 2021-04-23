@@ -1,16 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 // File Name: 		L2_Cache.sv
 // Module Name:		Level 2 Share Cache	
-// Project Name:	renas
+// Project Name:	RVS192
 // Author:	 		hungbk99
 // University:     	DP S192	HCMUT
 // Copyright (C) 	Le Quang Hung 
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
-import 	renas_package::*;
-import	renas_user_parameters::*;
+import 	RVS192_package::*;
+import	RVS192_user_parameters::*;
 module	L2_Cache
 #(
 	parameter	TAG_LENGTH = DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-$clog2(L2_CACHE_LINE)
@@ -62,7 +61,7 @@ module	L2_Cache
 	input 													                        data_res,
 	input 													                        inst_res,
 //	System
-	input					  								                        cache_clk,
+	input					  								                        clk_l1,
 	input 													                        clk_l2,
 	input						  							                        rst_n
 );
@@ -707,16 +706,14 @@ module	L2_Cache
 	
 //================================================================================	
 //	Simulate
-`ifdef 	SIMULATE
-	include "Write_Buffer_L2.sv";
-	include "Check_Set_L2.sv";
-	include "DualPort_SRAM.sv";	
-	include "L2C_Controller.sv"; 
+	//include "Write_Buffer_L2.sv";
+	//include "Check_Set_L2.sv";
+	//include "DualPort_SRAM.sv";	
+	//include "L2C_Controller.sv"; 
 		
 	initial begin
 		$readmemh("WBL2.txt", WB_L2.WB);			
 	end
-`endif
 	
 endmodule
 
@@ -760,7 +757,7 @@ module	cc_update_handshake
 	input									enable,
 											cpu_read,
 											update_req,
-											cache_clk,
+											clk_l1,
 											clk_l2,
 											rst_n
 );
@@ -773,7 +770,7 @@ module	cc_update_handshake
 	logic 									check_sent;
 
 	assign 	check_sent = &sent;
-	always_ff @(posedge cache_clk or negedge rst_n)
+	always_ff @(posedge clk_l1 or negedge rst_n)
 	begin
 		if(!rst_n)
 			sent <= '0;
@@ -783,7 +780,7 @@ module	cc_update_handshake
 			sent[addr_update] <= 1'b1;
 	end
 	
-	always_ff @(posedge cache_clk or negedge rst_n)
+	always_ff @(posedge clk_l1 or negedge rst_n)
 	begin
 		if(!rst_n)
 		begin
@@ -800,7 +797,7 @@ module	cc_update_handshake
 	assign 	w1_update = data[addr_update];
 	assign	w2_update = data[addr_update + SLOT/2];
 	
-	always_ff @(posedge cache_clk or negedge rst_n)
+	always_ff @(posedge clk_l1 or negedge rst_n)
 	begin
 		if(!rst_n)
 			update <= 1'b0;
@@ -814,7 +811,7 @@ module	cc_update_handshake
 	generate
 	if(KIND == "DATA")
 	begin
-		always_ff @(posedge cache_clk or negedge rst_n)
+		always_ff @(posedge clk_l1 or negedge rst_n)
 		begin
 			if(!rst_n)
 				addr_update_raw <= SLOT/2-1;
@@ -830,7 +827,7 @@ module	cc_update_handshake
 	end
 	else 
 	begin
-		always_ff @(posedge cache_clk or negedge rst_n)
+		always_ff @(posedge clk_l1 or negedge rst_n)
 		begin
 			if(!rst_n)
 				addr_update_raw <= SLOT/2-1;
@@ -905,7 +902,7 @@ module	cc_dirty_handshake
 	input 										dirty_req,
 	input 										update,
 //	input 										dirty_solve,
-	input 										cache_clk,
+	input 										clk_l1,
 	input 										clk_l2,
 	input 										rst_n
 );
@@ -915,7 +912,7 @@ module	cc_dirty_handshake
 												dirty_req_sync_1;
 	logic 	[$clog2(CACHE_BLOCK_SIZE/4)-1:0]	addr;
 	
-	always_ff @(posedge cache_clk)
+	always_ff @(posedge clk_l1)
 	begin
 		if(update)
 		begin
@@ -926,7 +923,7 @@ module	cc_dirty_handshake
 			dirty_data <= dirty_data;
 	end
 	
-	always_ff @(posedge cache_clk or negedge rst_n)
+	always_ff @(posedge clk_l1 or negedge rst_n)
 	begin
 		if(!rst_n)
 			addr <= '0;

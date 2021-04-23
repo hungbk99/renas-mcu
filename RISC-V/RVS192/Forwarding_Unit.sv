@@ -8,7 +8,7 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module Forwarding_Unit 

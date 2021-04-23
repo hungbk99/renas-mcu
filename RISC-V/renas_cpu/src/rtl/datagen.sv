@@ -12,7 +12,7 @@
 //        15.03.2021  hungbk99  Add support for AHB interface                      
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"renas_user_define.h"
+//`include"renas_user_define.h"
 import 	renas_package::*;
 import	renas_user_parameters::*;
 module datagen

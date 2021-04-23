@@ -25,7 +25,7 @@ module	DL1_Controller
 	input 												                    cpu_write,		
 	input 												                    L2_full_flag,
 //	Dirty Handshake
-	output 	logic 										                dirty_trigger,
+	output 	logic 										                dirty_trigger,  //dirty_replace -> dirty_trigger
 	output 	logic 										                dirty_replace,
 	output	logic 	[$clog2(CACHE_BLOCK_SIZE/8)-1:0]	dirty_word_sel,
 	input 	logic 										                dirty_done,
@@ -234,26 +234,38 @@ module	DL1_Controller
 			begin
 				DCC_halt_raw = 1'b1;			
 				dirty_replace = 1'b1;
-				if(dirty_word_sel == CACHE_BLOCK_SIZE/8-1)
-				begin
-					dirty_req_raw = 1'b1;
-//					dirty_replace = 1'b0;
-					next_state = HALT_DIRTY_2;
-				end			
-				else 
-					next_state = current_state;
-			end
-			HALT_DIRTY_2:
-			begin
-				if(dirty_done)
-				begin
-					dirty_req_raw = 1'b0;
-					update_req_raw = 1'b1;
-					next_state = HALT_REPLACE;				
-				end
-				else 
-					next_state = current_state;				
-			end
+        //Hung_add_21.04.2021
+        update_req_raw = 1'b0;
+        if(dirty_done) begin
+          update_req_raw = 1'b1;
+          dirty_replace = 1'b0;
+          next_state = HALT_REPLACE;
+        end
+        else
+          next_state = current_state;
+      end
+        //Hung_add_21.04.2021
+
+			//Hung_mod_21.04.2021	if(dirty_word_sel == CACHE_BLOCK_SIZE/8-1)
+			//Hung_mod_21.04.2021	begin
+			//Hung_mod_21.04.2021		dirty_req_raw = 1'b1;
+//		//Hung_mod_21.04.2021			dirty_replace = 1'b0;
+			//Hung_mod_21.04.2021		next_state = HALT_DIRTY_2;
+			//Hung_mod_21.04.2021	end			
+			//Hung_mod_21.04.2021	else 
+			//Hung_mod_21.04.2021		next_state = current_state;
+			//Hung_mod_21.04.2021end
+			//Hung_mod_21.04.2021HALT_DIRTY_2:
+			//Hung_mod_21.04.2021begin
+			//Hung_mod_21.04.2021	if(dirty_done)
+			//Hung_mod_21.04.2021	begin
+			//Hung_mod_21.04.2021		dirty_req_raw = 1'b0;
+			//Hung_mod_21.04.2021		update_req_raw = 1'b1;
+			//Hung_mod_21.04.2021		next_state = HALT_REPLACE;				
+			//Hung_mod_21.04.2021	end
+			//Hung_mod_21.04.2021	else 
+			//Hung_mod_21.04.2021		next_state = current_state;				
+			//Hung_mod_21.04.2021end
 			CHALLENGE:
 			begin
 //				replace_sel = 1'b1;			

@@ -6,7 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 
-`include"RVS192_user_define.h"
+//`include"RVS192_user_define.h"
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	Write_Buffer_L2

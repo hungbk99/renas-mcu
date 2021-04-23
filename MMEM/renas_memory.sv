@@ -7,9 +7,11 @@
 // Email: 			quanghungbk1999@gmail.com  
 // Ver    Date        Author    Description
 // v0.0   17.04.2021  hungbk99  Modify from RVS192 cpu
+// v0.1   19.04.2021  hungbk99  Modify from Single-RAM => Dual RAM
 //////////////////////////////////////////////////////////////////////////////////
 
 //`include"renas_user_define.h"
+//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"	
 import 	renas_package::*;
 import  AHB_package::*;
 import	renas_user_parameters::*;
@@ -30,14 +32,15 @@ module	renas_memory
   //Write buffer
   input   [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_data,	
 	input	        								          wb_req,
-	output 												          wb_ack,	
-	output 												          full_flag,
+	output logic 												    wb_ack,	
+	output logic 												    full_flag,
   input                                   cache_clk,
                                           mem_clk,
                                           rst_n
 );
   //--------------------------------------------------------------------	
-  logic [DATA_LENGTH-1:0]	MEM	[MEM_LINE-1:0];
+  logic [DATA_LENGTH-1:0]	MEM1	[MEM_LINE/2-1:0];
+  logic [DATA_LENGTH-1:0]	MEM2	[MEM_LINE/2-1:0];
   logic [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_reg;
   logic                                 wb_ready,
                                         wb_req_mask,
@@ -155,8 +158,8 @@ module	renas_memory
         imem_out_2.hrdata <= inst_mem_read2;
       end
       else begin
-        imem_out_1.hreadyout <= 1'b0;
-        imem_out_2.hreadyout <= 1'b0;
+        imem_out_1 <= 1'b0;
+        imem_out_2 <= 1'b0;
       end
 
       if(data_ack && data_req) begin
@@ -166,8 +169,8 @@ module	renas_memory
         dmem_out_2.hrdata <= data_mem_read2;
       end
       else begin
-        dmem_out_1.hreadyout <= 1'b0;
-        dmem_out_2.hreadyout <= 1'b0;
+        dmem_out_1 <= 1'b0;
+        dmem_out_2 <= 1'b0;
       end
     end
   end
@@ -231,40 +234,100 @@ module	renas_memory
 
   assign wb_dirty_data = wb_done ? wb_mem_write : data_mem_write_sync1;
 
-	always_ff @(posedge mem_clk or negedge rst_n)
+	//always_ff @(posedge mem_clk or negedge rst_n)
+	//begin
+	//	if(!rst_n)
+	//	begin
+	//		data_mem_read1 <= '0;
+	//		inst_mem_read1 <= '0;
+	//		data_mem_read2 <= '0;
+	//		inst_mem_read2 <= '0;
+	//	end
+	//	else begin
+	//		if((data_write_en1 || wb_done) && (p_D_Byte1 == '0))  //DEBUG
+	//		begin
+	//			MEM[p_D_Word1] <= wb_dirty_data;   
+	//			data_mem_read1 <= wb_dirty_data; 
+	//		end
+	//		else
+	//			data_mem_read1 <= MEM[p_D_Word1];
+	//		
+	//		if((data_write_en2) && (p_D_Byte2 == '0))
+	//		begin
+	//			MEM[p_D_Word2] <= data_mem_write_sync2;
+	//			data_mem_read2 <= data_mem_write_sync2;	
+	//		end
+	//		else
+	//			data_mem_read2 <= MEM[p_D_Word2];
+	//		
+  //    //if(!wb_ready)
+  //    //  MEM[wb_ptr] <= wb_mem_write;
+
+	//		inst_mem_read1 <= MEM[p_I_Word1];
+	//		inst_mem_read2 <= MEM[p_I_Word2];
+	//	end
+	//end
+	
+  always_ff @(posedge mem_clk)
 	begin
-		if(!rst_n)
-		begin
-			data_mem_read1 <= '0;
-			inst_mem_read1 <= '0;
-			data_mem_read2 <= '0;
-			inst_mem_read2 <= '0;
-		end
-		else begin
 			if((data_write_en1 || wb_done) && (p_D_Byte1 == '0))  //DEBUG
 			begin
-				MEM[p_D_Word1] <= wb_dirty_data;   
+				MEM1[p_D_Word1] <= wb_dirty_data;   
 				data_mem_read1 <= wb_dirty_data; 
 			end
 			else
-				data_mem_read1 <= MEM[p_D_Word1];
+				data_mem_read1 <= MEM1[p_D_Word1];
 			
+			inst_mem_read1 <= MEM1[p_I_Word1];
+	end
+	
+  always_ff @(posedge mem_clk)
+	begin
 			if((data_write_en2) && (p_D_Byte2 == '0))
 			begin
-				MEM[p_D_Word2] <= data_mem_write_sync2;
+				MEM2[p_D_Word2] <= data_mem_write_sync2;
 				data_mem_read2 <= data_mem_write_sync2;	
 			end
 			else
-				data_mem_read2 <= MEM[p_D_Word2];
+				data_mem_read2 <= MEM2[p_D_Word2];
 			
-      //if(!wb_ready)
-      //  MEM[wb_ptr] <= wb_mem_write;
-
-			inst_mem_read1 <= MEM[p_I_Word1];
-			inst_mem_read2 <= MEM[p_I_Word2];
-		end
+      inst_mem_read2 <= MEM2[p_I_Word2];
 	end
-	
+		//DualPort_SRAM
+		//#(
+		//.SRAM_LENGTH(DATA_LENGTH), 
+		//.SRAM_DEPTH(MEM_LINE/2)
+		//)
+		//SLOT1DATA
+		//(
+		//.data_out1(data_mem_read1), 
+		//.data_out2(inst_mem_read1),	
+		//.data_in1(wb_dirty_data),
+		//.data_in2('0),	
+		//.addr1(p_D_Word1),
+		//.addr2(p_I_Word1),
+		//.wen1((data_write_en1 || wb_done) && (p_D_Byte1 == '0)), 
+		//.wen2(1'b0),
+		//.clk(mem_clk)
+		//);
+
+		//DualPort_SRAM
+		//#(
+		//.SRAM_LENGTH(DATA_LENGTH), 
+		//.SRAM_DEPTH(MEM_LINE/2)
+		//)
+		//SLOT2DATA
+		//(
+		//.data_out1(data_mem_read2), 
+		//.data_out2(inst_mem_read2),	
+		//.data_in1(wb_dirty_data),
+		//.data_in2('0),	
+		//.addr1(p_D_Word2),
+		//.addr2(p_I_Word2),
+		//.wen1((data_write_en2) && (p_D_Byte2 == '0)), 
+		//.wen2(1'b0),
+		//.clk(mem_clk)
+		//);
 //================================================================================	
 //	Simulate
 `ifdef 	SIMULATE
@@ -285,10 +348,10 @@ module	renas_memory
 //	parameter INST = "D:/RISC-V/testbench/inner_loop1.txt";
 //	parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
 	parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
-	initial begin
-		$readmemh(INST, MEM, 32'h0000_0400 - 32'h400, 32'h0000_07ff - 32'h400);
-		$readmemh("D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/data_memory_file.txt", MEM, 32'h0000_0800 -32'h400, 32'h0001_03ff - 32'h400);
-	end
+	//initial begin
+	//	$readmemh(INST, MEM, 32'h0000_0400 - 32'h400, 32'h0000_07ff - 32'h400);
+	//	$readmemh("D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/data_memory_file.txt", MEM, 32'h0000_0800 -32'h400, 32'h0001_03ff - 32'h400);
+	//end
 `endif
 
 endmodule: renas_memory
