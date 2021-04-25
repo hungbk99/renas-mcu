@@ -62,16 +62,26 @@ module	L2_Cache
 	output	logic 	[TAG_LENGTH+$clog2(L2_CACHE_LINE)-1:0]	inst_addr_replace,
 			                             												data_addr_replace,																
 //	Mem
-	input	[INST_LENGTH-1:0]								                  inst_mem_read,
-	input	[DATA_LENGTH-1:0]								                  data_mem_read,
-	output	logic	[DATA_LENGTH-1:0]						              data_mem_write,	
-	output 	logic											                      inst_read_req,
-															                            data_read_req,
-															                            data_write_req,
-	output	logic	[DATA_LENGTH-1:0]						              data_addr,
-	output	logic	[PC_LENGTH-1:0]							              inst_addr,
-	input 													                        data_res,
-	input 													                        inst_res,
+	//Hung_mod_25.04.2021	input	[INST_LENGTH-1:0]								                  inst_mem_read,
+	//Hung_mod_25.04.2021	input	[DATA_LENGTH-1:0]								                  data_mem_read,
+	//Hung_mod_25.04.2021	output	logic	[DATA_LENGTH-1:0]						              data_mem_write,	
+	//Hung_mod_25.04.2021	output 	logic											                      inst_read_req,
+	//Hung_mod_25.04.2021															                            data_read_req,
+	//Hung_mod_25.04.2021															                            data_write_req,
+	//Hung_mod_25.04.2021	output	logic	[DATA_LENGTH-1:0]						              data_addr,
+	//Hung_mod_25.04.2021	output	logic	[PC_LENGTH-1:0]							              inst_addr,
+	//Hung_mod_25.04.2021	input 													                        data_res,
+	//Hung_mod_25.04.2021	input 													                        inst_res,
+  	output  mas_send_type                           iahb_out,
+  	input   slv_send_type                           iahb_in,
+  	//Interrupt Handler
+  	output logic                                    inst_dec_err,
+  	//AHB-ITF
+  	output  mas_send_type                           dahb_out,
+  	input   slv_send_type                           dahb_in,
+  	//Interrupt Handler
+  	output logic                                    data_dec_err,
+
 //	System
 	input					  								                        clk_l1,
 	input 													                        clk_l2,
@@ -650,6 +660,50 @@ module	L2_Cache
 	.*
 );
 
+//================================================================================		
+//AHB Interface
+//================================================================================		
+ahb_inst_itf	ahb_inst_interface
+(
+  //AHB-ITF
+  //Interrupt Handler
+  //Cache-ITF
+	.data_read_sync(inst_mem_read_sync),
+	.word_sel(inst_mem_word),
+	.write_en(inst_mem_write_ena),
+	.replace_done(inst_mem_replace_done),
+	.replace_req(inst_mem_replace_req),
+	.addr({inst_tag, inst_index}),
+	.*
+);
+
+ahb_data_itf	ahb_data_interface
+(
+  //AHB-ITF
+  //Interrupt Handler
+  //Cache-ITF
+  //Read
+	.data_read_sync(data_mem_read_sync),
+	.word_sel(data_mem_word),
+	.write_en(data_mem_write_ena),
+	.replace_done(data_mem_replace_done),
+	.replace_req(data_mem_replace_req),
+	.addr({data_tag, data_index}),
+
+  //Write
+	.inst_dirty_done(inst_mem_dirty_done),
+	.data_dirty_done(data_mem_dirty_done),
+	.inst_dirty_req(inst_mem_dirty_req),
+	.inst_dirty_tag(inst_dirty_tag),
+	.inst_dirty_data(inst_dirty_data_block),
+	.data_dirty_req(data_mem_dirty_req),
+	.data_dirty_tag(data_dirty_tag),
+	.data_dirty_data(data_dirty_data_block),	
+	.wb_empty(empty_flag),
+	.wb_tag(wb_tag_out),	
+	.wb_data(wb_data_out),
+	.*
+);
 //Hung_mod_24.04.2021//	Read Mem Interfaces
 //Hung_mod_24.04.202/	Read_Mem
 //Hung_mod_24.04.202/	#(
@@ -1851,7 +1905,7 @@ module ahb_data_itf
 
   assign read_res = dahb_in.hreadyout;
   assign data_read = dahb_in.hrdata;
-  assign inst_dec_err = dahb_in.hreadyout & dahb_in.hresp;
+  assign data_dec_err = dahb_in.hreadyout & dahb_in.hresp;
 
   always_ff @(posedge clk_l2, negedge rst_n)
   begin
