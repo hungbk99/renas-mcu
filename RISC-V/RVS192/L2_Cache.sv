@@ -1751,20 +1751,20 @@ parameter	WORD_LENGTH = 16
   end
   
   always_comb begin
-    n_state = IDLE;
+    n_state = IDLE_I;
     iahb_out.htrans = IDLE;
     unique case(n_state)
     IDLE_I: begin
       if(read_req) begin
         iahb_out.htrans = NONSEQ;
-        n_state = NONSEQ;
+        n_state = NONSEQ_I;
       end
     end
     NONSEQ_I: begin
       iahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
-        n_state = BUSY;
+        n_state = BUSY_I;
         iahb_out.htrans = BUSY;
       end
       else
@@ -1774,12 +1774,12 @@ parameter	WORD_LENGTH = 16
       iahb_out.htrans = SEQ;
       if(read_req && read_res && !inst_read_inst.stop) 
       begin
-        n_state = BUSY;
+        n_state = BUSY_I;
         iahb_out.htrans = BUSY;
       end
       else if(read_req && read_res && inst_read_inst.stop)
       begin
-        n_state = IDLE;
+        n_state = IDLE_I;
         iahb_out.htrans = IDLE;
       end
       else
@@ -1790,7 +1790,7 @@ parameter	WORD_LENGTH = 16
       if(!read_res && read_req)
       begin
         iahb_out.htrans = SEQ;
-        n_state = SEQ;
+        n_state = SEQ_I;
       end
       else
         n_state = state;
@@ -1925,20 +1925,20 @@ parameter	WORD_LENGTH = 16
   
   always_comb begin
     direction = 1'b0;
-    n_state = IDLE;
+    n_state = IDLE_D;
     dahb_out.htrans = IDLE;
     unique case(n_state)
     IDLE_D: begin
       if(read_req) begin
         dahb_out.htrans = NONSEQ;
-        n_state = NONSEQ;
+        n_state = NONSEQ_D;
       end
     end
     NONSEQ_D: begin
       dahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
-        n_state = BUSY;
+        n_state = BUSY_D;
         dahb_out.htrans = BUSY;
       end
       else
@@ -1948,12 +1948,12 @@ parameter	WORD_LENGTH = 16
       dahb_out.htrans = SEQ;
       if(read_req && read_res && !data_read_inst.stop) 
       begin
-        n_state = BUSY;
+        n_state = BUSY_D;
         dahb_out.htrans = BUSY;
       end
       else if(read_req && read_res && data_read_inst.stop)
       begin
-        n_state = IDLE;
+        n_state = IDLE_D;
         dahb_out.htrans = IDLE;
       end
       else
@@ -1964,7 +1964,7 @@ parameter	WORD_LENGTH = 16
       if(!read_res && read_req)
       begin
         dahb_out.htrans = SEQ;
-        n_state = SEQ;
+        n_state = SEQ_D;
       end
       else
         n_state = state;
