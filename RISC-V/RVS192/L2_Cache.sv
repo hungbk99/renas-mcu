@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////////
-// File Name: 		renas_cpu.sv
-// Function:		  Top Module for renas cpu
+// File Name: 		L2_Cache.sv
+// Function:		Level 2 Share Cache	
 // Project Name:	renas mcu
 // Copyright (C) 	Le Quang Hung 
 // Ho Chi Minh University of Technology
@@ -73,11 +73,12 @@ module	L2_Cache
 	//Hung_mod_25.04.2021	output	logic	[PC_LENGTH-1:0]							              inst_addr,
 	//Hung_mod_25.04.2021	input 													                        data_res,
 	//Hung_mod_25.04.2021	input 													                        inst_res,
+  	//I-AHB-ITF
   	output  mas_send_type                           iahb_out,
   	input   slv_send_type                           iahb_in,
   	//Interrupt Handler
   	output logic                                    inst_dec_err,
-  	//AHB-ITF
+  	//D-AHB-ITF
   	output  mas_send_type                           dahb_out,
   	input   slv_send_type                           dahb_in,
   	//Interrupt Handler

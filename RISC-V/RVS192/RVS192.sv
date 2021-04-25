@@ -8,6 +8,18 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////
+// File Name: 		renas_cpu.sv
+// Function:		Top Module for renas cpu
+// Project Name:	renas mcu
+// Copyright (C) 	Le Quang Hung 
+// Ho Chi Minh University of Technology
+// Email: 			quanghungbk1999@gmail.com  
+// Ver    Date        Author    Description
+// v0.1   25.04.2021  hungbk99  Mod: AHP Interface  
+//                                   Read Mem                     -> AHB-INST Interface
+//                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
+//////////////////////////////////////////////////////////////////////////////////
 `ifndef TEST
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
@@ -19,12 +31,25 @@ import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module 	RVS192
 (
-	input 	external_halt,
-			    clk,
-			    clk_l1,
-			    clk_l2,
-			    mem_clk,
-			    rst_n
+	//Hung_add_25.04.2021
+  	//I-AHB-ITF
+  	output  mas_send_type                           iahb_out,
+  	input   slv_send_type                           iahb_in,
+  	//Interrupt Handler
+  	output logic                                    inst_dec_err,
+  	//D-AHB-ITF
+  	output  mas_send_type                           dahb_out,
+  	input   slv_send_type                           dahb_in,
+  	//Interrupt Handler
+  	output logic                                    data_dec_err,
+	//Hung_add_25.04.2021
+
+	input 											external_halt,
+			    									clk,
+			    									clk_l1,
+			    									clk_l2,
+			    									mem_clk,
+			    									rst_n
 );
 
 //====================================================================
