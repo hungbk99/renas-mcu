@@ -585,9 +585,9 @@ module	DL1_Cache
 	//include "Configurable_Multiplexer.sv";
 	//include "Write_Buffer.sv";
 	
-	initial begin
-		$readmemh("WBL2.txt", DL1_WB.WB);			
-	end	
+	//Hung_mod_25.04.2021 initial begin
+	//Hung_mod_25.04.2021 	$readmemh("WBL2.txt", DL1_WB.WB);			
+	//Hung_mod_25.04.2021 end	
 	
 endmodule
 
