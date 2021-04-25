@@ -664,7 +664,11 @@ module	L2_Cache
 //================================================================================		
 //AHB Interface
 //================================================================================		
-ahb_inst_itf	ahb_inst_interface
+ahb_inst_itf
+#(
+.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+)
+ahb_inst_interface
 (
   //AHB-ITF
   //Interrupt Handler
@@ -678,7 +682,11 @@ ahb_inst_itf	ahb_inst_interface
 	.*
 );
 
-ahb_data_itf	ahb_data_interface
+ahb_data_itf	
+#(
+.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+)
+ahb_data_interface	
 (
   //AHB-ITF
   //Interrupt Handler
@@ -1681,6 +1689,11 @@ endmodule: Write_Mem
 //================================================================================
 
 module ahb_inst_itf
+#(
+parameter	DATA_LENGTH = 32,
+parameter ADDR_LENGTH = 32,
+parameter	WORD_LENGTH = 16
+)
 (
   //AHB-ITF
   output  mas_send_type                           iahb_out,
@@ -1789,6 +1802,11 @@ endmodule: ahb_inst_itf
 //================================================================================
 
 module ahb_data_itf
+#(
+parameter	DATA_LENGTH = 32,
+parameter ADDR_LENGTH = 32,
+parameter	WORD_LENGTH = 16
+)
 (
   //AHB-ITF
   output  mas_send_type                           dahb_out,
