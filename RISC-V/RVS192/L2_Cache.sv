@@ -1924,7 +1924,7 @@ parameter	WORD_LENGTH = 16
   end
   
   always_comb begin
-    direction = 1'b0;
+    //direction = 1'b0;
     n_state = IDLE_D;
     dahb_out.htrans = IDLE;
     unique case(n_state)
