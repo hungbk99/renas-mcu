@@ -10,6 +10,7 @@
 
 `ifndef TEST
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"
 `endif
