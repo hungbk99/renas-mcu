@@ -1745,7 +1745,7 @@ parameter	WORD_LENGTH = 16
   always_ff @(posedge clk_l2, negedge rst_n)
   begin
     if(!rst_n)
-      state <= IDLE;
+      state <= IDLE_I;
     else
       state <= n_state;
   end
@@ -1918,7 +1918,7 @@ parameter	WORD_LENGTH = 16
   always_ff @(posedge clk_l2, negedge rst_n)
   begin
     if(!rst_n)
-      state <= IDLE;
+      state <= IDLE_D;
     else
       state <= n_state;
   end
