@@ -9,6 +9,7 @@
 //                                    This version still not support hsplit, hretry and hremap    
 //            27/03/2021  Quang Hung  Modify -> Bug 
 //                                    decode -> address boundary
+//            25.04.2021  Quang Hung  Hung mod to support htrans == BUSY
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 //================================================================================
@@ -64,9 +65,11 @@ module AHB_decoder#NUM#
     end
   endgenerate
   
-  assign  dec_error = (htrans_buf != IDLE) ? ~|slave_detect : 1'b0;  //Access undefine region
+  //Hung_mod_25.04.2021 assign  dec_error = (htrans_buf != IDLE) ? ~|slave_detect : 1'b0;  //Access undefine region
+  assign  dec_error = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ? ~|slave_detect : 1'b0;  //Access undefine region
 
-  assign  hreq_buf = (htrans_buf != IDLE) ?  slave_detect : '0;
+  //Hung_mod_25.04.2021 assign  hreq_buf = (htrans_buf != IDLE) ?  slave_detect : '0;
+  assign  hreq_buf = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ?  slave_detect : '0;
 
   assign default_slv_sel = dec_error;
   assign hreq = hreq_buf;
