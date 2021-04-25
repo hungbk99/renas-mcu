@@ -1719,7 +1719,7 @@ parameter	WORD_LENGTH = 16
 												                          read_res;
 	logic [DATA_LENGTH-1:0]			    				        data_read;
 
-  enum logic [1:0] {IDLE, NONSEQ, SEQ, BUSY}      state, n_state;
+  enum logic [1:0] {IDLE_I, NONSEQ_I, SEQ_I, BUSY_I}      state, n_state;
   //------------------------------------------------------------------------------
   Read_Mem
   #(
@@ -1754,13 +1754,13 @@ parameter	WORD_LENGTH = 16
     n_state = IDLE;
     iahb_out.htrans = IDLE;
     unique case(n_state)
-    IDLE: begin
+    IDLE_I: begin
       if(read_req) begin
         iahb_out.htrans = NONSEQ;
         n_state = NONSEQ;
       end
     end
-    NONSEQ: begin
+    NONSEQ_I: begin
       iahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
@@ -1770,7 +1770,7 @@ parameter	WORD_LENGTH = 16
       else
         n_state = state;
     end
-    SEQ: begin
+    SEQ_I: begin
       iahb_out.htrans = SEQ;
       if(read_req && read_res && !inst_read_inst.stop) 
       begin
@@ -1785,7 +1785,7 @@ parameter	WORD_LENGTH = 16
       else
         n_state = state;
     end
-    BUSY: begin
+    BUSY_I: begin
       iahb_out.htrans = BUSY;
       if(!read_res && read_req)
       begin
@@ -1806,7 +1806,7 @@ endmodule: ahb_inst_itf
 module ahb_data_itf
 #(
 parameter	DATA_LENGTH = 32,
-parameter ADDR_LENGTH = 32,
+parameter 	ADDR_LENGTH = 32,
 parameter	WORD_LENGTH = 16
 )
 (
@@ -1853,7 +1853,7 @@ parameter	WORD_LENGTH = 16
   logic                                           direction,
                                                   wb_empty_mod,
                                                   busy;
-  enum logic [1:0] {IDLE, NONSEQ, SEQ, BUSY}      state, n_state;
+  enum logic [1:0] {IDLE_D, NONSEQ_D, SEQ_D, BUSY_D}      state, n_state;
   //------------------------------------------------------------------------------
 	Read_Mem
 	#(
@@ -1928,13 +1928,13 @@ parameter	WORD_LENGTH = 16
     n_state = IDLE;
     dahb_out.htrans = IDLE;
     unique case(n_state)
-    IDLE: begin
+    IDLE_D: begin
       if(read_req) begin
         dahb_out.htrans = NONSEQ;
         n_state = NONSEQ;
       end
     end
-    NONSEQ: begin
+    NONSEQ_D: begin
       dahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
@@ -1944,7 +1944,7 @@ parameter	WORD_LENGTH = 16
       else
         n_state = state;
     end
-    SEQ: begin
+    SEQ_D: begin
       dahb_out.htrans = SEQ;
       if(read_req && read_res && !data_read_inst.stop) 
       begin
@@ -1959,7 +1959,7 @@ parameter	WORD_LENGTH = 16
       else
         n_state = state;
     end
-    BUSY: begin
+    BUSY_D: begin
       dahb_out.htrans = BUSY;
       if(!read_res && read_req)
       begin
