@@ -1709,7 +1709,7 @@ module ahb_inst_itf
   #(
 	  .WORD_LENGTH(CACHE_BLOCK_SIZE/4)
   )
-  inst_read
+  inst_read_inst
   (
     .*
   );
@@ -1838,7 +1838,7 @@ module ahb_data_itf
 	#(
 	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
 	)
-  data_read
+  	data_read_inst
 	(
 	.*
 	);	
@@ -1847,7 +1847,7 @@ module ahb_data_itf
 	#(
 	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
 	)
-  data_write
+ 	data_write_inst
 	(
   .wb_empty(wb_empty_mod),  
 	.*
@@ -1861,6 +1861,7 @@ module ahb_data_itf
     begin
       direction <= 1'b0;
       busy <= 1'b0;
+	end
     else if((state == IDLE) && (replace_req))
     begin
       if(replace_req)
