@@ -788,9 +788,9 @@ ahb_data_interface
 	//include "DualPort_SRAM.sv";	
 	//include "L2C_Controller.sv"; 
 		
-	initial begin
-		$readmemh("WBL2.txt", WB_L2.WB);			
-	end
+	//Hung_mod_25.04.2021 initial begin
+	//Hung_mod_25.04.2021 	$readmemh("WBL2.txt", WB_L2.WB);			
+	//Hung_mod_25.04.2021 end
 	
 endmodule
 
