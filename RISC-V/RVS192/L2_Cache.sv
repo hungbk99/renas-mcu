@@ -777,7 +777,8 @@ ahb_data_interface
 //Hung_mod_24.04.202/	.*
 //Hung_mod_24.04.202/);
 
-	assign	data_addr = (data_addr_sel || data_write_req) ? write_data_addr : read_data_addr;
+	//Hung_add_25.04.2021	assign	data_addr = (data_addr_sel || data_write_req) ? write_data_addr : read_data_addr;
+	assign	data_addr = (data_addr_sel || (dahb_out.htrans )) ? write_data_addr : read_data_addr;
 	
 //================================================================================	
 //	Simulate
