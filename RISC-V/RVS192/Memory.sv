@@ -15,16 +15,16 @@ module	Memory
 (
 	output 	logic [INST_LENGTH-1:0]			inst_mem_read,
 	output 	logic [DATA_LENGTH-1:0]			data_mem_read,
-	output 	logic							inst_res,		//	Use for synchoronous
-											data_res,
-	input 	[DATA_LENGTH-1:0]				data_mem_write,
-											data_addr,
-	input 	[PC_LENGTH-1:0]					inst_addr,
-	input 									inst_read_req,
-											data_read_req,
-											data_write_req,
-											mem_clk,
-											rst_n
+	output 	logic							          inst_res,		//	Use for synchoronous
+											                data_res,
+	input 	[DATA_LENGTH-1:0]				    data_mem_write,
+											                data_addr,
+	input 	[PC_LENGTH-1:0]					    inst_addr,
+	input 							                inst_read_req,
+											                data_read_req,
+											                data_write_req,
+											                mem_clk,
+											                rst_n
 );
 //================================================================================	
 //	Internal Signals

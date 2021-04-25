@@ -8,6 +8,18 @@
 // Email: 			quanghungbk1999@gmail.com  
 //////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////
+// File Name: 		renas_cpu.sv
+// Function:		  Top Module for renas cpu
+// Project Name:	renas mcu
+// Copyright (C) 	Le Quang Hung 
+// Ho Chi Minh University of Technology
+// Email: 			quanghungbk1999@gmail.com  
+// Ver    Date        Author    Description
+// v0.1   24.04.2021  hungbk99  Mod: AHP Interface  
+//                                   Read Mem                     -> AHB-INST Interface
+//                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
+//////////////////////////////////////////////////////////////////////////////////
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	L2_Cache
@@ -638,69 +650,69 @@ module	L2_Cache
 	.*
 );
 
-//	Read Mem Interfaces
-	Read_Mem
-	#(
-	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
-	)	
-	INST_READ_INTERFACE
-	(
-	.data_read_sync(inst_mem_read_sync),
-	.addr_read(inst_addr),
-	.word_sel(inst_mem_word),
-	.read_req(inst_read_req),
-	.write_en(inst_mem_write_ena),
-	.replace_done(inst_mem_replace_done),
-	.replace_req(inst_mem_replace_req),
-	.read_res(inst_res),	
-	.data_read(inst_mem_read),
-	.addr({inst_tag, inst_index}),
-	.*
-	);
-
-	Read_Mem
-	#(
-	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
-	)	
-	DATA_READ_INTERFACE
-	(
-	.data_read_sync(data_mem_read_sync),
-	.addr_read(read_data_addr),
-	.word_sel(data_mem_word),
-	.read_req(data_read_req),
-	.write_en(data_mem_write_ena),
-	.replace_done(data_mem_replace_done),
-	.replace_req(data_mem_replace_req),
-	.read_res(data_res),	
-	.data_read(data_mem_read),
-	.addr({data_tag, data_index}),
-	.*
-	);	
-	
-//	Write Mem Interfaces
-	Write_Mem
-	#(
-	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
-	)
-	DATA_WRITE_INTERFACE
-	(
-	.data_write_sync(data_mem_write),
-	.addr_write_sync(write_data_addr),
-	.write_req(data_write_req),	
-	.inst_dirty_done(inst_mem_dirty_done),
-	.data_dirty_done(data_mem_dirty_done),
-	.write_res(data_res),
-	.inst_dirty_req(inst_mem_dirty_req),
-	.inst_dirty_tag(inst_dirty_tag),
-	.inst_dirty_data(inst_dirty_data_block),
-	.data_dirty_req(data_mem_dirty_req),
-	.data_dirty_tag(data_dirty_tag),
-	.data_dirty_data(data_dirty_data_block),	
-	.wb_empty(empty_flag),
-	.wb_tag(wb_tag_out),	
-	.wb_data(wb_data_out),
-	.*
-);
+//Hung_mod_24.04.2021//	Read Mem Interfaces
+//Hung_mod_24.04.202/	Read_Mem
+//Hung_mod_24.04.202/	#(
+//Hung_mod_24.04.202/	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+//Hung_mod_24.04.202/	)	
+//Hung_mod_24.04.202/	INST_READ_INTERFACE
+//Hung_mod_24.04.202/	(
+//Hung_mod_24.04.202/	.data_read_sync(inst_mem_read_sync),
+//Hung_mod_24.04.202/	.addr_read(inst_addr),
+//Hung_mod_24.04.202/	.word_sel(inst_mem_word),
+//Hung_mod_24.04.202/	.read_req(inst_read_req),
+//Hung_mod_24.04.202/	.write_en(inst_mem_write_ena),
+//Hung_mod_24.04.202/	.replace_done(inst_mem_replace_done),
+//Hung_mod_24.04.202/	.replace_req(inst_mem_replace_req),
+//Hung_mod_24.04.202/	.read_res(inst_res),	
+//Hung_mod_24.04.202/	.data_read(inst_mem_read),
+//Hung_mod_24.04.202/	.addr({inst_tag, inst_index}),
+//Hung_mod_24.04.202/	.*
+//Hung_mod_24.04.202/	);
+//Hung_mod_24.04.202/
+//Hung_mod_24.04.202/	Read_Mem
+//Hung_mod_24.04.202/	#(
+//Hung_mod_24.04.202/	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+//Hung_mod_24.04.202/	)	
+//Hung_mod_24.04.202/	DATA_READ_INTERFACE
+//Hung_mod_24.04.202/	(
+//Hung_mod_24.04.202/	.data_read_sync(data_mem_read_sync),
+//Hung_mod_24.04.202/	.addr_read(read_data_addr),
+//Hung_mod_24.04.202/	.word_sel(data_mem_word),
+//Hung_mod_24.04.202/	.read_req(data_read_req),
+//Hung_mod_24.04.202/	.write_en(data_mem_write_ena),
+//Hung_mod_24.04.202/	.replace_done(data_mem_replace_done),
+//Hung_mod_24.04.202/	.replace_req(data_mem_replace_req),
+//Hung_mod_24.04.202/	.read_res(data_res),	
+//Hung_mod_24.04.202/	.data_read(data_mem_read),
+//Hung_mod_24.04.202/	.addr({data_tag, data_index}),
+//Hung_mod_24.04.202/	.*
+//Hung_mod_24.04.202/	);	
+//Hung_mod_24.04.202/	
+//Hung_mod_24.04.202///	Write Mem Interfaces
+//Hung_mod_24.04.202/	Write_Mem
+//Hung_mod_24.04.202/	#(
+//Hung_mod_24.04.202/	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+//Hung_mod_24.04.202/	)
+//Hung_mod_24.04.202/	DATA_WRITE_INTERFACE
+//Hung_mod_24.04.202/	(
+//Hung_mod_24.04.202/	.data_write_sync(data_mem_write),
+//Hung_mod_24.04.202/	.addr_write_sync(write_data_addr),
+//Hung_mod_24.04.202/	.write_req(data_write_req),	
+//Hung_mod_24.04.202/	.inst_dirty_done(inst_mem_dirty_done),
+//Hung_mod_24.04.202/	.data_dirty_done(data_mem_dirty_done),
+//Hung_mod_24.04.202/	.write_res(data_res),
+//Hung_mod_24.04.202/	.inst_dirty_req(inst_mem_dirty_req),
+//Hung_mod_24.04.202/	.inst_dirty_tag(inst_dirty_tag),
+//Hung_mod_24.04.202/	.inst_dirty_data(inst_dirty_data_block),
+//Hung_mod_24.04.202/	.data_dirty_req(data_mem_dirty_req),
+//Hung_mod_24.04.202/	.data_dirty_tag(data_dirty_tag),
+//Hung_mod_24.04.202/	.data_dirty_data(data_dirty_data_block),	
+//Hung_mod_24.04.202/	.wb_empty(empty_flag),
+//Hung_mod_24.04.202/	.wb_tag(wb_tag_out),	
+//Hung_mod_24.04.202/	.wb_data(wb_data_out),
+//Hung_mod_24.04.202/	.*
+//Hung_mod_24.04.202/);
 
 	assign	data_addr = (data_addr_sel || data_write_req) ? write_data_addr : read_data_addr;
 	
@@ -717,7 +729,10 @@ module	L2_Cache
 	
 endmodule
 
+module
 
+
+endmodule
 
 
 
@@ -1151,32 +1166,32 @@ endmodule
 module Read_Mem
 #(
 parameter	DATA_LENGTH = 32,
-parameter 	ADDR_LENGTH = 32,
+parameter ADDR_LENGTH = 32,
 parameter	WORD_LENGTH = 16
 )
 (
-	output	logic	[DATA_LENGTH-1:0]					data_read_sync,
-	output 	logic	[ADDR_LENGTH-1:0]					addr_read,
-	output 	logic	[$clog2(WORD_LENGTH)-1:0]			word_sel,
-	output 	logic										read_req,
-														write_en,
-														replace_done,
-	input 												replace_req,
-	input 												read_res,	
-	input 	[DATA_LENGTH-1:0]							data_read,
+	output	logic	[DATA_LENGTH-1:0]					        data_read_sync,
+	output 	logic	[ADDR_LENGTH-1:0]					        addr_read,
+	output 	logic	[$clog2(WORD_LENGTH)-1:0]		      word_sel,
+	output 	logic										                read_req,
+														                      write_en,
+														                      replace_done,
+	input 												                  replace_req,
+	input 												                  read_res,	
+	input 	[DATA_LENGTH-1:0]			    				      data_read,
 	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]		addr,
-	input 												clk_l2,
-	input 												rst_n
+	input 												                  clk_l2,
+	input 												                  rst_n
 );
 
 	logic 	[$clog2(WORD_LENGTH)-1:0]	word_count;
-	logic								stop,
-										write_en_raw,
-										read_req_raw,
-										read_done,
-										read_done1,
-										replace_done1,
-										replace_done2;
+	logic								              stop,
+										                write_en_raw,
+										                read_req_raw,
+										                read_done,
+										                read_done1,
+										                replace_done1,
+										                replace_done2;
 	enum 	logic [1:0]
 	{
 	READY,
@@ -1252,7 +1267,7 @@ parameter	WORD_LENGTH = 16
 		else if(replace_req)
 			word_count <= '0;
 		else if(write_en && !stop)
-			word_count <=  word_count+1;
+			word_count <= word_count+1;
 		else  
 			word_count <= word_count;	
 	end
@@ -1284,34 +1299,35 @@ parameter	WORD_LENGTH = 16
 	
 	assign 	replace_done = !replace_done2 && replace_done1;
 	
-endmodule
+endmodule: Read_Mem
 	
+//================================================================================
 	
 module	Write_Mem
 #(
 parameter	DATA_LENGTH = 32,
-parameter 	ADDR_LENGTH = 32,
+parameter ADDR_LENGTH = 32,
 parameter	WORD_LENGTH = 16
 )
 (
-	output	logic	[DATA_LENGTH-1:0]				data_write_sync,
-	output 	logic	[ADDR_LENGTH-1:0]				addr_write_sync,
-	output 	logic									write_req,	
-													load,
-													inst_dirty_done,
-													data_dirty_done,
-	input 											write_res,
-	input 											inst_dirty_req,	
+	output	logic	[DATA_LENGTH-1:0]				        data_write_sync,
+	output 	logic	[ADDR_LENGTH-1:0]				        addr_write_sync,
+	output 	logic									                write_req,	
+													                      load,
+													                      inst_dirty_done,
+													                      data_dirty_done,
+	input 											                  write_res,
+	input 											                  inst_dirty_req,	
 	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	inst_dirty_tag,
 	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		inst_dirty_data,
-	input 											data_dirty_req,
+	input 											                  data_dirty_req,
 	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	data_dirty_tag,
 	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		data_dirty_data,	
-	input 											wb_empty,
-	input 	[ADDR_LENGTH-3:0]						wb_tag,	
-	input 	[DATA_LENGTH-1:0]						wb_data,
-	input 											clk_l2,
-	input 											rst_n
+	input 											                  wb_empty,
+	input 	[ADDR_LENGTH-3:0]						          wb_tag,	
+	input 	[DATA_LENGTH-1:0]						          wb_data,
+	input 											                  clk_l2,
+	input 											                  rst_n
 );
 
 	logic											load_raw,
@@ -1619,4 +1635,280 @@ parameter	WORD_LENGTH = 16
 		end
 	end
 	
-endmodule
+endmodule: Write_Mem
+
+//================================================================================
+
+module ahb_inst_itf
+(
+  //AHB-ITF
+  output  mas_send_type                           iahb_out,
+  input   slv_send_type                           iahb_in,
+  //Interrupt Handler
+  output logic                                    inst_dec_err,
+  //Cache-ITF
+	output  logic	[DATA_LENGTH-1:0]					        data_read_sync,
+	output 	logic	[$clog2(WORD_LENGTH)-1:0]		      word_sel,
+	output 	logic													          write_en,
+	output 	logic												            replace_done,
+	input 												                  replace_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]		addr,
+	input 												                  clk_l2,
+	input 												                  rst_n
+);
+
+  //------------------------------------------------------------------------------
+	logic	[ADDR_LENGTH-1:0]					                addr_read;
+	logic										                        read_req,
+												                          read_res;
+	logic [DATA_LENGTH-1:0]			    				        data_read;
+
+  enum logic [1:0] {IDLE, NONSEQ, SEQ, BUSY}      state, n_state;
+  //------------------------------------------------------------------------------
+  Read_Mem
+  #(
+	  .WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+  )
+  inst_read
+  (
+    .*
+  );
+  //------------------------------------------------------------------------------
+  assign iahb_out.hwrite    = 0;
+  assign iahb_out.hburst    = INC16; 
+  assign iahb_out.haddr     = addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
+  assign iahb_out.hsize     = WORD;
+  assign iahb_out.hmastlock = 1'b0;
+  assign iahb_out.hprot     = 4'h0;
+  assign iahb_out.hwdata    = '0;
+
+  assign read_res = iahb_in.hreadyout;
+  assign data_read = iahb_in.hrdata;
+  assign inst_dec_err = iahb_in.hreadyout & iahb_in.hresp;
+
+  always_ff @(posedge clk_l2, negedge rst_n)
+  begin
+    if(!rst_n)
+      state <= START;
+    else
+      state <= n_state;
+  end
+  
+  always_comb begin
+    n_state = IDLE;
+    iahb_out.htrans = IDLE;
+    unique case(n_state)
+    IDLE: begin
+      if(read_req) begin
+        iahb_out.htrans = NONSEQ;
+        n_state = NONSEQ;
+      end
+    end
+    NONSEQ: begin
+      iahb_out.htrans = NONSEQ;
+      if(read_req && read_res) 
+      begin
+        n_state = BUSY;
+        iahb_out.htrans = BUSY;
+      end
+      else
+        n_state = state;
+    end
+    SEQ: begin
+      iahb_out.htrans = SEQ;
+      if(read_req && read_res && !inst_read.stop) 
+      begin
+        n_state = BUSY;
+        iahb_out.htrans = BUSY;
+      end
+      else if(read_req && read_res && inst_read.stop)
+      begin
+        n_state = IDLE;
+        iahb_out.htrans = IDLE;
+      end
+      else
+        n_state = state;
+    end
+    BUSY: begin
+      iahb_out.htrans = BUSY;
+      if(!read_res && read_req)
+      begin
+        iahb_out.htrans = SEQ;
+        n_state = SEQ;
+      end
+      else
+        n_state = state;
+    end
+    default: n_state = state;
+    endcase
+  end
+
+endmodule: ahb_inst_itf
+
+//================================================================================
+
+module ahb_data_itf
+(
+  //AHB-ITF
+  output  mas_send_type                           dahb_out,
+  input   slv_send_type                           dahb_in,
+  //Interrupt Handler
+  output logic                                    data_dec_err,
+  //Cache-ITF
+  //Read
+	output  logic	[DATA_LENGTH-1:0]					        data_read_sync,
+	output 	logic	[$clog2(WORD_LENGTH)-1:0]		      word_sel,
+	output 	logic													          write_en,
+	output 	logic												            replace_done,
+	input 												                  replace_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]		addr,
+  //Write
+	output 	logic												            load,
+	output 	logic												            inst_dirty_done,
+	output 	logic												            data_dirty_done,
+	input 											                    inst_dirty_req,	
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	  inst_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		  inst_dirty_data,
+	input 											                    data_dirty_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	  data_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		  data_dirty_data,	
+	input 											                    wb_empty,
+	input 	[ADDR_LENGTH-3:0]						            wb_tag,	
+	input 	[DATA_LENGTH-1:0]						            wb_data,
+	input 											                    clk_l2,
+	input 											                    rst_n
+);
+  //------------------------------------------------------------------------------
+	logic	[DATA_LENGTH-1:0]				                  data_write_sync;
+	logic	[ADDR_LENGTH-1:0]				                  addr_write_sync;
+	logic									                          write_req,	
+											                            write_res;
+	
+  logic	[ADDR_LENGTH-1:0]					                addr_read;
+	logic										                        read_req,
+												                          read_res;
+	logic [DATA_LENGTH-1:0]			    				        data_read;
+
+  logic                                           direction,
+                                                  wb_empty_mod,
+                                                  busy;
+  enum logic [1:0] {IDLE, NONSEQ, SEQ, BUSY}      state, n_state;
+  //------------------------------------------------------------------------------
+	Read_Mem
+	#(
+	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+	)
+  data_read
+	(
+	.*
+	);	
+	
+	Write_Mem
+	#(
+	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+	)
+  data_write
+	(
+  .wb_empty(wb_empty_mod),  
+	.*
+  );
+  
+  //------------------------------------------------------------------------------
+  assign wb_empty_mod = wb_empty & busy; 
+  always_ff @(posedge clk_l2, negedge rst_n) 
+  begin
+    if(!rst_n)
+    begin
+      direction <= 1'b0;
+      busy <= 1'b0;
+    else if((state == IDLE) && (replace_req))
+    begin
+      if(replace_req)
+      begin
+        direction <= 1'b0;
+        busy <= 1'b1;
+      end
+      else if(inst_dirty_req || data_dirty_req || !wb_empty)
+      begin
+        direction <= 1'b1;
+        busy <= 1'b0;
+      end
+      else begin
+        direction <= 1'b0;
+        busy <= 1'b0;
+      end
+    end
+  end
+
+  //------------------------------------------------------------------------------
+  assign dahb_out.hwrite    = direction;
+  assign dahb_out.hburst    = INC16; 
+  assign dahb_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
+  assign dahb_out.hsize     = WORD;
+  assign dahb_out.hmastlock = 1'b0;
+  assign dahb_out.hprot     = 4'h0;
+  assign dahb_out.hwdata    = data_write_sync;
+
+  assign read_res = dahb_in.hreadyout;
+  assign data_read = dahb_in.hrdata;
+  assign inst_dec_err = dahb_in.hreadyout & dahb_in.hresp;
+
+  always_ff @(posedge clk_l2, negedge rst_n)
+  begin
+    if(!rst_n)
+      state <= START;
+    else
+      state <= n_state;
+  end
+  
+  always_comb begin
+    direction = 1'b0;
+    n_state = IDLE;
+    dahb_out.htrans = IDLE;
+    unique case(n_state)
+    IDLE: begin
+      if(read_req) begin
+        dahb_out.htrans = NONSEQ;
+        n_state = NONSEQ;
+      end
+    end
+    NONSEQ: begin
+      dahb_out.htrans = NONSEQ;
+      if(read_req && read_res) 
+      begin
+        n_state = BUSY;
+        dahb_out.htrans = BUSY;
+      end
+      else
+        n_state = state;
+    end
+    SEQ: begin
+      dahb_out.htrans = SEQ;
+      if(read_req && read_res && !data_read.stop) 
+      begin
+        n_state = BUSY;
+        dahb_out.htrans = BUSY;
+      end
+      else if(read_req && read_res && data_read.stop)
+      begin
+        n_state = IDLE;
+        dahb_out.htrans = IDLE;
+      end
+      else
+        n_state = state;
+    end
+    BUSY: begin
+      dahb_out.htrans = BUSY;
+      if(!read_res && read_req)
+      begin
+        dahb_out.htrans = SEQ;
+        n_state = SEQ;
+      end
+      else
+        n_state = state;
+    end
+    default: n_state = state;
+    endcase
+  end
+
+endmodule: ahb_data_itf

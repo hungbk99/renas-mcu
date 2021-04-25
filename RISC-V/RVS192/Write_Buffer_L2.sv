@@ -13,38 +13,38 @@ module	Write_Buffer_L2
 #(
 parameter	DATA_LENGTH = 32,
 parameter	TAG_LENGTH = 30,
-parameter 	WB_DEPTH = 16,
-parameter 	WORD_INDEX = 4
+parameter	WB_DEPTH = 16,
+parameter WORD_INDEX = 4
 )
 (
-	output 	logic 	[DATA_LENGTH-1:0]	wb_data_out,
-	output 	logic 	[TAG_LENGTH-1:0]	wb_tag_out,
-	output 	logic 						full_flag,
-										empty_flag,
-										overflow_flag,
-										underflow_flag,
-										wb_read_tag_hit,
-	input	[DATA_LENGTH-1:0]			data_in,
-	input 	[TAG_LENGTH-1:0]			write_tag_in,
+	output 	logic 	[DATA_LENGTH-1:0]	  wb_data_out,
+	output 	logic 	[TAG_LENGTH-1:0]	  wb_tag_out,
+	output 	logic 						          full_flag,
+										                  empty_flag,
+										                  overflow_flag,
+										                  underflow_flag,
+										                  wb_read_tag_hit,
+	input	  [DATA_LENGTH-1:0]		        data_in,
+	input 	[TAG_LENGTH-1:0]			      write_tag_in,
 	input 	[TAG_LENGTH-WORD_INDEX-1:0]	read_tag_in,	
-	input								store,
-	input 								load,
-	input								clk_l2,
-	input 								rst_n
+	input								                store,
+	input 								              load,
+	input								                clk_l2,
+	input 								              rst_n
 );
  
 	parameter	POINTER_WIDTH = $clog2(WB_DEPTH);
-	logic	[DATA_LENGTH+TAG_LENGTH-1:0]	WB	[WB_DEPTH-1:0];
-	logic 	[WB_DEPTH-1:0]								valid;
-	logic												write_en,
-														read_en,
-														wb_write_hit;
-	logic	[POINTER_WIDTH:0] 							w_ptr,
-														r_ptr;
-	logic	[POINTER_WIDTH-1:0]	 						w_addr,
-														r_addr,
-														hit_addr;
-	logic 	[WB_DEPTH-1:0]	[TAG_LENGTH-1:0]			tag_check_write;
+	logic	  [DATA_LENGTH+TAG_LENGTH-1:0]	WB	[WB_DEPTH-1:0];
+	logic 	[WB_DEPTH-1:0]						  valid;
+	logic											          write_en,
+														          read_en,
+														          wb_write_hit;
+	logic 	[POINTER_WIDTH:0] 					w_ptr,
+														          r_ptr;
+	logic	  [POINTER_WIDTH-1:0]	 				w_addr,
+														          r_addr,
+														          hit_addr;
+	logic 	[WB_DEPTH-1:0]	[TAG_LENGTH-1:0]			      tag_check_write;
 	logic 	[WB_DEPTH-1:0]	[TAG_LENGTH-WORD_INDEX-1:0]	tag_check_read;									
 //	Valid Set & Clear
 	always_ff @(posedge clk_l2 or negedge rst_n)

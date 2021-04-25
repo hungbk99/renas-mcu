@@ -11,45 +11,37 @@ import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	L2C_Controller
 (
-	output 	logic 								data_addr_sel,
+	output 	logic 								  data_addr_sel,
 //	Update IL1
-	output 	logic								inst_update_ena,
-//	output 	logic	[PC_LENGTH-1:0]				inst_check_tag,
-//	input 	[$clog2(L2_CACHE_LINE)-1:0]			inst_index,
-	output 	logic								inst_mem_dirty_req,
-												inst_mem_replace_req,
-												inst_replace_req,
-	input 										inst_mem_dirty_done,
-												inst_mem_replace_done,
-												l1_inst_replace_req,
-												inst_replace_il1_ack_sync,
-												inst_replace_dl1_ack_sync,
-//	input	[L2_CACHE_WAY-1:0]					inst_replace_way_new,
-//	output	logic	[L2_CACHE_WAY-1:0]			inst_replace_way,	
+	output 	logic								    inst_update_ena,
+	output 	logic								    inst_mem_dirty_req,
+										          		inst_mem_replace_req,
+												          inst_replace_req,
+	input 										      inst_mem_dirty_done,
+												          inst_mem_replace_done,
+												          l1_inst_replace_req,
+												          inst_replace_il1_ack_sync,
+												          inst_replace_dl1_ack_sync,
 //	Update DL1
-	output 	logic								data_update_ena,
-//	output 	logic	[DATA_LENGTH-1:0]			data_check_tag,
-//	input 	[$clog2(L2_CACHE_LINE)-1:0]			data_index,
-	output 	logic								data_mem_dirty_req,
-												data_mem_replace_req,	
-												data_replace_req,
-	input 										data_mem_dirty_done,
-												data_mem_replace_done,
-												l1_data_replace_req,
-												data_replace_il1_ack_sync,
-												data_replace_dl1_ack_sync,
-//	input	[L2_CACHE_WAY-1:0]					data_replace_way_new,
-//	output	logic	[L2_CACHE_WAY-1:0]			data_replace_way,		
+	output 	logic								    data_update_ena,
+	output 	logic 	  							data_mem_dirty_req,
+		        		  								data_mem_replace_req,	
+										          		data_replace_req,
+	input 										      data_mem_dirty_done,
+												          data_mem_replace_done,
+												          l1_data_replace_req,
+												          data_replace_il1_ack_sync,
+												          data_replace_dl1_ack_sync,
 //	L2 Cache
-	input 										inst_miss,
-	input 										data_miss,
-	input 										inst_dirty,
-	input 										data_dirty,
+	input 										      inst_miss,
+	input 										      data_miss,
+	input 										      inst_dirty,
+	input 										      data_dirty,
 //	WB
-	input 										wb_read_tag_hit,
+	input 										      wb_read_tag_hit,
 //	System
-	input										clk_l2,
-	input										rst_n
+	input								        		clk_l2,
+	input								        		rst_n
 );
 	
 
@@ -209,11 +201,11 @@ module	L2C_Controller
 				data_next_state = D_WAIT_ACK;
 				data_replace_req_raw = 1'b1;
 			end
-			else if(l1_data_replace_req && data_miss)
-			begin
-				data_next_state = D_IDLE;
-				data_update_ena_raw = 1'b1;
-			end
+			//else if(l1_data_replace_req && data_miss)
+			//begin
+			//	data_next_state = D_IDLE;
+			//	data_update_ena_raw = 1'b1;
+			//end
 			else
 			begin
 				data_next_state = data_current_state;

@@ -1,0 +1,333 @@
+module	Write_Mem
+#(
+parameter	DATA_LENGTH = 32,
+parameter ADDR_LENGTH = 32,
+parameter	WORD_LENGTH = 16
+)
+(
+	output	logic	[DATA_LENGTH-1:0]				        data_write_sync,
+	output 	logic	[ADDR_LENGTH-1:0]				        addr_write_sync,
+	output 	logic									                write_req,	
+													                      load,
+													                      inst_dirty_done,
+													                      data_dirty_done,
+	input 											                  write_res,
+	input 											                  inst_dirty_req,	
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	inst_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		inst_dirty_data,
+	input 											                  data_dirty_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	data_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		data_dirty_data,	
+	input 											                  wb_empty,
+	input 	[ADDR_LENGTH-3:0]						          wb_tag,	
+	input 	[DATA_LENGTH-1:0]						          wb_data,
+	input 											                  clk_l2,
+	input 											                  rst_n
+);
+
+	logic											load_raw,
+													write_req_raw,
+													write_req_raw1,
+													dirty_done_raw,
+													inst_write_ena_raw,
+													data_write_ena_raw,
+													inst_dirty_done_raw,
+													data_dirty_done_raw,
+													write_done,
+													write_done1,
+													write_done_dl,
+													inst_clear,
+													data_clear,
+													inst_clear_raw,
+													data_clear_raw,
+													inst_write_en,
+													data_write_en,
+													stop,
+													wb_en;
+	logic 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		dirty_data_way;
+	logic 	[DATA_LENGTH-1:0]						dirty_data;
+	logic 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	dirty_tag;
+	logic 	[$clog2(WORD_LENGTH)-1:0]				word_count;
+	
+	enum logic [2:0]
+	{
+	READY,
+	WB_BUSY,
+	I_SETUP,
+	I_BUSY,
+	I_DONE,
+	D_SETUP,
+	D_BUSY,
+	D_DONE
+	}	current_state, next_state;
+
+//	Next State Logic 
+	always_comb begin
+		load_raw = 1'b0;
+		write_req_raw = 1'b0;
+		inst_dirty_done_raw = 1'b0;
+		data_dirty_done_raw = 1'b0;
+		inst_write_ena_raw = 1'b0;
+		data_write_ena_raw = 1'b0;	
+		inst_clear_raw = 1'b0;
+		data_clear_raw = 1'b0;
+		next_state = READY;
+		wb_en = 1'b1;
+		unique case(current_state)
+		READY:
+		begin
+			inst_dirty_done_raw = 1'b0;
+			data_dirty_done_raw = 1'b0;
+			if(!inst_dirty_req && !data_dirty_req && !wb_empty)
+			begin
+				next_state =  WB_BUSY;
+				write_req_raw = 1'b1;
+			end
+			else if(inst_dirty_req)
+			begin
+				next_state = I_SETUP;
+				inst_clear_raw = 1'b1;
+			end
+			else if(data_dirty_req)
+			begin
+				next_state = D_SETUP;
+				data_clear_raw = 1'b1;
+			end
+			else
+				next_state = current_state;
+		end
+		WB_BUSY:
+		begin
+			if(write_done)
+			begin
+				load_raw = 1'b1;
+				next_state = READY;
+			end
+			else
+				next_state = current_state;
+		end
+/*
+		I_SETUP:
+		begin
+			wb_en = 1'b0;		
+			if(stop && write_res)
+			begin
+				next_state = I_DONE;
+				inst_dirty_done_raw = 1'b1;
+				inst_write_ena_raw = 1'b0;
+			end
+			else 
+			begin
+				next_state = I_BUSY;
+				write_req_raw = 1'b1;
+				inst_write_ena_raw = 1'b0;
+			end
+		end		
+		I_BUSY:
+		begin
+			wb_en = 1'b0;
+			if(write_done)
+			begin
+				inst_write_ena_raw = 1'b1;
+				next_state = I_SETUP;
+			end
+			else
+				next_state = current_state;
+		end	
+*/
+		I_SETUP:
+		begin
+			wb_en = 1'b0;		
+			next_state = I_BUSY;
+			write_req_raw = 1'b1;
+			inst_write_ena_raw = 1'b0;
+		end		
+		I_BUSY:
+		begin
+			wb_en = 1'b0;
+			if(write_done && !stop)
+			begin
+				inst_write_ena_raw = 1'b1;
+				next_state = I_SETUP;
+			end
+			else if(stop && write_done)
+			begin
+				next_state = I_DONE;
+				inst_dirty_done_raw = 1'b1;
+				inst_write_ena_raw = 1'b0;
+			end			
+			else
+				next_state = current_state;
+		end				
+		I_DONE:
+		begin
+			if(!inst_dirty_req)
+				next_state = READY;
+			else 
+				next_state = current_state;
+		end
+/*		
+		D_SETUP:
+		begin
+			wb_en = 1'b0;		
+			if(stop && write_done)
+			begin
+				next_state = D_DONE;
+				data_dirty_done_raw = 1'b1;
+				data_write_ena_raw = 1'b0;
+			end
+			else if(!stop)
+			begin
+				next_state = D_BUSY;
+				write_req_raw = 1'b1;
+				data_write_ena_raw = 1'b0;
+			end	
+			else
+				next_state = current_state;
+		end		
+		D_BUSY:
+		begin
+			wb_en = 1'b0;		
+			if(write_done)
+			begin
+				data_write_ena_raw = 1'b1;
+				next_state = D_SETUP;
+			end
+			else
+				next_state = current_state;
+		end
+*/	
+		D_SETUP:
+		begin
+			wb_en = 1'b0;		
+			next_state = D_BUSY;
+			write_req_raw = 1'b1;
+			inst_write_ena_raw = 1'b0;
+		end		
+		D_BUSY:
+		begin
+			wb_en = 1'b0;
+			if(write_done && !stop)
+			begin
+				data_write_ena_raw = 1'b1;
+				next_state = D_SETUP;
+			end
+			else if(stop && write_done)
+			begin
+				next_state = D_DONE;
+				data_dirty_done_raw = 1'b1;
+				data_write_ena_raw = 1'b0;
+			end			
+			else
+				next_state = current_state;
+		end	
+		D_DONE:
+		begin
+			if(!data_dirty_req)
+				next_state = READY;
+			else 
+				next_state = current_state;
+		end		
+		default: next_state = READY;
+		endcase
+	end
+
+// 	State Memory
+	always_ff @(posedge clk_l2 or negedge rst_n)
+	begin
+		if(!rst_n)
+			current_state <= READY;
+		else 
+			current_state <=  next_state;
+	end
+
+//	DFF to remove glitches
+	always_ff @(posedge clk_l2)
+	begin
+		/*
+		inst_write_en <= inst_write_ena_raw;
+		data_write_en <= data_write_ena_raw;		
+		inst_dirty_done <= inst_dirty_done_raw;		//	Dung DFF nhu tren thi tin hieu stop bi delay
+		data_dirty_done <= data_dirty_done_raw;		//	Mach chay sai
+		inst_clear <= inst_clear_raw;
+		data_clear <= data_clear_raw;
+		load <= load_raw;
+		*/
+		write_done_dl <= write_done;
+		write_req_raw1 <= write_req_raw;
+		if(write_req)
+			write_req <= !write_res;
+		else
+			write_req <= write_req_raw1;
+		write_done1 <= write_res;
+	end	
+
+	assign	inst_write_en = inst_write_ena_raw;
+	assign	data_write_en = data_write_ena_raw;		
+	assign	inst_dirty_done = inst_dirty_done_raw;		
+	assign	data_dirty_done = data_dirty_done_raw;		
+	assign	inst_clear = inst_clear_raw;
+	assign	data_clear = data_clear_raw;
+	assign	load = load_raw;
+	
+	assign write_done = !write_res && write_done1;
+//	Dirty Update
+	always_ff @(posedge clk_l2 or negedge rst_n)
+	begin
+		if(!rst_n)
+			word_count <= WORD_LENGTH-1;
+		else if(inst_clear || data_clear)
+			word_count <= '0;
+		else if(write_done && !stop)
+			word_count <=  word_count+1;
+		else 
+			word_count <= word_count;			
+	end
+	
+	always_comb	begin
+		dirty_data = 'x;
+		for(int i = 0; i < L2_CACHE_WAY; i++)
+		begin
+		if(word_count == i)
+			dirty_data = dirty_data_way[i];
+		end
+	end
+	
+	always_ff @(posedge clk_l2)
+	begin
+		if(current_state == I_SETUP)
+		begin
+			dirty_tag <= inst_dirty_tag;
+			dirty_data_way <= inst_dirty_data;
+		end
+		else if(current_state == D_SETUP)
+		begin
+			dirty_tag <= data_dirty_tag;
+			dirty_data_way <= data_dirty_data;		
+		end
+	end	
+	
+	assign	stop = (word_count == WORD_LENGTH-1) ? 1'b1 : 1'b0;
+//	assign 	addr_write_sync = inst_dirty_req ? {dirty_tag, word_count, 2'b0} : {wb_tag, 2'b0}; 
+//	assign 	data_write_sync = inst_dirty_req ? dirty_data : wb_data;
+	
+	always_ff @(posedge clk_l2 or negedge rst_n)
+	begin
+		if(!rst_n)
+		begin
+			addr_write_sync	<= '0;
+			data_write_sync <= '0;
+		end
+		else if(wb_en)
+		begin
+			addr_write_sync = {wb_tag, 2'b0};
+			data_write_sync = wb_data;			
+		end
+		else
+		begin
+			addr_write_sync = {dirty_tag, word_count, 2'b0};
+			data_write_sync = dirty_data;			
+		end
+	end
+	
+endmodule
