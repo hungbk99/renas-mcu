@@ -1729,7 +1729,7 @@ parameter	WORD_LENGTH = 16
   );
   //------------------------------------------------------------------------------
   assign iahb_out.hwrite    = 0;
-  assign iahb_out.hburst    = INC16; 
+  assign iahb_out.hburst    = INCR16; 
   assign iahb_out.haddr     = addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
   assign iahb_out.hsize     = WORD;
   assign iahb_out.hmastlock = 1'b0;
@@ -1743,7 +1743,7 @@ parameter	WORD_LENGTH = 16
   always_ff @(posedge clk_l2, negedge rst_n)
   begin
     if(!rst_n)
-      state <= START;
+      state <= IDLE;
     else
       state <= n_state;
   end
@@ -1770,12 +1770,12 @@ parameter	WORD_LENGTH = 16
     end
     SEQ: begin
       iahb_out.htrans = SEQ;
-      if(read_req && read_res && !inst_read.stop) 
+      if(read_req && read_res && !inst_read_inst.stop) 
       begin
         n_state = BUSY;
         iahb_out.htrans = BUSY;
       end
-      else if(read_req && read_res && inst_read.stop)
+      else if(read_req && read_res && inst_read_inst.stop)
       begin
         n_state = IDLE;
         iahb_out.htrans = IDLE;
@@ -1902,7 +1902,7 @@ parameter	WORD_LENGTH = 16
 
   //------------------------------------------------------------------------------
   assign dahb_out.hwrite    = direction;
-  assign dahb_out.hburst    = INC16; 
+  assign dahb_out.hburst    = INCR16; 
   assign dahb_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
   assign dahb_out.hsize     = WORD;
   assign dahb_out.hmastlock = 1'b0;
@@ -1916,7 +1916,7 @@ parameter	WORD_LENGTH = 16
   always_ff @(posedge clk_l2, negedge rst_n)
   begin
     if(!rst_n)
-      state <= START;
+      state <= IDLE;
     else
       state <= n_state;
   end
@@ -1944,12 +1944,12 @@ parameter	WORD_LENGTH = 16
     end
     SEQ: begin
       dahb_out.htrans = SEQ;
-      if(read_req && read_res && !data_read.stop) 
+      if(read_req && read_res && !data_read_inst.stop) 
       begin
         n_state = BUSY;
         dahb_out.htrans = BUSY;
       end
-      else if(read_req && read_res && data_read.stop)
+      else if(read_req && read_res && data_read_inst.stop)
       begin
         n_state = IDLE;
         dahb_out.htrans = IDLE;
