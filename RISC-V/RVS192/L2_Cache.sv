@@ -20,6 +20,7 @@
 //                                   Read Mem                     -> AHB-INST Interface
 //                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
 //////////////////////////////////////////////////////////////////////////////////
+import AHB_package::*;
 import 	RVS192_package::*;
 import	RVS192_user_parameters::*;
 module	L2_Cache
