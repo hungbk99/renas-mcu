@@ -19,13 +19,13 @@ import	renas_user_parameters::*;
 module  renas_memory 
 (
   //I-AHB-ITF
-  input                   imem_hsel
+  input                   imem_hsel,
   input   mas_send_type   imem_in,
   output  slv_send_type   imem_out,
   //D-AHB-ITF
-  input                   dmem_hsel
-  input   mas_send_type   imem_in,
-  output  slv_send_type   imem_out,
+  input                   dmem_hsel,
+  input   mas_send_type   dmem_in,
+  output  slv_send_type   dmem_out,
 
   //	System
   inpu                    clk_l2,
@@ -35,8 +35,8 @@ module  renas_memory
 //--------------------------------------------------------------------------------
 logic dmem_wen;
 logic [DATA_LENGTH-1:0]   syn_imem_rdata;
-logic [DATA_LENGTH-1:0]   syn_imem_rdata;
-logic [DATA_LENGTH-1:0]   syn_imem_wdata;
+logic [DATA_LENGTH-1:0]   syn_dmem_rdata;
+logic [DATA_LENGTH-1:0]   syn_dmem_wdata;
 logic [PC_LENGTH-1:0]     syn_imem_addr;
 logic [DATA_LENGTH-1:0]   syn_dmem_addr;
 logic                     imem_req;

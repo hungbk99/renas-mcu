@@ -9,17 +9,17 @@
 // v0.0   10.04.2021  hungbk99  First Creation
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_user_define.h"
+`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
 `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
-`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/renas_cpu.sv"
+`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
 `include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
 module renas_mcu_top
 (
   input                                 clk,
-	                                      cache_clk, //Delay clock used for Cache
-			                                  //Hung_mod_14_03 clk_l2,
-			                                  mem_clk,
-			                                  rst_n
+	                                      clk_l1, //Delay clock used for Cache
+			                                  clk_l2,
+                                        clk_mem,
+                                        rst_n
 
 );
   //==============================================================================
