@@ -12,7 +12,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 //`include"renas_user_define.h"
-//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"	
+//`include "D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/DualPort_SRAM.sv"  
+  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"	
 import 	renas_package::*;
 import  AHB_package::*;
 import	renas_user_parameters::*;
