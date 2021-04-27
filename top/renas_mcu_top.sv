@@ -96,26 +96,21 @@ module renas_mcu_top
   	//.hprior_master_data(),
   	.master_data_out(dahb_out),
   //#MI#
-  	.slave_peri_in(),
+  	.slave_peri_in(peri_slave_out),
   	.hsel_slave_peri(peri_hsel),
-  	.slave_peri_out(),
-  	.slave_isnt_in(),
+  	.slave_peri_out(peri_slave_in),
+  	.slave_isnt_in(imem_out),
   	.hsel_slave_isnt(imem_hsel),
-  	.slave_isnt_out(),
-  	.slave_data_in(),
+  	.slave_isnt_out(imem_in),
+  	.slave_data_in(dmem_out),
   	.hsel_slave_data(dmem_hsel),
-  	.slave_data_out(),
+  	.slave_data_out(dmem_in),
   	.hclk(clk_l2),
   	.hreset_n(rst_n)
   (
 
   renas_memory  mmem
   (
-    .imem_in(),
-    .imem_out(),
-    
-    .dmem_in(),
-    .dmem_out(),
 	  .*
   );
 endmodule: renas_mcu_top
