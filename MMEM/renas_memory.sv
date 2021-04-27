@@ -98,7 +98,39 @@ begin
     syn_dmem_addr <= '0;
     syn_dmem_wdata <= '0;
   end
+  else begin
+    if(imem_req)
+      syn_imem_addr <= iahb_in.haddr;
+
+    if(dmem_req) begin
+      syn_dmem_addr <= dahb_in.haddr;
+      syn_dmem_wdata <= dahb_in.hwdata;
+    end
+  end
 end
+
+always_ff @(posedge clk_l2, negedge rst_n)
+begin
+  if(!rst_n)    
+  begin
+    imem_ack <= 1'b0;
+    dmem_ack <= 1'b0;
+  end
+  else begin
+    if(imem_req)
+      imem_ack <= 1'b1;
+    else 
+      imem_ack <= 1'b0;
+        
+    if(dmem_req)
+      dmem_ack <= 1'b1;
+    else 
+      dmem_ack <= 1'b0;
+  end
+end
+
+assign dmem_wen = dmem_ack;
+
 //--------------------------------------------------------------------------------
 DualPort_SRAM
 #(
