@@ -102,11 +102,59 @@ module renas_mcu_top
   assign imem_hsel = hsel_slave_inst_1 & hsel_slave_inst_2;
   assign peri_hsel = hsel_slave_peri;
 
-  renas_cpu renas_cpu_202
+  RVS192 renas_cpu_202
   (
     .*
   );
-
+  AHB_bus ahb_matrix
+  (
+  //#INTERFACEGEN#
+  //#SI#
+  	.master_peri_in(),
+  	.hprior_master_peri(),
+  	.master_peri_out(),
+  	.master_inst_in(),
+  	.hprior_master_inst(),
+  	.master_inst_out(),
+  	.master_data_in(),
+  	.hprior_master_data(),
+  	.master_data_out(),
+  //#MI#
+  	.slave_peri_in(),
+  	.hsel_slave_peri(),
+  	.slave_peri_out(),
+  	.slave_isnt_in(),
+  	.hsel_slave_isnt(),
+  	.slave_isnt_out(),
+  	.slave_data_in(),
+  	.hsel_slave_data(),
+  	.slave_data_out(),
+  	.hclk(),
+  	.hreset_n()
+  (
+//#INTERFACEGEN#
+//#SI#
+	input  mas_send_type  master_peri_in,
+	input  [2-1:0]  hprior_master_peri,
+	output  slv_send_type  master_peri_out,
+	input  mas_send_type  master_inst_in,
+	input  [2-1:0]  hprior_master_inst,
+	output  slv_send_type  master_inst_out,
+	input  mas_send_type  master_data_in,
+	input  [2-1:0]  hprior_master_data,
+	output  slv_send_type  master_data_out,
+//#MI#
+	input  slv_send_type  slave_peri_in,
+	output hsel_slave_peri,
+	output mas_send_type  slave_peri_out,
+	input  slv_send_type  slave_isnt_in,
+	output hsel_slave_isnt,
+	output mas_send_type  slave_isnt_out,
+	input  slv_send_type  slave_data_in,
+	output hsel_slave_data,
+	output mas_send_type  slave_data_out,
+	input					 hclk,
+	input					 hreset_n
   AHB_bus ahb_matrix
   (
   //#INTERFACEGEN#
@@ -139,6 +187,16 @@ module renas_mcu_top
 
   renas_memory  mmem
   (
-    .*
+    .imem_hsel(),
+    .imem_in(),
+    .imem_out(),
+    
+    .dmem_hsel(),
+    .dmem_in(),
+    .dmem_out(),
+
+    .clk_l2(),
+	  .clk_mem(),
+	  .rst_n()
   );
 endmodule: renas_mcu_top

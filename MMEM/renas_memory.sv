@@ -17,9 +17,9 @@
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"	
-import 	renas_package::*;
+import 	RVS192_package::*;
 import  AHB_package::*;
-import	renas_user_parameters::*;
+import	RVS192_user_parameters::*;
 module  renas_memory 
 (
   //I-AHB-ITF
