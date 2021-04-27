@@ -32,7 +32,7 @@ module  renas_memory
   output  slv_send_type   dmem_out,
 
   //	System
-  inpu                    clk_l2,
+  input                   clk_l2,
 	input                   clk_mem,
 	input	                  rst_n
 );
@@ -74,7 +74,7 @@ begin
   end
 end
 
-always_ff @(posedge cache_clk, negedge rst_n)
+always_ff @(posedge clk_l2, negedge rst_n)
 begin
   if(!rst_n) begin
     imem_req <= 1'b0;
@@ -104,11 +104,11 @@ begin
   end
   else begin
     if(imem_req)
-      syn_imem_addr <= iahb_in.haddr;
+      syn_imem_addr <= imem_in.haddr;
 
     if(dmem_req) begin
-      syn_dmem_addr <= dahb_in.haddr;
-      syn_dmem_wdata <= dahb_in.hwdata;
+      syn_dmem_addr <= dmem_in.haddr;
+      syn_dmem_wdata <= dmem_in.hwdata;
     end
   end
 end
@@ -153,7 +153,7 @@ MEM
 .wen2(dmem_wen), 
 .clk(clk_l2)
 );
-//--------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------
 endmodule
 
 
@@ -176,7 +176,7 @@ endmodule
 //	input	        								          wb_req,
 //	output logic 												    wb_ack,	
 //	output logic 												    full_flag,
-//  input                                   cache_clk,
+//  input                                   clk_l2,
 //                                          mem_clk,
 //                                          rst_n
 //);
@@ -228,7 +228,7 @@ endmodule
 //  assign wb_req_mask = wb_req & wb_ready;
 //  assign full_flag = ~wb_ready;
 //  
-//  always_ff @(posedge cache_clk, negedge rst_n)
+//  always_ff @(posedge clk_l2, negedge rst_n)
 //  begin
 //    if(!rst_n)
 //    begin
@@ -264,7 +264,7 @@ endmodule
 //  assign wb_ptr = wb_reg[DATA_LENGTH-BYTE_OFFSET-1:0];
 //  assign wb_mem_write = wb_reg[2*DATA_LENGTH-BYTE_OFFSET-1:DATA_LENGTH+BYTE_OFFSET];
 //
-//  always_ff @(posedge cache_clk, negedge rst_n)
+//  always_ff @(posedge clk_l2, negedge rst_n)
 //  begin
 //    if(!rst_n) begin
 //      inst_req <= 1'b0;
@@ -283,7 +283,7 @@ endmodule
 //    end
 //  end
 //
-//  always_ff @(posedge cache_clk, negedge rst_n)
+//  always_ff @(posedge clk_l2, negedge rst_n)
 //  begin
 //    if(!rst_n)
 //    begin

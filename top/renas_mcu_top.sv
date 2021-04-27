@@ -26,31 +26,18 @@ module renas_mcu_top
   //-------------------------------------------------------------------
   //CPU 
   //-------------------------------------------------------------------
-  //INST-AHB bus
-  mas_send_type           iahb_out_1;
-  mas_send_type           iahb_out_2;
-  slv_send_type           iahb_in_1;
-  slv_send_type           iahb_in_2;
-  //Interrupt Handler
-  logic                    inst_dec_err;
+  	mas_send_type                           iahb_out;
+  	slv_send_type                           iahb_in;
+  	//Interrupt Handler
+  	logic                                   inst_dec_err;
+  	//D-AHB-ITF
+  	mas_send_type                           dahb_out;
+  	slv_send_type                           dahb_in;
+  	//Interrupt Handler
+  	logic                                   data_dec_err,
+	 											                    external_halt;
   //-------------------------------------------------------------------
-  //DATA-AHB bus
-  mas_send_type                         dahb_out_1;
-  mas_send_type                         dahb_out_2;
-  mas_send_type                         peri_ahb_out;
-  slv_send_type                         dahb_in_1;
-  slv_send_type                         dahb_in_2;
-  slv_send_type                         peri_ahb_in;
-  //Interrupt Handler
-  logic                                 data_dec_err,
-                                        peri_dec_err;
-  //-------------------------------------------------------------------
-	//WB Buffer
-  logic [2*DATA_LENGTH-BYTE_OFFSET-1:0] wb_data;	
-	logic 											          wb_req,
-												                wb_ack,	
-												                full_flag,
-	                                      external_halt;
+  //logic                                   peri_dec_err;
   //==============================================================================
   //-------------------------------------------------------------------
   //AHB-Bus: AHB-lite -> single slave-single master only
@@ -71,15 +58,11 @@ module renas_mcu_top
                 hsel_slave_data_1,
                 hsel_slave_data_2;
 
-  mas_send_type dmem_in_1;
-  mas_send_type dmem_in_2;
-  slv_send_type dmem_out_1;
-  slv_send_type dmem_out_2;
+  mas_send_type dmem_in;
+  slv_send_type dmem_out;
 
-  mas_send_type imem_in_1;
-  mas_send_type imem_in_2;
-  slv_send_type imem_out_1;
-  slv_send_type imem_out_2;
+  mas_send_type imem_in;
+  slv_send_type imem_out;
   
   mas_send_type peri_apb_out;
   slv_send_type peri_apb_in;
@@ -92,18 +75,29 @@ module renas_mcu_top
   //-------------------------------------------------------------------
   //Floating signals of AHB bus
   assign hprior_master_peri = '0;
-  assign hprior_master_inst_1 = '0;
-  assign hprior_master_inst_2 = '0;
-  assign hprior_master_data_1 = '0;
-  assign hprior_master_data_2 = '0;
+  assign hprior_master_inst = '0;
+  assign hprior_master_data = '0;
   //-------------------------------------------------------------------
-
-  assign dmem_hsel = hsel_slave_data_1 & hsel_slave_data_2; 
-  assign imem_hsel = hsel_slave_inst_1 & hsel_slave_inst_2;
-  assign peri_hsel = hsel_slave_peri;
 
   RVS192 renas_cpu_202
   (
+  	output  mas_send_type                           iahb_out,
+  	input   slv_send_type                           iahb_in,
+  	//Interrupt Handler
+  	output logic                                    inst_dec_err,
+  	//D-AHB-ITF
+  	output  mas_send_type                           dahb_out,
+  	input   slv_send_type                           dahb_in,
+  	//Interrupt Handler
+  	output logic                                    data_dec_err,
+	//Hung_add_25.04.2021
+
+	input 											external_halt,
+			    									clk,
+			    									clk_l1,
+			    									clk_l2,
+			    									mem_clk,
+			    									rst_n
     .*
   );
   AHB_bus ahb_matrix
@@ -121,82 +115,25 @@ module renas_mcu_top
   	.master_data_out(),
   //#MI#
   	.slave_peri_in(),
-  	.hsel_slave_peri(),
+  	.hsel_slave_peri(peri_hsel),
   	.slave_peri_out(),
   	.slave_isnt_in(),
-  	.hsel_slave_isnt(),
+  	.hsel_slave_isnt(imem_hsel),
   	.slave_isnt_out(),
   	.slave_data_in(),
-  	.hsel_slave_data(),
+  	.hsel_slave_data(dmem_hsel),
   	.slave_data_out(),
-  	.hclk(),
-  	.hreset_n()
+  	.hclk(clk_l2),
+  	.hreset_n(rst_n)
   (
-//#INTERFACEGEN#
-//#SI#
-	input  mas_send_type  master_peri_in,
-	input  [2-1:0]  hprior_master_peri,
-	output  slv_send_type  master_peri_out,
-	input  mas_send_type  master_inst_in,
-	input  [2-1:0]  hprior_master_inst,
-	output  slv_send_type  master_inst_out,
-	input  mas_send_type  master_data_in,
-	input  [2-1:0]  hprior_master_data,
-	output  slv_send_type  master_data_out,
-//#MI#
-	input  slv_send_type  slave_peri_in,
-	output hsel_slave_peri,
-	output mas_send_type  slave_peri_out,
-	input  slv_send_type  slave_isnt_in,
-	output hsel_slave_isnt,
-	output mas_send_type  slave_isnt_out,
-	input  slv_send_type  slave_data_in,
-	output hsel_slave_data,
-	output mas_send_type  slave_data_out,
-	input					 hclk,
-	input					 hreset_n
-  AHB_bus ahb_matrix
-  (
-  //#INTERFACEGEN#
-  //#SI#
-  	.master_peri_in(peri_ahb_out),
-  	.master_peri_out(peri_ahb_in),
-  	.master_inst_1_in(iahb_out_1),
-  	.master_inst_1_out(iahb_in_1),
-  	.master_inst_2_in(iahb_out_2),
-  	.master_inst_2_out(iahb_in_2),
-  	.master_data_1_in(dahb_out_1),
-  	.master_data_1_out(dahb_in_1),
-  	.master_data_2_in(dahb_out_2),
-  	.master_data_2_out(dahb_in_2),
-  //#MI#
-  	.slave_peri_in(peri_apb_in),
-  	.slave_peri_out(peri_apb_out),
-  	.slave_inst_1_in(imem_out_1),
-  	.slave_inst_1_out(imem_in_1),
-  	.slave_inst_2_in(imem_out_2),
-  	.slave_inst_2_out(imem_in_2),
-  	.slave_data_1_in(dmem_out_1),
-  	.slave_data_1_out(dmem_in_1),
-  	.slave_data_2_in(dmem_out_2),
-  	.slave_data_2_out(dmem_in_2),
-    .hclk(cache_clk),
-    .hreset_n(rst_n),
-    .*
-  );
 
   renas_memory  mmem
   (
-    .imem_hsel(),
     .imem_in(),
     .imem_out(),
     
-    .dmem_hsel(),
     .dmem_in(),
     .dmem_out(),
-
-    .clk_l2(),
-	  .clk_mem(),
-	  .rst_n()
+	  .*
   );
 endmodule: renas_mcu_top
