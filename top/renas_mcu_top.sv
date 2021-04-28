@@ -9,10 +9,10 @@
 // v0.0   10.04.2021  hungbk99  First Creation
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
-`include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
-`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
-`include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
+//`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+//`include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
+//`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
+//`include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
 module renas_mcu_top
 (
   input                                 clk,
