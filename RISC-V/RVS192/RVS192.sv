@@ -48,7 +48,7 @@ module 	RVS192
 			    									clk,
 			    									clk_l1,
 			    									clk_l2,
-			    									mem_clk,
+			    									clk_mem,
 			    									rst_n
 );
 

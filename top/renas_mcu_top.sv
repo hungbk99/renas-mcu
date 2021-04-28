@@ -9,10 +9,14 @@
 // v0.0   10.04.2021  hungbk99  First Creation
 //////////////////////////////////////////////////////////////////////////////////
 
-//`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
-//`include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
-//`include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
-//`include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
+`define TOP
+`ifndef TEST
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
+  `include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
+`endif
+
 module renas_mcu_top
 (
   input                                 clk,
@@ -86,28 +90,28 @@ module renas_mcu_top
   (
   //#INTERFACEGEN#
   //#SI#
-  	.master_peri_in(peri_master_in),
+  	.master_peri_in(peri_master_out),
   	//.hprior_master_peri(),
-  	.master_peri_out(peri_master_out),
-  	.master_inst_in(iahb_in),
+  	.master_peri_out(peri_master_in),
+  	.master_inst_in(iahb_out),
   	//.hprior_master_inst(),
-  	.master_inst_out(iahb_out),
-  	.master_data_in(dahb_in),
+  	.master_inst_out(iahb_in),
+  	.master_data_in(dahb_out),
   	//.hprior_master_data(),
-  	.master_data_out(dahb_out),
+  	.master_data_out(dahb_in),
   //#MI#
   	.slave_peri_in(peri_slave_out),
   	.hsel_slave_peri(peri_hsel),
   	.slave_peri_out(peri_slave_in),
-  	.slave_isnt_in(imem_out),
-  	.hsel_slave_isnt(imem_hsel),
-  	.slave_isnt_out(imem_in),
+  	.slave_inst_in(imem_out),
+  	.hsel_slave_inst(imem_hsel),
+  	.slave_inst_out(imem_in),
   	.slave_data_in(dmem_out),
   	.hsel_slave_data(dmem_hsel),
   	.slave_data_out(dmem_in),
   	.hclk(clk_l2),
   	.hreset_n(rst_n)
-  (
+  );
 
   renas_memory  mmem
   (

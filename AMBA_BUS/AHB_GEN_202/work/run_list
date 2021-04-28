@@ -3,12 +3,14 @@
 ../Gen_Result/AHB_default_slave.sv
 ../Gen_Result/AHB_package.sv
 ../Gen_Result/arbiter/AHB_arbiter_slave_data.sv
+../Gen_Result/arbiter/AHB_arbiter_slave_inst.sv
 ../Gen_Result/arbiter/AHB_arbiter_slave_isnt.sv
 ../Gen_Result/arbiter/AHB_arbiter_slave_peri.sv
 ../Gen_Result/decoder/AHB_decoder_master_data.sv
 ../Gen_Result/decoder/AHB_decoder_master_inst.sv
 ../Gen_Result/decoder/AHB_decoder_master_peri.sv
 ../Gen_Result/mux/AHB_mi_mux_slave_data.sv
+../Gen_Result/mux/AHB_mi_mux_slave_inst.sv
 ../Gen_Result/mux/AHB_mi_mux_slave_isnt.sv
 ../Gen_Result/mux/AHB_mi_mux_slave_peri.sv
 ../Gen_Result/mux/AHB_si_mux_master_data.sv

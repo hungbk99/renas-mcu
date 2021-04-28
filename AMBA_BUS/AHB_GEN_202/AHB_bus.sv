@@ -87,7 +87,6 @@ module AHB_bus
 	mas_send_type payload_slave_inst_out;
 	logic [1-1:0] hgrant_slave_inst;
 	logic [1-1:0][2-1:0] hprior_slave_inst;
-	logic hgrant_slave_inst_master_inst;
 	logic [1-1:0] hreq_slave_data;
 	logic [1-1:0][SI_PAYLOAD-1:0] payload_slave_data_in;
 	mas_send_type payload_slave_data_out;
@@ -242,11 +241,6 @@ module AHB_bus
 	assign hprior_slave_peri = { hprior_master_peri};
 	assign payload_slave_peri_in[0] = master_peri_in;
 	assign slave_inst_out = payload_slave_inst_out;
-
-	assign hreq_slave_inst = { hreq_master_inst[0]};
-	assign { hgrant_slave_inst_master_inst} = hgrant_slave_inst;
-	assign hprior_slave_inst = { hprior_master_inst};
-	assign payload_slave_inst_in[0] = master_inst_in;
 	assign slave_data_out = payload_slave_data_out;
 
 	assign hreq_slave_data = { hreq_master_data[0]};

@@ -11,12 +11,15 @@
 // v0.2   26.04.2021  hungbk99  Modify to map with RVS192 cpu
 //////////////////////////////////////////////////////////////////////////////////
 
-//`include"renas_user_define.h"
-  `include "D:/Project/renas-mcu/RISC-V/RVS192/DualPort_SRAM.sv"  
-  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
-  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
-  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
-  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"	
+`ifndef TEST
+  `ifndef TOP
+    `include "D:/Project/renas-mcu/RISC-V/RVS192/DualPort_SRAM.sv"  
+    `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
+    `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
+    `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_parameters.sv"
+    `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_package.sv"
+  `endif
+`endif
 import 	RVS192_package::*;
 import  AHB_package::*;
 import	RVS192_user_parameters::*;

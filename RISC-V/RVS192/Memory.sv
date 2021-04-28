@@ -23,7 +23,7 @@ module	Memory
 	input 							                inst_read_req,
 											                data_read_req,
 											                data_write_req,
-											                mem_clk,
+											                clk_mem,
 											                rst_n
 );
 //================================================================================	
@@ -54,7 +54,7 @@ module	Memory
 
 //================================================================================	
 //	L2 Cache Interface
-	always_ff @(posedge mem_clk or negedge rst_n)
+	always_ff @(posedge clk_mem or negedge rst_n)
 	begin
 		if(!rst_n)
 		begin
@@ -79,7 +79,7 @@ module	Memory
 	assign 	data_read_samp = data_read_req && !data_read_req_sync;
 	assign 	data_write_samp = data_write_req && !data_write_req_sync;
 	
-	always_ff @(posedge mem_clk)
+	always_ff @(posedge clk_mem)
 	begin
 		if(data_write_samp)
 			data_mem_write_sync <= data_mem_write;	
@@ -87,7 +87,7 @@ module	Memory
 			data_mem_write_sync <= data_mem_write_sync;
 	end
 
-	always_ff @(posedge mem_clk or negedge rst_n)
+	always_ff @(posedge clk_mem or negedge rst_n)
 	begin
 		if(!rst_n)
 		begin
@@ -113,7 +113,7 @@ module	Memory
 	assign 	p_D_Word = data_addr_sync[31:2];
 	assign 	p_D_Byte = data_addr_sync[1:0];	
 	
-	always_ff @(posedge mem_clk or negedge rst_n)
+	always_ff @(posedge clk_mem or negedge rst_n)
 	begin
 		if(!rst_n)
 		begin
@@ -133,7 +133,7 @@ module	Memory
 		end
 	end
 	
-	always_ff @(posedge mem_clk or negedge rst_n)
+	always_ff @(posedge clk_mem or negedge rst_n)
 	begin
 		if(!rst_n)
 		begin
