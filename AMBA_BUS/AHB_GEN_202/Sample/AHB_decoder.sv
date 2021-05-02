@@ -16,9 +16,9 @@
 //#CONFIG_GEN#
 //================================================================================
 
-import AHB_package::*;
 
 module AHB_decoder#NUM# 
+import AHB_package::*;
 #(
 //#PARAGEN#
 )
@@ -66,10 +66,10 @@ module AHB_decoder#NUM#
   endgenerate
   
   //Hung_mod_25.04.2021 assign  dec_error = (htrans_buf != IDLE) ? ~|slave_detect : 1'b0;  //Access undefine region
-  assign  dec_error = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ? ~|slave_detect : 1'b0;  //Access undefine region
-
+  assign  dec_error = ((htrans_buf == NONSEQ) || (htrans_buf == SEQ)) ? ~|slave_detect : 1'b0;  //Access undefine region
+  
   //Hung_mod_25.04.2021 assign  hreq_buf = (htrans_buf != IDLE) ?  slave_detect : '0;
-  assign  hreq_buf = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ?  slave_detect : '0;
+  assign  hreq_buf = ((htrans_buf == NONSEQ) || (htrans_buf == SEQ)) ?  slave_detect : '0;
 
   assign default_slv_sel = dec_error;
   assign hreq = hreq_buf;

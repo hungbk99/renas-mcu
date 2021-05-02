@@ -16,9 +16,9 @@
 //#CONFIG_GEN#
 //================================================================================
 
-import AHB_package::*;
 
 module AHB_decoder_master_data 
+import AHB_package::*;
 #(
 //#PARAGEN#
 	parameter AHB_ADDR_WIDTH = 32,
@@ -50,8 +50,8 @@ module AHB_decoder_master_data
 //ADDRESS MAP
 //#ADDRMAPGEN#
 //db	slave_data
-	assign low_addr[0] = 32'h0000_0800;
-	assign high_addr[0] = 32'h0001_03FF;
+	assign low_addr[0] = 32'h0000_0000;
+	assign high_addr[0] = 32'h0000_7FFF;
 //================================================================================
   assign haddr_buf = haddr; 
   assign htrans_buf = htrans; 
@@ -71,10 +71,10 @@ module AHB_decoder_master_data
   endgenerate
   
   //Hung_mod_25.04.2021 assign  dec_error = (htrans_buf != IDLE) ? ~|slave_detect : 1'b0;  //Access undefine region
-  assign  dec_error = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ? ~|slave_detect : 1'b0;  //Access undefine region
-
+  assign  dec_error = ((htrans_buf == NONSEQ) || (htrans_buf == SEQ)) ? ~|slave_detect : 1'b0;  //Access undefine region
+  
   //Hung_mod_25.04.2021 assign  hreq_buf = (htrans_buf != IDLE) ?  slave_detect : '0;
-  assign  hreq_buf = ((htrans_buf != IDLE) || (htrans_buf != BUSY)) ?  slave_detect : '0;
+  assign  hreq_buf = ((htrans_buf == NONSEQ) || (htrans_buf == SEQ)) ?  slave_detect : '0;
 
   assign default_slv_sel = dec_error;
   assign hreq = hreq_buf;

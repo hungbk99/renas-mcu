@@ -1691,22 +1691,20 @@ parameter	WORD_LENGTH = 16
       iahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
-        //n_state = BUSY_I;
-        n_state = SEQ_I;
-        iahb_out.htrans = SEQ;
+        n_state = BUSY_I;
+        iahb_out.htrans = BUSY;
       end
       else
         n_state = state;
     end
     SEQ_I: begin
       iahb_out.htrans = SEQ;
-      //if(read_req && read_res && !inst_read_inst.stop) 
-      //begin
-      //  n_state = BUSY_I;
-      //  iahb_out.htrans = BUSY;
-      //end
-      //else 
-      if(read_req && read_res && inst_read_inst.stop)
+      if(read_req && read_res && !inst_read_inst.stop) 
+      begin
+        n_state = BUSY_I;
+        iahb_out.htrans = BUSY;
+      end
+      else if(read_req && read_res && inst_read_inst.stop)
       begin
         n_state = IDLE_I;
         iahb_out.htrans = IDLE;
@@ -1714,16 +1712,16 @@ parameter	WORD_LENGTH = 16
       else
         n_state = state;
     end
-    //BUSY_I: begin
-    //  iahb_out.htrans = BUSY;
-    //  if(!read_res && read_req)
-    //  begin
-    //    iahb_out.htrans = SEQ;
-    //    n_state = SEQ_I;
-    //  end
-    //  else
-    //    n_state = state;
-    //end
+    BUSY_I: begin
+      iahb_out.htrans = BUSY;
+      if(!read_res && read_req)
+      begin
+        iahb_out.htrans = SEQ;
+        n_state = SEQ_I;
+      end
+      else
+        n_state = state;
+    end
     default: n_state = state;
     endcase
   end

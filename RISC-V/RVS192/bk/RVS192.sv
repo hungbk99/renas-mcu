@@ -258,9 +258,7 @@ module 	RVS192
 	begin
 		if(rst_n == 1'b0)
 		begin
-			//Hung_mod pc_fetch <= 32'h0000_0ffc;
-			//pc_fetch <= 32'h0000_03fc;
-			pc_fetch <= 32'h0000_8000;
+			pc_fetch <= 32'h0000_0ffc;
 		end
 		else if(pc_halt)
 			pc_fetch <= pc_fetch;
@@ -447,10 +445,10 @@ module 	RVS192
 	.*
 	);
 
-	//Memory 		MEM_DUT
-	//(
-	//.*
-	//);
+	Memory 		MEM_DUT
+	(
+	.*
+	);
 endmodule	
 	
 //=====================================================================	

@@ -2,16 +2,19 @@
 // File Name: 		AHB_bus.sv
 // Project Name:	AHB_Gen
 // Email:         quanghungbk1999@gmail.com
-// Version    Date      Author      Description
-// v0.0       2/10/2020 Quang Hung  First Creation
+// Version    Date        Author      Description
+// v0.0       02/10/2020  Quang Hung  First Creation
+// v0.1       05/01/2021  Quang Hung  First Gen from AHB_GEN
+//                                    Modify to connect with renas_cpu 
+//                                    Eliminate Arbiter -> single mode only
 //////////////////////////////////////////////////////////////////////////////////
 
   //`include "D:/Project/renas-mcu//AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
-  `include "D:/Project/renas-mcu//AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_arbiter_package.sv"
+ // `include "D:/Project/renas-mcu//AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_arbiter_package.sv"
   `include "D:/Project/renas-mcu//AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_default_slave.sv"
-  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_data.sv"
-  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_inst.sv"
-  `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_peri.sv"
+ // `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_data.sv"
+ // `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_inst.sv"
+ // `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/arbiter/AHB_arbiter_slave_peri.sv"
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/decoder/AHB_decoder_master_data.sv"
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/decoder/AHB_decoder_master_inst.sv"
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/decoder/AHB_decoder_master_peri.sv"
@@ -87,6 +90,7 @@ module AHB_bus
 	mas_send_type payload_slave_inst_out;
 	logic [1-1:0] hgrant_slave_inst;
 	logic [1-1:0][2-1:0] hprior_slave_inst;
+	logic hgrant_slave_inst_master_inst;
 	logic [1-1:0] hreq_slave_data;
 	logic [1-1:0][SI_PAYLOAD-1:0] payload_slave_data_in;
 	mas_send_type payload_slave_data_out;
@@ -178,58 +182,58 @@ module AHB_bus
 
 //================================================================================
 //#ARBGEN#
-	AHB_arbiter_slave_peri ARB_slave_peri
-	(
-		.hreq(hreq_slave_peri),
-		.hburst(payload_slave_peri_out.hburst),
-		.hwait(~slave_peri_in.hreadyout),
-		.hgrant(hgrant_slave_peri),
-		.hsel(hsel_slave_peri),
-		.*
-	);
+	//AHB_arbiter_slave_peri ARB_slave_peri
+	//(
+	//	.hreq(hreq_slave_peri),
+	//	.hburst(payload_slave_peri_out.hburst),
+	//	.hwait(~slave_peri_in.hreadyout),
+	//	.hgrant(hgrant_slave_peri),
+	//	.hsel(hsel_slave_peri),
+	//	.*
+	//);
 
 
 	AHB_mux_slave_peri MUX_slave_peri
 	(
 		.payload_in(payload_slave_peri_in),
 		.payload_out(payload_slave_peri_out),
-		.sel(hgrant_slave_peri)
+		.sel(1'b1)
 	);
 
-	AHB_arbiter_slave_inst ARB_slave_inst
-	(
-		.hreq(hreq_slave_inst),
-		.hburst(payload_slave_inst_out.hburst),
-		.hwait(~slave_inst_in.hreadyout),
-		.hgrant(hgrant_slave_inst),
-		.hsel(hsel_slave_inst),
-		.*
-	);
+	//AHB_arbiter_slave_inst ARB_slave_inst
+	//(
+	//	.hreq(hreq_slave_inst),
+	//	.hburst(payload_slave_inst_out.hburst),
+	//	.hwait(~slave_inst_in.hreadyout),
+	//	.hgrant(hgrant_slave_inst),
+	//	.hsel(hsel_slave_inst),
+	//	.*
+	//);
 
 
 	AHB_mux_slave_inst MUX_slave_inst
 	(
 		.payload_in(payload_slave_inst_in),
 		.payload_out(payload_slave_inst_out),
-		.sel(hgrant_slave_inst)
+		.sel(1'b1)
 	);
 
-	AHB_arbiter_slave_data ARB_slave_data
-	(
-		.hreq(hreq_slave_data),
-		.hburst(payload_slave_data_out.hburst),
-		.hwait(~slave_data_in.hreadyout),
-		.hgrant(hgrant_slave_data),
-		.hsel(hsel_slave_data),
-		.*
-	);
+	//AHB_arbiter_slave_data ARB_slave_data
+	//(
+	//	.hreq(hreq_slave_data),
+	//	.hburst(payload_slave_data_out.hburst),
+	//	.hwait(~slave_data_in.hreadyout),
+	//	.hgrant(hgrant_slave_data),
+	//	.hsel(hsel_slave_data),
+	//	.*
+	//);
 
 
 	AHB_mux_slave_data MUX_slave_data
 	(
 		.payload_in(payload_slave_data_in),
 		.payload_out(payload_slave_data_out),
-		.sel(hgrant_slave_data)
+		.sel(1'b1)
 	);
 
 //================================================================================
@@ -241,6 +245,11 @@ module AHB_bus
 	assign hprior_slave_peri = { hprior_master_peri};
 	assign payload_slave_peri_in[0] = master_peri_in;
 	assign slave_inst_out = payload_slave_inst_out;
+
+	assign hreq_slave_inst = { hreq_master_inst[0]};
+	assign { hgrant_slave_inst_master_inst} = hgrant_slave_inst;
+	assign hprior_slave_inst = { hprior_master_inst};
+	assign payload_slave_inst_in[0] = master_inst_in;
 	assign slave_data_out = payload_slave_data_out;
 
 	assign hreq_slave_data = { hreq_master_data[0]};
@@ -257,5 +266,8 @@ module AHB_bus
 	assign master_data_out = (dec_error_sel_master_data) ? payload_dec_error_master_data : payload_master_data_out;
 
 	assign payload_master_data_in[0] = {slave_data_in.hreadyout & hgrant_slave_data_master_data, slave_data_in.hrdata, slave_data_in.hresp};
-
+//Hung add
+  assign hsel_slave_peri = hreq_slave_peri;
+  assign hsel_slave_inst = hreq_slave_inst;
+  assign hsel_slave_data = hreq_slave_data;
 endmodule: AHB_bus

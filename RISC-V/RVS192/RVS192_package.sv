@@ -18,7 +18,7 @@ package	RVS192_package;
 	parameter 	CONTROL_ADDR_LENGTH = 9;
 	parameter 	BYTE_OFFSET = 2;
 	parameter	WORD_OFFSET = $clog2(CACHE_BLOCK_SIZE/4);
-	parameter	MEM_LINE = 2**11;		//	64KB: 32K data, 32K inst
+	parameter	MEM_LINE = 2**17;		
 	parameter 	REGISTER_FILE_DEPTH = 32;
 
 //	Controller data type

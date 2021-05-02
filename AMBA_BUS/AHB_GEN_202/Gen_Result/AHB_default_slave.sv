@@ -26,7 +26,7 @@ module default_slave
     hresp     = 1'b0;
     case(current_state)
       IDLE: begin
-        error_sel = 1'b1;
+        error_sel = 1'b0;
         if(default_slv_sel)
           next_state = ERROR;
         else

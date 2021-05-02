@@ -91,13 +91,13 @@ module renas_mcu_top
   //#INTERFACEGEN#
   //#SI#
   	.master_peri_in(peri_master_out),
-  	//.hprior_master_peri(),
+  	.hprior_master_peri(hprior_master_peri),
   	.master_peri_out(peri_master_in),
   	.master_inst_in(iahb_out),
-  	//.hprior_master_inst(),
+  	.hprior_master_inst(hprior_master_inst),
   	.master_inst_out(iahb_in),
   	.master_data_in(dahb_out),
-  	//.hprior_master_data(),
+  	.hprior_master_data(hprior_master_data),
   	.master_data_out(dahb_in),
   //#MI#
   	.slave_peri_in(peri_slave_out),
