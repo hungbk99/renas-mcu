@@ -48,8 +48,10 @@ logic [PC_LENGTH-1:0]     syn_imem_addr;
 logic [DATA_LENGTH-1:0]   syn_dmem_addr;
 logic                     imem_req;
 logic                     imem_ack;
+logic                     imem_ack_dl;
 logic                     dmem_req;
 logic                     dmem_ack;
+logic                     dmem_ack_dl;
 //--------------------------------------------------------------------------------
 always_ff @(posedge clk_l2, negedge rst_n)
 begin
@@ -82,14 +84,18 @@ begin
   if(!rst_n) begin
     imem_req <= 1'b0;
     dmem_req <= 1'b0;
+    imem_ack_dl <= 1'b0;
+    dmem_ack_dl <= 1'b0;
   end
   else begin
-    if(imem_hsel && !imem_ack)
+    imem_ack_dl <= imem_ack;
+    if(imem_hsel && !imem_ack && !imem_ack_dl)
       imem_req <= 1'b1;
     else if(imem_ack)
       imem_req <= 1'b0;
 
-    if(dmem_hsel && !dmem_ack)
+    dmem_ack_dl <= dmem_ack;
+    if(dmem_hsel && !dmem_ack && !dmem_ack_dl)
       dmem_req <= 1'b1;
     else if(dmem_ack)
       dmem_req <= 1'b0;
@@ -97,7 +103,7 @@ begin
 end
 //--------------------------------------------------------------------------------
 
-always_ff @(posedge clk_l2, negedge rst_n)
+always_ff @(posedge clk_mem, negedge rst_n)
 begin
   if(!rst_n)    
   begin
@@ -106,17 +112,17 @@ begin
     syn_dmem_wdata <= '0;
   end
   else begin
-    if(imem_req)
+    //if(imem_req)
       syn_imem_addr <= imem_in.haddr;
 
-    if(dmem_req) begin
+    //if(dmem_req) begin
       syn_dmem_addr <= dmem_in.haddr;
       syn_dmem_wdata <= dmem_in.hwdata;
-    end
+    //end
   end
 end
 
-always_ff @(posedge clk_l2, negedge rst_n)
+always_ff @(posedge clk_mem, negedge rst_n)
 begin
   if(!rst_n)    
   begin

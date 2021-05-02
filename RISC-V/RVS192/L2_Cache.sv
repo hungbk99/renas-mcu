@@ -1180,7 +1180,7 @@ parameter	WORD_LENGTH = 16
 //	Next State Logic	
 	always_comb begin
 		read_req_raw = 1'b0;
-		write_en_raw = 1'b0;
+		//Hung_mod write_en_raw = 1'b0;
 		next_state = READY;
 		unique case(current_state)
 		READY:
@@ -1194,8 +1194,9 @@ parameter	WORD_LENGTH = 16
 		end
 		REQ:
 		begin
-			write_en_raw = 1'b0;
-			if(!stop)
+			//Hung_mod write_en_raw = 1'b0;
+			//Hung_mod if(!stop)
+      if(!(stop && write_en))
 			begin
 				next_state = BUSY;
 				read_req_raw = 1'b1;
@@ -1204,10 +1205,21 @@ parameter	WORD_LENGTH = 16
 				next_state = READY;
 		end
 		BUSY:
+		//Hung_mod begin
+		//Hung_mod 	if(read_done)
+		//Hung_mod 	begin
+		//Hung_mod 		//Hung_mod write_en_raw = 1'b1;
+		//Hung_mod 		next_state = REQ;
+		//Hung_mod 	end
+		//Hung_mod 	else 
+		//Hung_mod 		next_state = current_state;
+		//Hung_mod end
 		begin
-			if(read_done)
+      if(stop && replace_done)
+        next_state = READY;
+			else if(read_done)
 			begin
-				write_en_raw = 1'b1;
+				//Hung_mod write_en_raw = 1'b1;
 				next_state = REQ;
 			end
 			else 
@@ -1228,14 +1240,17 @@ parameter	WORD_LENGTH = 16
 	
 	always_ff @(posedge clk_l2)
 	begin
-		write_en <= write_en_raw;
+		//Hung_mod write_en <= write_en_raw;
 		if(read_req)
 			read_req <= !read_res;
 		else
 			read_req <= read_req_raw;
 		read_done1 <= read_res;
 	end	
-	
+
+  //Hung_add
+  assign write_en = read_req & read_res;
+
 	assign read_done = !read_res && read_done1;
 	
 	always_ff @(posedge clk_l2 or negedge rst_n)
@@ -1250,16 +1265,19 @@ parameter	WORD_LENGTH = 16
 			word_count <= word_count;	
 	end
 
-	always_ff @(posedge clk_l2 or negedge rst_n)
-	begin
-		if(!rst_n)
-			data_read_sync <= '0;
-		else if(read_res)
-			data_read_sync <= data_read;
-		else 
-			data_read_sync <= data_read_sync;
-	end
-	
+	//Hung_mod always_ff @(posedge clk_l2 or negedge rst_n)
+	//Hung_mod begin
+	//Hung_mod 	if(!rst_n)
+	//Hung_mod 		data_read_sync <= '0;
+	//Hung_mod 	else if(read_res)
+	//Hung_mod 		data_read_sync <= data_read;
+	//Hung_mod 	else 
+	//Hung_mod 		data_read_sync <= data_read_sync;
+	//Hung_mod end
+  //Hung_add
+  assign data_read_sync = data_read;
+
+
 	assign	stop = (word_count == WORD_LENGTH-1) ? 1'b1 : 1'b0;	
 	assign	addr_read = {addr, word_count, 2'b0};
 	assign	word_sel = word_count;
@@ -1678,14 +1696,17 @@ parameter	WORD_LENGTH = 16
   end
   
   always_comb begin
-    n_state = IDLE_I;
-    iahb_out.htrans = IDLE;
-    unique case(n_state)
+    //n_state = IDLE_I;
+    //iahb_out.htrans = IDLE;
+    unique case(state)
     IDLE_I: begin
+      iahb_out.htrans = IDLE;
       if(read_req) begin
-        iahb_out.htrans = NONSEQ;
+        //iahb_out.htrans = NONSEQ;
         n_state = NONSEQ_I;
       end
+      else
+        n_state = state;
     end
     NONSEQ_I: begin
       iahb_out.htrans = NONSEQ;
@@ -1693,7 +1714,7 @@ parameter	WORD_LENGTH = 16
       begin
         //n_state = BUSY_I;
         n_state = SEQ_I;
-        iahb_out.htrans = SEQ;
+        //iahb_out.htrans = SEQ;
       end
       else
         n_state = state;
@@ -1709,7 +1730,7 @@ parameter	WORD_LENGTH = 16
       if(read_req && read_res && inst_read_inst.stop)
       begin
         n_state = IDLE_I;
-        iahb_out.htrans = IDLE;
+        //iahb_out.htrans = IDLE;
       end
       else
         n_state = state;
