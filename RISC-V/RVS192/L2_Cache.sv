@@ -1875,12 +1875,13 @@ parameter	WORD_LENGTH = 16
   
   always_comb begin
     //direction = 1'b0;
-    n_state = IDLE_D;
-    dahb_out.htrans = IDLE;
-    unique case(n_state)
+    //Hung_mod n_state = IDLE_D;
+    //Hung_mod dahb_out.htrans = IDLE;
+    unique case(state)
     IDLE_D: begin
+      dahb_out.htrans = IDLE;
       if(read_req) begin
-        dahb_out.htrans = NONSEQ;
+        //Hung_mod dahb_out.htrans = NONSEQ;
         n_state = NONSEQ_D;
       end
     end
@@ -1888,37 +1889,39 @@ parameter	WORD_LENGTH = 16
       dahb_out.htrans = NONSEQ;
       if(read_req && read_res) 
       begin
-        n_state = BUSY_D;
-        dahb_out.htrans = BUSY;
+        //Hung_mod n_state = BUSY_D;
+        //Hung_mod dahb_out.htrans = BUSY;
+		n_state = SEQ_D;
       end
       else
         n_state = state;
     end
     SEQ_D: begin
       dahb_out.htrans = SEQ;
-      if(read_req && read_res && !data_read_inst.stop) 
-      begin
-        n_state = BUSY_D;
-        dahb_out.htrans = BUSY;
-      end
-      else if(read_req && read_res && data_read_inst.stop)
+      //Hung_mod if(read_req && read_res && !data_read_inst.stop) 
+      //Hung_mod begin
+      //Hung_mod   n_state = BUSY_D;
+      //Hung_mod   dahb_out.htrans = BUSY;
+      //Hung_mod end
+      //Hung_mod else 
+	  if(read_req && read_res && data_read_inst.stop)
       begin
         n_state = IDLE_D;
-        dahb_out.htrans = IDLE;
+        //Hung_mod dahb_out.htrans = IDLE;
       end
       else
         n_state = state;
     end
-    BUSY_D: begin
-      dahb_out.htrans = BUSY;
-      if(!read_res && read_req)
-      begin
-        dahb_out.htrans = SEQ;
-        n_state = SEQ_D;
-      end
-      else
-        n_state = state;
-    end
+    //Hung_mod BUSY_D: begin
+    //Hung_mod   dahb_out.htrans = BUSY;
+    //Hung_mod   if(!read_res && read_req)
+    //Hung_mod   begin
+    //Hung_mod     dahb_out.htrans = SEQ;
+    //Hung_mod     n_state = SEQ_D;
+    //Hung_mod   end
+    //Hung_mod   else
+    //Hung_mod     n_state = state;
+    //Hung_mod end
     default: n_state = state;
     endcase
   end
