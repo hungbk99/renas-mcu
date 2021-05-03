@@ -199,12 +199,18 @@ module 	RVS192
 			wrong_dl_1 <= wrong_dl;
 	end
 	
-//============================Fetch Stage=============================
+//=====================Pipelined Registers============================
 //====================================================================
 	always_ff @(posedge clk or negedge rst_n)
 	begin
 		if(!rst_n)
-			o_pp_fetch_dec <= '0;
+    begin
+			//Hung_mod o_pp_fetch_dec <= '0;
+      o_pp_fetch_dec.pc <= '0;
+      o_pp_fetch_dec.br_check <= '0;
+      o_pp_fetch_dec.inst <= 32'h00007033;
+
+    end
 		else if(fetch_dec_halt) 
 			o_pp_fetch_dec <= o_pp_fetch_dec;
 		else

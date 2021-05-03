@@ -12,13 +12,13 @@ import	RVS192_user_parameters::*;
 module	Decoder
 (
 	output	control_type_ex			control_dec,
-	output 	[4:0]					rs1,
-									rs2,
-									rd,
-	input	[INST_LENGTH-1:0]		inst_raw
+	output 	[4:0]					      rs1,
+									            rs2,
+									            rd,
+	input	[INST_LENGTH-1:0]		  inst_raw
 );
 
-	i_extract_type					inst_union;
+	i_extract_type					    inst_union;
 	assign 	inst_union = inst_raw;
 	
 	always_comb begin

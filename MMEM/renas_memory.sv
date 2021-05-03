@@ -84,17 +84,17 @@ begin
   if(!rst_n) begin
     imem_req <= 1'b0;
     dmem_req <= 1'b0;
-    imem_ack_dl <= 1'b0;
-    dmem_ack_dl <= 1'b0;
+    //Hung_mod imem_ack_dl <= 1'b0;
+    //Hung_mod dmem_ack_dl <= 1'b0;
   end
   else begin
-    imem_ack_dl <= imem_ack;
+    //Hung_mod imem_ack_dl <= imem_ack;
     if(imem_hsel && !imem_ack && !imem_ack_dl)
       imem_req <= 1'b1;
     else if(imem_ack)
       imem_req <= 1'b0;
 
-    dmem_ack_dl <= dmem_ack;
+    //Hung_mod dmem_ack_dl <= dmem_ack;
     if(dmem_hsel && !dmem_ack && !dmem_ack_dl)
       dmem_req <= 1'b1;
     else if(dmem_ack)
@@ -110,14 +110,24 @@ begin
     syn_imem_addr <= '0;
     syn_dmem_addr <= '0;
     syn_dmem_wdata <= '0;
+    //Hung_add
+    imem_ack_dl <= 1'b0;
+    dmem_ack_dl <= 1'b0;
+    //Hung_add
   end
   else begin
     //if(imem_req)
       syn_imem_addr <= imem_in.haddr;
+      //Hung_add
+      imem_ack_dl <= imem_ack;
+      //Hung_add
 
     //if(dmem_req) begin
       syn_dmem_addr <= dmem_in.haddr;
       syn_dmem_wdata <= dmem_in.hwdata;
+      //Hung_add
+      dmem_ack_dl <= dmem_ack;
+      //Hung_add
     //end
   end
 end
@@ -142,7 +152,7 @@ begin
   end
 end
 
-assign dmem_wen = dmem_ack;
+assign dmem_wen = dmem_ack & dmem_in.hwrite;
 
 //--------------------------------------------------------------------------------
 DualPort_SRAM

@@ -1543,24 +1543,44 @@ parameter	WORD_LENGTH = 16
 	end
 
 //	DFF to remove glitches
-	always_ff @(posedge clk_l2)
+	//Hung_mod always_ff @(posedge clk_l2)
+	//Hung_mod begin
+	//Hung_mod 	/*
+	//Hung_mod 	inst_write_en <= inst_write_ena_raw;
+	//Hung_mod 	data_write_en <= data_write_ena_raw;		
+	//Hung_mod 	inst_dirty_done <= inst_dirty_done_raw;		//	Dung DFF nhu tren thi tin hieu stop bi delay
+	//Hung_mod 	data_dirty_done <= data_dirty_done_raw;		//	Mach chay sai
+	//Hung_mod 	inst_clear <= inst_clear_raw;
+	//Hung_mod 	data_clear <= data_clear_raw;
+	//Hung_mod 	load <= load_raw;
+	//Hung_mod 	*/
+	//Hung_mod 	write_done_dl <= write_done;
+	//Hung_mod 	write_req_raw1 <= write_req_raw;
+	//Hung_mod 	if(write_req)
+	//Hung_mod 		write_req <= !write_res;
+	//Hung_mod 	else
+	//Hung_mod 		write_req <= write_req_raw1;
+	//Hung_mod 	write_done1 <= write_res;
+	//Hung_mod end	
+
+	always_ff @(posedge clk_l2, negedge rst_n)
 	begin
-		/*
-		inst_write_en <= inst_write_ena_raw;
-		data_write_en <= data_write_ena_raw;		
-		inst_dirty_done <= inst_dirty_done_raw;		//	Dung DFF nhu tren thi tin hieu stop bi delay
-		data_dirty_done <= data_dirty_done_raw;		//	Mach chay sai
-		inst_clear <= inst_clear_raw;
-		data_clear <= data_clear_raw;
-		load <= load_raw;
-		*/
-		write_done_dl <= write_done;
-		write_req_raw1 <= write_req_raw;
-		if(write_req)
-			write_req <= !write_res;
-		else
-			write_req <= write_req_raw1;
-		write_done1 <= write_res;
+    if(!rst_n)
+    begin
+      write_done_dl <= 1'b0;
+      write_done1 <= 1'b0;
+      write_req <= 1'b0;
+      write_req_raw1 <= 1'b0;
+    end
+    else begin
+		  write_done_dl <= write_done;
+		  write_req_raw1 <= write_req_raw;
+		  if(write_req)
+		  	write_req <= !write_res;
+		  else
+		  	write_req <= write_req_raw1;
+		  write_done1 <= write_res;
+    end
 	end	
 
 	assign	inst_write_en = inst_write_ena_raw;
@@ -1825,22 +1845,23 @@ parameter	WORD_LENGTH = 16
   );
   
   //------------------------------------------------------------------------------
-  assign wb_empty_mod = wb_empty & busy; 
+  assign wb_empty_mod = wb_empty | busy; //DEBUG
+  
   always_ff @(posedge clk_l2, negedge rst_n) 
   begin
     if(!rst_n)
     begin
       direction <= 1'b0;
       busy <= 1'b0;
-	end
-    else if((state == IDLE) && (replace_req))
+	  end
+    else if(state == IDLE)
     begin
       if(replace_req)
       begin
         direction <= 1'b0;
         busy <= 1'b1;
       end
-      else if(inst_dirty_req || data_dirty_req || !wb_empty)
+      else if(inst_dirty_req || data_dirty_req || !wb_empty)  //DEBUG
       begin
         direction <= 1'b1;
         busy <= 1'b0;
@@ -1854,14 +1875,15 @@ parameter	WORD_LENGTH = 16
 
   //------------------------------------------------------------------------------
   assign dahb_out.hwrite    = direction;
-  assign dahb_out.hburst    = INCR16; 
+  assign dahb_out.hburst    = (data_write_inst.current_state == 1) ? SINGLE : INCR16; 
   assign dahb_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
   assign dahb_out.hsize     = WORD;
   assign dahb_out.hmastlock = 1'b0;
   assign dahb_out.hprot     = 4'h0;
   assign dahb_out.hwdata    = data_write_sync;
 
-  assign read_res = dahb_in.hreadyout;
+  assign read_res = ~direction & dahb_in.hreadyout;
+  assign write_res = direction & dahb_in.hreadyout;
   assign data_read = dahb_in.hrdata;
   assign data_dec_err = dahb_in.hreadyout & dahb_in.hresp;
 
@@ -1880,18 +1902,23 @@ parameter	WORD_LENGTH = 16
     unique case(state)
     IDLE_D: begin
       dahb_out.htrans = IDLE;
-      if(read_req) begin
+      if(read_req || write_req) begin
         //Hung_mod dahb_out.htrans = NONSEQ;
         n_state = NONSEQ_D;
       end
+      else
+        n_state = state;
     end
     NONSEQ_D: begin
       dahb_out.htrans = NONSEQ;
-      if(read_req && read_res) 
+      if((read_req && read_res) || (write_req && write_res))
       begin
         //Hung_mod n_state = BUSY_D;
         //Hung_mod dahb_out.htrans = BUSY;
-		n_state = SEQ_D;
+        if(data_write_inst.current_state == 1)
+		      n_state = IDLE_D;
+        else
+		      n_state = SEQ_D;
       end
       else
         n_state = state;
@@ -1904,7 +1931,7 @@ parameter	WORD_LENGTH = 16
       //Hung_mod   dahb_out.htrans = BUSY;
       //Hung_mod end
       //Hung_mod else 
-	  if(read_req && read_res && data_read_inst.stop)
+	  if((read_req && read_res && data_read_inst.stop) || (write_req && write_res && data_write_inst.stop))
       begin
         n_state = IDLE_D;
         //Hung_mod dahb_out.htrans = IDLE;
