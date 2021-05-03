@@ -15,14 +15,14 @@ module x2p_top
 (
   //AHB interface
   input                              hsel_slave_peri,  
-  input   AHB_package::mas_send_type master_peri_out,
-  output  AHB_package::slv_send_type master_peri_in,
+  input   AHB_package::mas_send_type slave_peri_out,
+  output  AHB_package::slv_send_type slave_peri_in,
   //APB interface
   output  apb_package::master_s_type apb_spi_out,
-  output  logic                      spi_hsel,   
+  //Hung_mod output  logic                      spi_hsel,   
   input   apb_package::slave_s_type  apb_spi_in;
   output  apb_package::master_s_type apb_gpio_out,
-  output  logic                      gpio_hsel,  
+  //Hung_mod output  logic                      gpio_hsel,  
   input   apb_package::slave_s_type  apb_gpio_in;
   input                              ahb_clk
   input                              apb_clk,
@@ -40,7 +40,7 @@ module x2p_top
                               spi_sel,
                               ahb_hsel,
                               apb_hsel,
-                              apb_samp_ack,
+                              apb_sample_ack,
                               sample_ena,
                               trans_done,
                               trans_end,
@@ -71,9 +71,9 @@ module x2p_top
       sample_ena <= 1'b1;
     end
     else begin
-      ahb_master_sample <= master_peri_out;
+      ahb_master_sample <= slave_peri_out;
       if(ahb_hsel == 1'b1) 
-        ahb_hsel <= !apb_samp_ack;
+        ahb_hsel <= !apb_sample_ack;
       else if (sample_ena)
         ahb_hsel <= hsel_slave_peri;
       
@@ -88,11 +88,11 @@ module x2p_top
   begin
     if(!rst_n) begin
       apb_master_sample <= '0;
-      apb_samp_ack <= 1'b0;
+      apb_sample_ack <= 1'b0;
     end
     else if(ahb_hsel == 1'b1) begin
       apb_sample_ack <= 1'b1; 
-      apb_master_sample <= ahb_master_sample;
+      apb_master_sample <= slave_peri_out;
     end 
     else if(trans_end)
       apb_master_sample <= '0;
@@ -190,18 +190,18 @@ module x2p_top
   always_ff @(posedge ahb_clk, negedge rst_n)
   begin
     if(!rst_n) begin
-      master_peri_in <= '0;
+      slave_peri_in <= '0;
       terminate <= 1'b0;
       resp_support <= 1'b0;
     end
     else if(trans_end && !terminate) begin
-      master_peri_in.hresp <= apb_trans_out.pslverr;
-      master_peri_in.hrdata <= apb_trans_out.prdata;
+      slave_peri_in.hresp <= apb_trans_out.pslverr;
+      slave_peri_in.hrdata <= apb_trans_out.prdata;
       if(!apb_trans_out.pslverr) begin
-        master_peri_in.hreadyout <= 1'b1;
+        slave_peri_in.hreadyout <= 1'b1;
         terminate <= 1'b1;
       end else if(resp_support) begin
-        master_peri_in.hreadyout <= 1'b1;
+        slave_peri_in.hreadyout <= 1'b1;
         terminate <= 1'b1;
       end else
         resp_support <= 1'b1;
@@ -209,7 +209,7 @@ module x2p_top
     else if(trans_end_dl)
       terminate <= 1'b0;
     else
-      master_peri_in <= '0;
+      slave_peri_in <= '0;
   end
 
 endmodule: x2p_top

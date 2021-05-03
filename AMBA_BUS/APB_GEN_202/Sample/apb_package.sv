@@ -15,7 +15,7 @@ package apb_package;
   typedef struct packed {
     logic [DATA_LENGTH-1:0] paddr;
     logic [2:0]             pprot;
-    //logic                   psel;
+    logic                   psel;
     logic                   penable;
     logic                   pwrite;
     logic [DATA_LENGTH-1:0] pwdata;
