@@ -6,6 +6,7 @@
 // University:     	DP S192	HCMUT
 //////////////////////////////////////////////////////////////////////////////////
 //`include"RVS192_user_define.h"
+  `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
 	`ifdef	HYBRID_BP
 	`define GBP_GEN;
 	`define LBP_GEN;
@@ -183,7 +184,7 @@ module	BPU
 	end
 
 //================================================================================	
-	`ifdef SIMULATE
+//	`ifdef SIMULATE
 		`ifdef	GBP_GEN
 		initial begin
 			for(int i = 0; i < 2**GSHARE_GPT_INDEX; i++)
@@ -220,7 +221,7 @@ module	BPU
 			$readmemh("SRAM.txt", CPT);	
 			$readmemh("SRAM.txt", BTB);			
 		end
-	`endif
+//	`endif
 
 endmodule
 
