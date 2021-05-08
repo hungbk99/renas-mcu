@@ -19,6 +19,7 @@
 // v0.1   25.04.2021  hungbk99  Mod: AHP Interface  
 //                                   Read Mem                     -> AHB-INST Interface
 //                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
+//        06.05.2021  hungbk99  Mod: Add support for peri slave
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TEST
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
@@ -116,6 +117,9 @@ module 	RVS192
 //====================================================================
 	parameter	L2_TAG_LENGTH = DATA_LENGTH-BYTE_OFFSET-WORD_OFFSET-$clog2(L2_CACHE_LINE);
 
+  //Hung_mod_peri
+  logic                                             peri_halt;
+  //Hung_mod_peri
 //	CPU
 	logic												                      ICC_halt;
 	logic												                      DCC_halt;
@@ -174,11 +178,17 @@ module 	RVS192
 														
 //====================================================================
 //===========================Halt Control=============================
-	assign 	pc_halt = DCC_halt || ICC_halt || FW_halt || external_halt;
+	//Hung_mod_peri assign 	pc_halt = DCC_halt || ICC_halt || FW_halt || external_halt;
+	//Hung_mod_peri assign 	fetch_dec_halt = pc_halt;
+	//Hung_mod_peri assign 	dec_ex_halt = FW_halt || DCC_halt || external_halt;
+	//Hung_mod_peri assign 	dec_ex_flush = ICC_halt;
+	//Hung_mod_peri assign 	ex_mem_halt =  DCC_halt || external_halt;
+	//Hung_mod_peri assign 	ex_mem_flush = FW_halt;
+	assign 	pc_halt = (DCC_halt || peri_halt) || ICC_halt || FW_halt || external_halt;
 	assign 	fetch_dec_halt = pc_halt;
-	assign 	dec_ex_halt = FW_halt || DCC_halt || external_halt;
+	assign 	dec_ex_halt = FW_halt || (DCC_halt || peri_halt) || external_halt;
 	assign 	dec_ex_flush = ICC_halt;
-	assign 	ex_mem_halt =  DCC_halt || external_halt;
+	assign 	ex_mem_halt =  (DCC_halt || peri_halt) || external_halt;
 	assign 	ex_mem_flush = FW_halt;
 	
 	always_ff @(posedge clk or negedge rst_n)
@@ -406,6 +416,48 @@ module 	RVS192
 	assign	i_pp_mem_wb.rd = o_pp_ex_mem.rd;
 	assign 	i_pp_mem_wb.alu_out = o_pp_ex_mem.alu_out;
 
+  //-------------------------------------------------------------------
+  //Add support for Peri Interface
+  assign peri_halt = 1'b0;  //Mod this
+
+  logic mem_read, mem_write, peri_read, peri_write;
+  logic [DATA_LENGTH-1:0] datar_peri, dataw_peri; 
+
+  //assign mem_read = o_pp_ex_mem.control_signals.cpu_read;
+  //assign mem_write = o_pp_ex_mem.control_signals.cpu_write;
+  //assign peri_read = 1'b0;
+  //assign peri_write = 1'b0;
+  always_comb begin      
+    //mem_read = 1'b0;
+    //peri_read = 1'b0;
+    if(o_pp_ex_mem.control_signals.cpu_read)
+    begin
+      if(o_pp_ex_mem.alu_out < 32'h8000)
+        mem_read = 1'b1;
+      else
+        peri_read = 1'b1;
+    end else begin
+      mem_read = 1'b0;
+      peri_read = 1'b0;
+    end
+
+    //mem_write = 1'b0;
+    //peri_write = 1'b0;
+    if(o_pp_ex_mem.control_signals.cpu_write)
+    begin
+      if(o_pp_ex_mem.alu_out < 32'h8000)
+        mem_write = 1'b1;
+      else
+        peri_write = 1'b1;
+    end
+    else begin
+      mem_write = 1'b0;
+      peri_write = 1'b0;
+    end
+  end
+
+  //-------------------------------------------------------------------
+  
 	DataGen	DG_U
 	(
 	.data_type(o_pp_ex_mem.control_signals.mem_gen),
@@ -424,8 +476,10 @@ module 	RVS192
 */
 	DL1_Cache	DL1_DUT
 	(
-	.cpu_read(o_pp_ex_mem.control_signals.cpu_read),
-	.cpu_write(o_pp_ex_mem.control_signals.cpu_write),
+	//Hung_mod_peri.cpu_read(o_pp_ex_mem.control_signals.cpu_read),
+	//Hung_mod_peri.cpu_write(o_pp_ex_mem.control_signals.cpu_write),
+	.cpu_read(mem_read),
+	.cpu_write(mem_write),
 	.data_write(i_pp_mem_wb.mem_out),
 	.data_read(data_r),
 	.alu_out(o_pp_ex_mem.alu_out),
@@ -435,7 +489,8 @@ module 	RVS192
 	.*
 	);
 	
-	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
+	//Hung_mod_peri assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
+	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? datar_peri : data_r) : o_pp_ex_mem.rs2_out_fix;
 	
 //==========================Write Back Stage===========================	
 //=====================================================================			
@@ -487,3 +542,184 @@ endmodule
 //=====================================================================	
 //=====================================================================	
 	
+module ahb_data_itf
+#(
+parameter	DATA_LENGTH = 32,
+parameter 	ADDR_LENGTH = 32,
+parameter	WORD_LENGTH = 16
+)
+(
+  //AHB-ITF
+  output  mas_send_type                           dahb_out,
+  input   slv_send_type                           dahb_in,
+  //Interrupt Handler
+  output logic                                    data_dec_err,
+  //Cache-ITF
+  //Read
+	output  logic	[DATA_LENGTH-1:0]					        data_read_sync,
+	output 	logic	[$clog2(WORD_LENGTH)-1:0]		      word_sel,
+	output 	logic													          write_en,
+	output 	logic												            replace_done,
+	input 												                  replace_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]		addr,
+  //Write
+	output 	logic												            load,
+	output 	logic												            inst_dirty_done,
+	output 	logic												            data_dirty_done,
+	input 											                    inst_dirty_req,	
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	  inst_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		  inst_dirty_data,
+	input 											                    data_dirty_req,
+	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	  data_dirty_tag,
+	input 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		  data_dirty_data,	
+	input 											                    wb_empty,
+	input 	[ADDR_LENGTH-3:0]						            wb_tag,	
+	input 	[DATA_LENGTH-1:0]						            wb_data,
+	input 											                    clk_l2,
+	input 											                    rst_n
+);
+  //------------------------------------------------------------------------------
+	logic	[DATA_LENGTH-1:0]				                  data_write_sync;
+	logic	[ADDR_LENGTH-1:0]				                  addr_write_sync;
+	logic									                          write_req,	
+											                            write_res;
+	
+  logic	[ADDR_LENGTH-1:0]					                addr_read;
+	logic										                        read_req,
+												                          read_res;
+	logic [DATA_LENGTH-1:0]			    				        data_read;
+
+  logic                                           direction,
+                                                  wb_empty_mod,
+                                                  busy;
+  enum logic [1:0] {IDLE_D, NONSEQ_D, SEQ_D, BUSY_D}      state, n_state;
+  //------------------------------------------------------------------------------
+	Read_Mem
+	#(
+	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+	)
+  	data_read_inst
+	(
+	.*
+	);	
+	
+	Write_Mem
+	#(
+	.WORD_LENGTH(CACHE_BLOCK_SIZE/4)
+	)
+ 	data_write_inst
+	(
+  .wb_empty(wb_empty_mod),  
+	.*
+  );
+  
+  //------------------------------------------------------------------------------
+  assign wb_empty_mod = wb_empty | busy; //DEBUG
+  
+  always_ff @(posedge clk_l2, negedge rst_n) 
+  begin
+    if(!rst_n)
+    begin
+      direction <= 1'b0;
+      busy <= 1'b0;
+	  end
+    else if(state == IDLE)
+    begin
+      if(replace_req)
+      begin
+        direction <= 1'b0;
+        busy <= 1'b1;
+      end
+      else if(inst_dirty_req || data_dirty_req || !wb_empty)  //DEBUG
+      begin
+        direction <= 1'b1;
+        busy <= 1'b0;
+      end
+      else begin
+        direction <= 1'b0;
+        busy <= 1'b0;
+      end
+    end
+  end
+
+  //------------------------------------------------------------------------------
+  assign dahb_out.hwrite    = direction;
+  assign dahb_out.hburst    = (data_write_inst.current_state == 1) ? SINGLE : INCR16; 
+  assign dahb_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
+  assign dahb_out.hsize     = WORD;
+  assign dahb_out.hmastlock = 1'b0;
+  assign dahb_out.hprot     = 4'h0;
+  assign dahb_out.hwdata    = data_write_sync;
+
+  assign read_res = ~direction & dahb_in.hreadyout;
+  assign write_res = direction & dahb_in.hreadyout;
+  assign data_read = dahb_in.hrdata;
+  assign data_dec_err = dahb_in.hreadyout & dahb_in.hresp;
+
+  always_ff @(posedge clk_l2, negedge rst_n)
+  begin
+    if(!rst_n)
+      state <= IDLE_D;
+    else
+      state <= n_state;
+  end
+  
+  always_comb begin
+    //direction = 1'b0;
+    //Hung_mod n_state = IDLE_D;
+    //Hung_mod dahb_out.htrans = IDLE;
+    unique case(state)
+    IDLE_D: begin
+      dahb_out.htrans = IDLE;
+      if(read_req || write_req) begin
+        //Hung_mod dahb_out.htrans = NONSEQ;
+        n_state = NONSEQ_D;
+      end
+      else
+        n_state = state;
+    end
+    NONSEQ_D: begin
+      dahb_out.htrans = NONSEQ;
+      if((read_req && read_res) || (write_req && write_res))
+      begin
+        //Hung_mod n_state = BUSY_D;
+        //Hung_mod dahb_out.htrans = BUSY;
+        if(data_write_inst.current_state == 1)
+		      n_state = IDLE_D;
+        else
+		      n_state = SEQ_D;
+      end
+      else
+        n_state = state;
+    end
+    SEQ_D: begin
+      dahb_out.htrans = SEQ;
+      //Hung_mod if(read_req && read_res && !data_read_inst.stop) 
+      //Hung_mod begin
+      //Hung_mod   n_state = BUSY_D;
+      //Hung_mod   dahb_out.htrans = BUSY;
+      //Hung_mod end
+      //Hung_mod else 
+	  if((read_req && read_res && data_read_inst.stop) || (write_req && write_res && data_write_inst.stop))
+      begin
+        n_state = IDLE_D;
+        //Hung_mod dahb_out.htrans = IDLE;
+      end
+      else
+        n_state = state;
+    end
+    //Hung_mod BUSY_D: begin
+    //Hung_mod   dahb_out.htrans = BUSY;
+    //Hung_mod   if(!read_res && read_req)
+    //Hung_mod   begin
+    //Hung_mod     dahb_out.htrans = SEQ;
+    //Hung_mod     n_state = SEQ_D;
+    //Hung_mod   end
+    //Hung_mod   else
+    //Hung_mod     n_state = state;
+    //Hung_mod end
+    default: n_state = state;
+    endcase
+  end
+
+endmodule: ahb_data_itf
