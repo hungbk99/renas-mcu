@@ -1154,6 +1154,7 @@ parameter	WORD_LENGTH = 16
 	output 	logic										                read_req,
 														                      write_en,
 														                      replace_done,
+                                                  stop, //Syn
 	input 												                  replace_req,
 	input 												                  read_res,	
 	input 	[DATA_LENGTH-1:0]			    				      data_read,
@@ -1163,8 +1164,8 @@ parameter	WORD_LENGTH = 16
 );
 
 	logic 	[$clog2(WORD_LENGTH)-1:0]	word_count;
-	logic								              stop,
-										                write_en_raw,
+	//logic								              stop,
+  logic							                write_en_raw,
 										                read_req_raw,
 										                read_done,
 										                read_done1,
@@ -1312,6 +1313,8 @@ parameter	WORD_LENGTH = 16
 													                      load,
 													                      inst_dirty_done,
 													                      data_dirty_done,
+                                                stop, //Syn
+                                                wb_busy, //Syn
 	input 											                  write_res,
 	input 											                  inst_dirty_req,	
 	input 	[ADDR_LENGTH-$clog2(WORD_LENGTH)-3:0]	inst_dirty_tag,
@@ -1343,7 +1346,6 @@ parameter	WORD_LENGTH = 16
 													data_clear_raw,
 													inst_write_en,
 													data_write_en,
-													stop,
 													wb_en;
 	logic 	[WORD_LENGTH-1:0][DATA_LENGTH-1:0]		dirty_data_way;
 	logic 	[DATA_LENGTH-1:0]						dirty_data;
@@ -1361,7 +1363,9 @@ parameter	WORD_LENGTH = 16
 	D_BUSY,
 	D_DONE
 	}	current_state, next_state;
-
+  
+  assign wb_busy = (current_state == WB_BUSY) ? 1'b1 : 1'b0;  //Syn 
+    
 //	Next State Logic 
 	always_comb begin
 		load_raw = 1'b0;
@@ -1683,7 +1687,8 @@ parameter	WORD_LENGTH = 16
 	logic										                        read_req,
 												                          read_res;
 	logic [DATA_LENGTH-1:0]			    				        data_read;
-
+  
+  logic                                           stop; //Syn
   enum logic [1:0] {IDLE_I, NONSEQ_I, SEQ_I, BUSY_I}      state, n_state;
   //------------------------------------------------------------------------------
   Read_Mem
@@ -1747,7 +1752,8 @@ parameter	WORD_LENGTH = 16
       //  iahb_out.htrans = BUSY;
       //end
       //else 
-      if(read_req && read_res && inst_read_inst.stop)
+      //if(read_req && read_res && inst_read_inst.stop)
+      if(read_req && read_res && stop)  //Syn
       begin
         n_state = IDLE_I;
         //iahb_out.htrans = IDLE;
@@ -1823,6 +1829,11 @@ parameter	WORD_LENGTH = 16
   logic                                           direction,
                                                   wb_empty_mod,
                                                   busy;
+
+  logic                                           read_stop,
+                                                  write_stop,
+                                                  wb_busy;    //Syn
+
   enum logic [1:0] {IDLE_D, NONSEQ_D, SEQ_D, BUSY_D}      state, n_state;
   //------------------------------------------------------------------------------
 	Read_Mem
@@ -1831,7 +1842,8 @@ parameter	WORD_LENGTH = 16
 	)
   	data_read_inst
 	(
-	.*
+    .stop(read_stop),
+	  .*
 	);	
 	
 	Write_Mem
@@ -1840,8 +1852,9 @@ parameter	WORD_LENGTH = 16
 	)
  	data_write_inst
 	(
-  .wb_empty(wb_empty_mod),  
-	.*
+    .stop(write_stop),
+    .wb_empty(wb_empty_mod),  
+	  .*
   );
   
   //------------------------------------------------------------------------------
@@ -1875,7 +1888,7 @@ parameter	WORD_LENGTH = 16
 
   //------------------------------------------------------------------------------
   assign dahb_out.hwrite    = direction;
-  assign dahb_out.hburst    = (data_write_inst.current_state == 1) ? SINGLE : INCR16; 
+  assign dahb_out.hburst    = wb_busy ? SINGLE : INCR16; 
   assign dahb_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
   assign dahb_out.hsize     = WORD;
   assign dahb_out.hmastlock = 1'b0;
@@ -1915,7 +1928,8 @@ parameter	WORD_LENGTH = 16
       begin
         //Hung_mod n_state = BUSY_D;
         //Hung_mod dahb_out.htrans = BUSY;
-        if(data_write_inst.current_state == 1)
+        //if(data_write_inst.current_state == 1)
+        if(wb_busy == 1)
 		      n_state = IDLE_D;
         else
 		      n_state = SEQ_D;
@@ -1931,7 +1945,8 @@ parameter	WORD_LENGTH = 16
       //Hung_mod   dahb_out.htrans = BUSY;
       //Hung_mod end
       //Hung_mod else 
-	  if((read_req && read_res && data_read_inst.stop) || (write_req && write_res && data_write_inst.stop))
+	  //if((read_req && read_res && data_read_inst.stop) || (write_req && write_res && data_write_inst.stop))
+	  if((read_req && read_res && read_stop) || (write_req && write_res && write_stop))
       begin
         n_state = IDLE_D;
         //Hung_mod dahb_out.htrans = IDLE;

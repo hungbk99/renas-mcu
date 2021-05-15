@@ -39,15 +39,15 @@ module renas_mcu_top
   	mas_send_type                           dahb_out;
   	slv_send_type                           dahb_in;
   	//Interrupt Handler
-  	logic                                   data_dec_err,
-	 											                    external_halt;
-  	//Peri-AHB-ITF
-    mas_send_type                           peri_master_out;
-  	slv_send_type                           peri_master_in;
+  	logic                                   data_dec_err;
+    
+    //PERI-ITF
+    mas_send_type                           peri_out;
+    slv_send_type                           peri_in;
   	//Interrupt Handler
-  	logic                                   peri_dec_err;
+    logic                                   peri_dec_err;
   //-------------------------------------------------------------------
-  //logic                                   peri_dec_err;
+	 	logic								                    external_halt;
   //==============================================================================
   //-------------------------------------------------------------------
   //AHB-Bus: AHB-lite -> single slave-single master only
@@ -90,9 +90,9 @@ module renas_mcu_top
   (
   //#INTERFACEGEN#
   //#SI#
-  	.master_peri_in(peri_master_out),
+  	.master_peri_in(peri_out),
   	.hprior_master_peri(hprior_master_peri),
-  	.master_peri_out(peri_master_in),
+  	.master_peri_out(peri_in),
   	.master_inst_in(iahb_out),
   	.hprior_master_inst(hprior_master_inst),
   	.master_inst_out(iahb_in),

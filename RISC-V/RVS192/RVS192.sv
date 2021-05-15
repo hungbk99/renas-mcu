@@ -43,6 +43,11 @@ module 	RVS192
   	input   slv_send_type                           dahb_in,
   	//Interrupt Handler
   	output logic                                    data_dec_err,
+  	//PERI-ITF
+    output  mas_send_type                           peri_out,
+    input   slv_send_type                           peri_in,
+  	//Interrupt Handler
+    output logic                                    peri_dec_err,
 	//Hung_add_25.04.2021
 
 	input 											external_halt,
@@ -119,6 +124,7 @@ module 	RVS192
 
   //Hung_mod_peri
   logic                                             peri_halt;
+  logic                                             peri_halt_raw;
   //Hung_mod_peri
 //	CPU
 	logic												                      ICC_halt;
@@ -418,11 +424,12 @@ module 	RVS192
 
   //-------------------------------------------------------------------
   //Add support for Peri Interface
-  assign peri_halt = 1'b0;  //Mod this
+  //assign peri_halt = 1'b0;  //Mod this
 
   logic mem_read, mem_write, peri_read, peri_write;
-  logic [DATA_LENGTH-1:0] datar_peri, dataw_peri; 
-
+  logic [DATA_LENGTH-1:0]    //datar_peri, dataw_peri;
+                             peri_read_data, peri_write_data; 
+  logic                      peri_ena;
   //assign mem_read = o_pp_ex_mem.control_signals.cpu_read;
   //assign mem_write = o_pp_ex_mem.control_signals.cpu_write;
   //assign peri_read = 1'b0;
@@ -430,32 +437,58 @@ module 	RVS192
   always_comb begin      
     //mem_read = 1'b0;
     //peri_read = 1'b0;
-    if(o_pp_ex_mem.control_signals.cpu_read)
-    begin
-      if(o_pp_ex_mem.alu_out < 32'h8000)
-        mem_read = 1'b1;
-      else
-        peri_read = 1'b1;
-    end else begin
-      mem_read = 1'b0;
-      peri_read = 1'b0;
-    end
+    //if(o_pp_ex_mem.control_signals.cpu_read)
+    //begin
+    //  if(o_pp_ex_mem.alu_out < 32'h8000)
+    //    mem_read = 1'b1;
+    //  else
+    //    peri_read = 1'b1;
+    //end else begin
+    //  mem_read = 1'b0;
+    //  peri_read = 1'b0;
+    //end
 
-    //mem_write = 1'b0;
-    //peri_write = 1'b0;
-    if(o_pp_ex_mem.control_signals.cpu_write)
-    begin
-      if(o_pp_ex_mem.alu_out < 32'h8000)
-        mem_write = 1'b1;
-      else
-        peri_write = 1'b1;
-    end
-    else begin
-      mem_write = 1'b0;
-      peri_write = 1'b0;
-    end
+    ////mem_write = 1'b0;
+    ////peri_write = 1'b0;
+    //if(o_pp_ex_mem.control_signals.cpu_write)
+    //begin
+    //  if(o_pp_ex_mem.alu_out < 32'h8000)
+    //    mem_write = 1'b1;
+    //  else
+    //    peri_write = 1'b1;
+    //end
+    //else begin
+    //  mem_write = 1'b0;
+    //  peri_write = 1'b0;
+    //end
   end
 
+  always_comb begin
+    if(o_pp_ex_mem.control_signals.cpu_write && (o_pp_ex_mem.alu_out < 32'h8000))
+      mem_write = 1'b1;
+    else
+      mem_write = 1'b0;
+
+    if(o_pp_ex_mem.control_signals.cpu_read && (o_pp_ex_mem.alu_out < 32'h8000))
+      mem_read = 1'b1;
+    else
+      mem_read = 1'b0;
+  end
+
+  always_comb begin
+    if(o_pp_ex_mem.control_signals.cpu_write && (o_pp_ex_mem.alu_out >= 32'h8000))
+      peri_write = 1'b1;
+    else
+      peri_write = 1'b0;
+
+    if(o_pp_ex_mem.control_signals.cpu_read && (o_pp_ex_mem.alu_out >= 32'h8000))
+      peri_read = 1'b1;
+    else
+      peri_read = 1'b0;
+  end
+
+  assign peri_halt_raw = peri_read | peri_write;
+  assign peri_halt = peri_halt_raw & ~peri_ena;
   //-------------------------------------------------------------------
   
 	DataGen	DG_U
@@ -490,8 +523,27 @@ module 	RVS192
 	);
 	
 	//Hung_mod_peri assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
-	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? datar_peri : data_r) : o_pp_ex_mem.rs2_out_fix;
+	//assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? datar_peri : data_r) : o_pp_ex_mem.rs2_out_fix;
+	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (peri_write ? peri_write_data : o_pp_ex_mem.rs2_out_fix);
 	
+  ahb_peri_itf  
+  //#(
+  //  //Using default parameter
+  //)
+  ahb_peri_itf
+  (
+    //.peri_out(),
+    //.peri_in(),
+    //.peri_dec_err(),
+    //.peri_ena(),
+  	.peri_addr(o_pp_ex_mem.alu_out),
+  	//.peri_read_data(),
+  	//.peri_read(),
+  	//.peri_write_data(),	
+  	//.peri_write(),
+  	//.clk_l2(clk),
+  	.*
+  );
 //==========================Write Back Stage===========================	
 //=====================================================================			
 	
@@ -554,34 +606,27 @@ parameter 	ADDR_LENGTH = 32
   //Interrupt Handler
   output logic                                    peri_dec_err,
   output logic                                    peri_ena,
-  //Cache-ITF
+  //RISC-ITF
+	input 	[ADDR_LENGTH-1:0]		                    peri_addr,
   //Read
 	output  logic	[DATA_LENGTH-1:0]					        peri_read_data,
 	input 												                  peri_read,
-	input 	[ADDR_LENGTH-1:0]		                    addr,
   //Write
 	input 	[DATA_LENGTH-1:0]		                    peri_write_data,	
 	input 												                  peri_write,
-	input 											                    clk_l2,
+	input 											                    clk,
 	input 											                    rst_n
 );
   //------------------------------------------------------------------------------
-	logic	[DATA_LENGTH-1:0]				                  data_write_sync;
-	logic	[ADDR_LENGTH-1:0]				                  addr_write_sync;
 	logic									                          write_res;	
-	
-  logic	[ADDR_LENGTH-1:0]					                addr_read;
 	logic										                        peri_res;
-	
-  logic [DATA_LENGTH-1:0]			    				        data_read;
-
   logic                                           direction;
   //enum logic [1:0] {IDLE_D, NONSEQ_D, SEQ_D, BUSY_D}      state, n_state;
-  enum logic [1:0] {IDLE_D, NONSEQ_D}      state, n_state;
+  enum logic [1:0] {IDLE_D, NONSEQ_D}             state, n_state;
   //------------------------------------------------------------------------------
   //------------------------------------------------------------------------------
   
-  always_ff @(posedge clk_l2, negedge rst_n) 
+  always_ff @(posedge clk, negedge rst_n) 
   begin
     if(!rst_n)
     begin
@@ -601,7 +646,7 @@ parameter 	ADDR_LENGTH = 32
   //------------------------------------------------------------------------------
   assign peri_out.hwrite    = direction;
   assign peri_out.hburst    = SINGLE; 
-  assign peri_out.haddr     = direction ? addr_write_sync : addr_read;//{pc[31:6], 1'b0, wrap_addr, 2'b0};
+  assign peri_out.haddr     = peri_addr; 
   assign peri_out.hsize     = WORD;
   assign peri_out.hmastlock = 1'b0;
   assign peri_out.hprot     = 4'h0;
@@ -609,10 +654,10 @@ parameter 	ADDR_LENGTH = 32
 
   assign read_res = ~direction & peri_in.hreadyout;
   assign write_res = direction & peri_in.hreadyout;
-  assign data_read = peri_in.hrdata;
+  assign peri_read_data = peri_in.hrdata;
   assign peri_dec_err = peri_in.hreadyout & peri_in.hresp;
 
-  always_ff @(posedge clk_l2, negedge rst_n)
+  always_ff @(posedge clk, negedge rst_n)
   begin
     if(!rst_n)
       state <= IDLE_D;
@@ -624,6 +669,7 @@ parameter 	ADDR_LENGTH = 32
     //direction = 1'b0;
     //Hung_mod n_state = IDLE_D;
     //Hung_mod peri_out.htrans = IDLE;
+    peri_ena = 1'b0;
     unique case(state)
     IDLE_D: begin
       peri_out.htrans = IDLE;
@@ -636,8 +682,11 @@ parameter 	ADDR_LENGTH = 32
     end
     NONSEQ_D: begin
       peri_out.htrans = NONSEQ;
-      if((peri_read && read_res) || (peri_write && write_res))
+      if((peri_read && read_res) || (peri_write && write_res)) 
+      begin
 		    n_state = IDLE_D;
+        peri_ena = 1'b1;
+      end
       else
         n_state = state;
     end
