@@ -61,6 +61,8 @@ begin
     dmem_out <= '0;    
   end
   else begin
+    imem_out.hresp <= 1'b0;
+    dmem_out.hresp <= 1'b0;
     if(imem_req && imem_ack)
     begin
       imem_out.hreadyout <= 1'b1;

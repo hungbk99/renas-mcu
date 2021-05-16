@@ -10,8 +10,8 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 package apb_package;
-  parameter DATA_LENGTH = 32;
-  parameter ADDR_LENGTH = 32;
+  //parameter DATA_LENGTH = 32;
+  //parameter ADDR_LENGTH = 32;
   typedef struct packed {
     logic [DATA_LENGTH-1:0] paddr;
     logic [2:0]             pprot;
@@ -20,11 +20,11 @@ package apb_package;
     logic                   pwrite;
     logic [DATA_LENGTH-1:0] pwdata;
     logic [3:0]             pstrb;
-  } master_s_type
+  } master_s_type;
 
   typedef struct packed {
     logic                   pready;
     logic [DATA_LENGTH-1:0] prdata;
     logic                   pslverr;
-  } slave_s_type
+  } slave_s_type;
 endpackage: apb_package

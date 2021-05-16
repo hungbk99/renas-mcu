@@ -15,6 +15,8 @@
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_result/AHB_bus.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192.sv"
   `include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
+  `include "D:/Project/renas-mcu/AMBA_BUS/APB_GEN_202/Sample/apb_package.sv"
+  `include "D:/Project/renas-mcu/AMBA_BUS/APB_GEN_202/Sample/h2p_top.sv"
 `endif
 
 module renas_mcu_top
@@ -22,9 +24,9 @@ module renas_mcu_top
   input                                 clk,
 	                                      clk_l1, //Delay clock used for Cache
 			                                  clk_l2,
+                                        clk_peri,
                                         clk_mem,
                                         rst_n
-
 );
   //==============================================================================
   //-------------------------------------------------------------------
@@ -67,8 +69,8 @@ module renas_mcu_top
   slv_send_type imem_out;
   
   //Peri-AHB-ITF
-  mas_send_type peri_slave_in;
-  slv_send_type peri_slave_out;
+  slv_send_type slave_peri_in;
+  mas_send_type slave_peri_out;
   //==============================================================================
   //Connection
   //==============================================================================
@@ -100,9 +102,9 @@ module renas_mcu_top
   	.hprior_master_data(hprior_master_data),
   	.master_data_out(dahb_in),
   //#MI#
-  	.slave_peri_in(peri_slave_out),
+  	.slave_peri_in(slave_peri_in),
   	.hsel_slave_peri(peri_hsel),
-  	.slave_peri_out(peri_slave_in),
+  	.slave_peri_out(slave_peri_out),
   	.slave_inst_in(imem_out),
   	.hsel_slave_inst(imem_hsel),
   	.slave_inst_out(imem_in),
@@ -117,4 +119,20 @@ module renas_mcu_top
   (
 	  .*
   );
+
+  x2p_top x2p 
+  (
+    //AHB interface
+    .hsel_slave_peri(peri_hsel),  
+    //.slave_peri_out(),
+    //.slave_peri_in(),
+    //APB interface
+    .apb_spi_out(),
+    .spi_psel(),
+    .apb_spi_in(),
+    .ahb_clk(clk),
+    .apb_clk(clk_peri),
+    .*
+  );
+
 endmodule: renas_mcu_top
