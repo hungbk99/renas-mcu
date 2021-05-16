@@ -13,20 +13,21 @@ package	spi_package;
 	
 	typedef	logic [SPI_DATA_WIDTH-1:0] bus;
 	
-	typedef struct packed	{
-	logic	pclk, preset_n;
-	logic 	[SPI_PADDR_WIDTH-1:0] paddr;
-	logic 	[2:0] pprot;
-	logic 	psel, penable, pwrite;
-	bus 	pwdata;
-	logic 	[3:0] pstrb;
-	}	apb_interfaces_in;
-	
-	typedef struct packed	{
-	logic 	pready;
-	bus		prdata;
-	logic 	pslverr;
-	}	apb_interfaces_out;
+	//typedef struct packed	{
+	//logic	pclk, preset_n;
+	//logic 	[SPI_PADDR_WIDTH-1:0] paddr;
+	//logic 	[2:0] pprot;
+	////Hung_mod logic 	psel, penable, pwrite;
+	//logic 	penable, pwrite;
+	//bus 	pwdata;
+	//logic 	[3:0] pstrb;
+	//}	apb_interfaces_in;
+	//
+	//typedef struct packed	{
+	//logic 	pready;
+	//bus		prdata;
+	//logic 	pslverr;
+	//}	apb_interfaces_out;
 	
 
 	typedef struct packed	{

@@ -3,31 +3,36 @@
 // Project name:  VG SoC 
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design   
+//          05.16.2021  hungbk99  seperate psel from apb_slave_in  
 //=================================================================
 
+
+`include "D:/Project/renas-mcu/SPI/rtl/spi_package.sv"
 import spi_package::*;
 module spi_top
 (
 // spi APB interface
-  output  apb_interfaces_out  apb_slave_out,
-  input   apb_interfaces_in   apb_slave_in,
+  output  apb_package::slave_s_type     apb_slave_out,
+  input   apb_package::master_s_type    apb_slave_in,
+  input                                 psel, //Hung_mod
+  input                                 pclk, //Hung_mod
+  input                                 preset_n,
 // SPI interface
-  output                      mosi_somi,
-                              ss_0,
-                              ss_1,
-                              ss_2,
-                              ss_3,
-  input                       miso_simo,
-  inout                       sclk                            
+  output                                mosi_somi,
+                                        ss_0,
+                                        ss_1,
+                                        ss_2,
+                                        ss_3,
+  input                                 miso_simo,
+  inout                                 sclk                            
 );
 
 //=================================================================
 // Interface signals
 // APB Slave
-  logic   rst_n_sync,
+  logic   rst_n_sync;
 //          preset_n,
-          pclk;
 
   bus     wdata,
           rfifo_out;      
@@ -36,6 +41,7 @@ module spi_top
   as2sd   data_req;           // FIFO - user control signals 
   as2sc   as2sc_wen;        // Control registers - user control signals 
 // SPI Data
+  as2sd                         as2sd_control;
   fifo_interrupt                rfifo_interrupt,
                                 tfifo_interrupt;
   logic [SPI_POINTER_WIDTH-1:0] rfifo_status,
@@ -63,7 +69,7 @@ module spi_top
   
 //=================================================================
 // Sub-module
-  assign as2sd_control = data_req;  //Hung_add_10_03_2021
+  assign as2sd_control = data_req;  //Hung_add_03.10_2021
   
   spi_apb_slave APBS_U
   (
@@ -107,7 +113,7 @@ module spi_top
 
 //=================================================================
 // Internal Connections
-  assign pclk = apb_slave_in.pclk;
+  //assign pclk = apb_slave_in.pclk;
   assign mstr = sc2scc_control.mstr;
 //  assign preset_n = apb_slave_in.preset_n;
 //  assign control_req = as2sc_wen;
@@ -122,7 +128,7 @@ endmodule
 // Project Name:	VG CPU
 // Page:     		  VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
 //////////////////////////////////////////////////////////////////////////////////
 
 module spi_sync_fifo
@@ -205,16 +211,20 @@ endmodule: spi_sync_fifo
 // Project Name:	VG CPU
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
+//          05.16.2021  hungbk99  seperate psel from apb_slave_in  
 //////////////////////////////////////////////////////////////////////////////////
 
 module	spi_apb_slave	
-	(output	apb_interfaces_out	apb_slave_out,
+	(output	apb_package::slave_s_type	apb_slave_out,
 	output	as2sd	data_req,
 	output 	as2sc	control_req,
 	output 	bus		wdata,
 	output 	logic 	rst_n_sync,
-	input 	apb_interfaces_in	apb_slave_in,
+	input 	apb_package::master_s_type	apb_slave_in,
+  input   psel,     //Hung_mod
+  input   preset_n, //Hung_mod
+  input   pclk,     //Hung_mod
 	input 	sc2as	reg_out,	
 	input 	bus		rfifo_out);
 
@@ -226,7 +236,7 @@ module	spi_apb_slave
 	logic 	[1:0] wen_sel;
   logic                         sync_rst_1,
                                 sync_rst_2,
-                                preset_n,
+                                //Hung_mod preset_n,
                                 clk;
 //=================================================================================	
 //	Read Req
@@ -248,10 +258,12 @@ module	spi_apb_slave
 		end
 	end
 	
-	assign	prdata_buf2 = (apb_slave_in.psel && (~apb_slave_in.pwrite))	? 	prdata_buf1 : apb_slave_out.prdata;
+	//Hung_mod assign	prdata_buf2 = (apb_slave_in.psel && (~apb_slave_in.pwrite))	? 	prdata_buf1 : apb_slave_out.prdata;
+	assign	prdata_buf2 = (psel && (~apb_slave_in.pwrite))	? 	prdata_buf1 : apb_slave_out.prdata;
 	assign 	data_req.rfifo_ren = &apb_slave_in.paddr[4:2] && (!error);
 	
-	always_ff @(posedge apb_slave_in.pclk, negedge rst_n_sync)
+	//always_ff @(posedge apb_slave_in.pclk, negedge rst_n_sync)
+	always_ff @(posedge pclk, negedge rst_n_sync)
 	begin
 		if(!rst_n_sync)
 			apb_slave_out.prdata <= '0;
@@ -260,7 +272,8 @@ module	spi_apb_slave
 	end
 	
 //	Write Req
-	assign 	wen_reg = apb_slave_in.penable && apb_slave_in.pwrite && apb_slave_in.psel && (!error);
+	//Hung_mod assign 	wen_reg = apb_slave_in.penable && apb_slave_in.pwrite && apb_slave_in.psel && (!error);
+	assign 	wen_reg = apb_slave_in.penable && apb_slave_in.pwrite && psel && (!error);
 	assign 	wen_sel = (~apb_slave_in.paddr[2] && apb_slave_in.paddr[3] && apb_slave_in.paddr[4]) ? 2'b11 : apb_slave_in.paddr[3:2];
 	
 	always_comb begin
@@ -282,18 +295,21 @@ module	spi_apb_slave
 	assign 	error = (|apb_slave_in.paddr[1:0])||(~&apb_slave_in.pstrb[3:0])||(apb_slave_in.pwrite&&((&apb_slave_in.paddr[3:2])||(apb_slave_in.paddr[4]&&~apb_slave_in.paddr[3])));
 	
 //	Other Signals
-	always_ff @(posedge apb_slave_in.pclk, negedge rst_n_sync )
+	//always_ff @(posedge apb_slave_in.pclk, negedge rst_n_sync )
+	always_ff @(posedge pclk, negedge rst_n_sync )
 	begin
 		if(!rst_n_sync)
 			apb_slave_out.pslverr <= 1'b0;
 		else 
-			apb_slave_out.pslverr <= error && ~apb_slave_in.penable && apb_slave_in.psel;
+			//apb_slave_out.pslverr <= error && ~apb_slave_in.penable && apb_slave_in.psel;
+			apb_slave_out.pslverr <= error && ~apb_slave_in.penable && psel;
 	end
 
 	assign 	apb_slave_out.pready = 1'b1;
 	assign 	wdata = apb_slave_in.pwdata;
-	assign 	clk = apb_slave_in.pclk;
-	assign 	preset_n = apb_slave_in.preset_n;
+	//assign 	clk = apb_slave_in.pclk;
+	assign 	clk = pclk;
+	//Hung_mod assign 	preset_n = apb_slave_in.preset_n;
 
 // Reset Synchronous Logic
   always_ff @(posedge clk, negedge preset_n)
@@ -319,7 +335,7 @@ endmodule: spi_apb_slave
 // Project Name:	VG SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
 //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -599,7 +615,7 @@ endmodule: spi_control
 // Project Name:	VG_SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
 //////////////////////////////////////////////////////////////////////////////////
 
 module	spi_data
@@ -619,9 +635,6 @@ module	spi_data
 );
 
 //================================================================================
-	`ifdef SIMULATE
-		include"spi_sync_fifo.sv";
-	`endif
 //================================================================================
 //	Internal Signals
 	bus	std_wdata;
@@ -704,7 +717,7 @@ endmodule: spi_data
 // Project name:  VG_SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
 //============================================================================
 
 
@@ -888,7 +901,7 @@ endmodule: spi_clock
 // Project name:  VG_SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     10.03.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
 //======================================================================
 
 module spi_shift

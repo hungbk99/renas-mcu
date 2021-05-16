@@ -17,16 +17,26 @@
   `include "D:/Project/renas-mcu/MMEM/renas_memory.sv"
   `include "D:/Project/renas-mcu/AMBA_BUS/APB_GEN_202/Sample/apb_package.sv"
   `include "D:/Project/renas-mcu/AMBA_BUS/APB_GEN_202/Sample/h2p_top.sv"
+  `include "D:/Project/renas-mcu/SPI/rtl/spi_top.sv"
 `endif
 
 module renas_mcu_top
 (
-  input                                 clk,
-	                                      clk_l1, //Delay clock used for Cache
-			                                  clk_l2,
-                                        clk_peri,
-                                        clk_mem,
-                                        rst_n
+  // SPI interface
+  output                      mosi_somi,
+                              ss_0,
+                              ss_1,
+                              ss_2,
+                              ss_3,
+  input                       miso_simo,
+  inout                       sclk,    
+  // Clock 
+  input                       clk,
+	                            clk_l1, //Delay clock used for Cache
+			                        clk_l2,
+                              clk_peri,
+                              clk_mem,
+                              rst_n
 );
   //==============================================================================
   //-------------------------------------------------------------------
@@ -71,6 +81,12 @@ module renas_mcu_top
   //Peri-AHB-ITF
   slv_send_type slave_peri_in;
   mas_send_type slave_peri_out;
+  //-------------------------------------------------------------------
+  //SPI-APB
+  //-------------------------------------------------------------------
+  apb_package::slave_s_type   apb_slave_out;
+  apb_package::master_s_type  apb_slave_in;
+  logic                       spi_psel;
   //==============================================================================
   //Connection
   //==============================================================================
@@ -127,12 +143,30 @@ module renas_mcu_top
     //.slave_peri_out(),
     //.slave_peri_in(),
     //APB interface
-    .apb_spi_out(),
-    .spi_psel(),
-    .apb_spi_in(),
+    .apb_spi_out(apb_slave_in),
+    //.spi_psel(),
+    .apb_spi_in(apb_slave_out),
     .ahb_clk(clk),
     .apb_clk(clk_peri),
     .*
   );
 
+  spi_top
+  (
+  //// spi APB interface
+  //  .apb_slave_out,
+  //  .apb_slave_in,
+  //// SPI interface
+  //  .mosi_somi,
+  //  .ss_0,
+  //  .ss_1,
+  //  .ss_2,
+  //  .ss_3,
+  //  .miso_simo,
+  //  .sclk                   
+    .psel(spi_psel),
+    .pclk(clk_peri), 
+    .preset_n(rst_n),
+    .*
+  );
 endmodule: renas_mcu_top
