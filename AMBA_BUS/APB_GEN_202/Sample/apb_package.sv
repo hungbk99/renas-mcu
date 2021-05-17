@@ -10,6 +10,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 package apb_package;
+import 	RVS192_package::*;
   //parameter DATA_LENGTH = 32;
   //parameter ADDR_LENGTH = 32;
   typedef struct packed {

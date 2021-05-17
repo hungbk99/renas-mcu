@@ -539,7 +539,7 @@ module 	RVS192
   	.peri_addr(o_pp_ex_mem.alu_out),
   	//.peri_read_data(),
   	//.peri_read(),
-  	//.peri_write_data(),	
+  	.peri_write_data(i_pp_mem_wb.mem_out),	
   	//.peri_write(),
   	//.clk_l2(clk),
   	.*

@@ -17,6 +17,15 @@ module renas_testbench();
   logic   clk_l1;
   logic   clk_l2;
   logic   clk_mem;
+  logic   clk_peri;
+  // SPI interface
+  logic   mosi_somi,
+          ss_0,
+          ss_1,
+          ss_2,
+          ss_3;
+  logic   miso_simo;
+  wire    sclk;    
 
   renas_mcu_top dut
   (
@@ -28,6 +37,7 @@ module renas_testbench();
 		clk_l1 = 1'b1;
 		clk_l2 = 1'b1;
 		clk_mem = 1'b1;
+    clk_peri = 1'b1;
 		rst_n = 0;
 		#42
 		rst_n = 1;
@@ -43,6 +53,11 @@ module renas_testbench();
 	initial begin
 		#1
 		forever #20	clk_l2 = !clk_l2;	
+	end
+	
+  initial begin
+		#1
+		forever #25	clk_peri = !clk_peri;	
 	end
 	
 	initial begin

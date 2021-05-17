@@ -34,8 +34,9 @@ module x2p_top
 //--------------------------------------------------------------------------------
   //Hung_mod localparam  GPIO_LOW  =     0x0000;
   //Hung_mod localparam  GPIO_HIGH =     0x0020;
-  localparam  SPI_LOW   =     32'h0100;
-  localparam  SPI_HIGH  =     32'h011C;
+  localparam  PERI_BASE =     32'h0001_0000;
+  localparam  SPI_LOW   =     32'h0100 + PERI_BASE;
+  localparam  SPI_HIGH  =     32'h011C + PERI_BASE;
 
   //Hung_mod logic                       gpio_sel,
   logic                       spi_sel,

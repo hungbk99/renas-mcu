@@ -176,26 +176,27 @@ MEM
 );
 //-------------------------------------------------------------------------------
   `ifdef MEM_SIM
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test1.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test2.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test3.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test4.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test5.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test6.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/pipeline_test7.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/forwarding_test.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/factorial_test.txt";		// maximum factorial = 12!
-	  //  //parameter INST = "D:/RISC-V/testbench/factorial_opt.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/arrangment.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/arrangement_fix.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/inner_loop.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/larger_inner_loop.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/inner_loop1.txt";
-	  //  //parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
-    //  parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
-    //  initial begin
-    //  	$readmemh(INST, MEM.SRAM, 32'h0000_2000, 32'h0000_3fff);
-    //  	$readmemh("D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/data_memory_file.txt", MEM.SRAM, 32'h0000_0000, 32'h0000_1fff);
-    //  end
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test1.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test2.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test3.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test4.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test5.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test6.txt";
+	    //parameter INST = "D:/RISC-V/testbench/pipeline_test7.txt";
+	    //parameter INST = "D:/RISC-V/testbench/forwarding_test.txt";
+	    //parameter INST = "D:/RISC-V/testbench/factorial_test.txt";		// maximum factorial = 12!
+	    //parameter INST = "D:/RISC-V/testbench/factorial_opt.txt";
+	    //parameter INST = "D:/RISC-V/testbench/arrangment.txt";
+	    //parameter INST = "D:/RISC-V/testbench/arrangement_fix.txt";
+	    //parameter INST = "D:/RISC-V/testbench/inner_loop.txt";
+	    //parameter INST = "D:/RISC-V/testbench/larger_inner_loop.txt";
+	    //parameter INST = "D:/RISC-V/testbench/inner_loop1.txt";
+	    //parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
+      parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
+      //parameter INST = "D:/Project/renas-mcu/MMEM/spi_test.txt";
+      initial begin
+      	$readmemh(INST, MEM.SRAM, 32'h0000_2000, 32'h0000_3fff);
+      	$readmemh("D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/data_memory_file.txt", MEM.SRAM, 32'h0000_0000, 32'h0000_1fff);
+      end
   `endif
 endmodule

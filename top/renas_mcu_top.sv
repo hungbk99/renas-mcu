@@ -151,7 +151,7 @@ module renas_mcu_top
     .*
   );
 
-  spi_top
+  spi_top spi
   (
   //// spi APB interface
   //  .apb_slave_out,
