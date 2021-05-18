@@ -41,7 +41,7 @@ module x2p_top
   //Hung_mod logic                       gpio_sel,
   logic                       spi_sel,
                               ahb_hsel,
-                              apb_hsel,
+                              //apb_hsel,
                               apb_sample_ack,
                               sample_ena,
                               trans_done,
@@ -146,7 +146,7 @@ module x2p_top
         //Hung_mod gpio_hsel = gpio_sel;
         spi_psel = spi_sel;
         apb_trans_out.penable = 1'b1;
-        if(apb_trans_in.pready)
+        if(apb_spi_in.pready)
           next_state = IDLE;
         else 
           next_state = current_state;
@@ -169,13 +169,14 @@ module x2p_top
       trans_end <= 1'b0;
       apb_trans_in <= '0;
     end
-    else if(apb_trans_in.pready && apb_trans_out.penable)
+    //else if(apb_trans_in.pready && apb_trans_out.penable)
+    else if(apb_spi_in.pready && apb_trans_out.penable)
     begin
       trans_end <= 1'b1;
       //Hung_mod if(gpio_sel)
       //Hung_mod   apb_trans_in = apb_gpio_in;
       //Hung_mod else 
-      if(spi_sel)
+      //if(spi_sel)
         apb_trans_in = apb_spi_in;
     end
     else begin 

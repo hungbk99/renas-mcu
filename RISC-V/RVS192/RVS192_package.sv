@@ -4,6 +4,12 @@
 // Project Name:	RVS192
 // Author:	 		hungbk99
 // University:     	DP S192	HCMUT
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// Ver    Date        Author    Description
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//        05.18.2021  hungbk99  Mod: Solve bug: sw after a register type instruction
+//                                   ex: addi x0, x0, 0x10 -> sw x0, 0x00(zero)
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //////////////////////////////////////////////////////////////////////////////////
 
 //`include"RVS192_user_define.h"
@@ -200,6 +206,9 @@ package	RVS192_package;
 	}	pp_dec_ex_type;
 	
 	typedef	struct packed	{
+    //Hung_mod_05.17.2021
+    logic [4:0]       rs1;
+    //Hung_mod_05.17.2021
 		logic	[4:0]				rd;
 //		logic 	[PC_LENGTH-1:0]		actual_pc;
 		logic 	[DATA_LENGTH-1:0]	alu_out;

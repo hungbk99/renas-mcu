@@ -15,11 +15,18 @@
 // Copyright (C) 	Le Quang Hung 
 // Ho Chi Minh University of Technology
 // Email: 			quanghungbk1999@gmail.com  
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Ver    Date        Author    Description
-// v0.1   25.04.2021  hungbk99  Mod: AHP Interface  
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// v0.1   04.25.2021  hungbk99  Mod: AHP Interface  
 //                                   Read Mem                     -> AHB-INST Interface
 //                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
-//        06.05.2021  hungbk99  Mod: Add support for peri slave
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//        05.06.2021  hungbk99  Mod: Add support for peri slave
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+//        05.18.2021  hungbk99  Mod: Solve bug: sw after a register type instruction
+//                                   ex: addi x0, x0, 0x10 -> sw x0, 0x00(zero)
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TEST
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
@@ -407,6 +414,9 @@ module 	RVS192
 		endcase
 	end
 
+  //Hung_mod_05.17.2021
+  assign i_pp_ex_mem.rs1 = o_pp_dec_ex.rs1;
+  //Hung_mod_05.17.2021
 // 	MEM FIX
 	always_comb begin
 		i_pp_ex_mem.rs2_out_fix = o_pp_dec_ex.rs2_out;
@@ -490,7 +500,19 @@ module 	RVS192
   assign peri_halt_raw = peri_read | peri_write;
   assign peri_halt = peri_halt_raw & ~peri_ena;
   //-------------------------------------------------------------------
-  
+ 
+  //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+  //Hung_mod_05.17.2021
+  logic addi_li_fix;
+  always_comb begin
+    if(o_pp_mem_wb.control_signals.reg_wen && (o_pp_mem_wb.rd == o_pp_ex_mem.rs1))
+      addi_li_fix = 1'b1;
+    else
+      addi_li_fix = 1'b0;
+  end
+  //Hung_mod_05.17.2021
+  //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 	DataGen	DG_U
 	(
 	.data_type(o_pp_ex_mem.control_signals.mem_gen),
@@ -524,7 +546,8 @@ module 	RVS192
 	
 	//Hung_mod_peri assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
 	//assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? datar_peri : data_r) : o_pp_ex_mem.rs2_out_fix;
-	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (peri_write ? peri_write_data : o_pp_ex_mem.rs2_out_fix);
+	//assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (peri_write ? peri_write_data : o_pp_ex_mem.rs2_out_fix);
+	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (addi_li_fix ? o_pp_mem_wb.alu_out : o_pp_ex_mem.rs2_out_fix);
 	
   ahb_peri_itf  
   //#(

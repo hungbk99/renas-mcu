@@ -7,7 +7,7 @@
 //          05.16.2021  hungbk99  seperate psel from apb_slave_in  
 //=================================================================
 
-
+`define SIM
 `include "D:/Project/renas-mcu/SPI/rtl/spi_package.sv"
 import spi_package::*;
 module spi_top
@@ -382,7 +382,17 @@ module	spi_control
 	spisr_type	  s_reg;
 	spirintr_type	rint_reg;
 	spiintr_type	int_reg;
-	
+
+  //`ifdef SIM
+  //  initial begin
+  //    $readmemh("mem.txt", c_reg);
+  //    $readmemh("mem.txt", b_reg);
+  //    $readmemh("mem.txt", inte_reg);
+  //    $readmemh("mem.txt", s_reg);
+  //    $readmemh("mem.txt", rint_reg);
+  //    $readmemh("mem.txt", int_reg);
+  //  end
+  //`endif
 	logic 		sync_1,
 			      sync_2,
 			      sync_3,
@@ -421,15 +431,15 @@ module	spi_control
 			rint_reg <= '0;
 			int_reg <= '0;
 		end
-		else if(!c_reg.SPIE)	
-		begin
-			c_reg <= 32'h307;
-			b_reg <= '0;
-			inte_reg <= '0;
-			s_reg <= '0;
-			rint_reg <= '0;
-			int_reg <= '0;
-		end
+		//else if(!c_reg.SPIE)	
+		//begin
+		//	c_reg <= 32'h307;
+		//	b_reg <= '0;
+		//	inte_reg <= '0;
+		//	s_reg <= '0;
+		//	rint_reg <= '0;
+		//	int_reg <= '0;
+		//end
 		else 
 		begin
 			if(as2sc_wen.cr_wen)
