@@ -8,6 +8,7 @@
 // Ver    Date        Author    Description
 // v0.0   04.04.2021  hungbk99  First creation
 // v0.1   05.16.2021  hungbk99  Remove support for GPIO
+//        05.20.2021  hungbk99  Debug: trans_done
 //////////////////////////////////////////////////////////////////////////////////
 
 import apb_package::*;
@@ -50,7 +51,7 @@ module x2p_top
                               terminate,
                               resp_support;
                               
-  AHB_package::mas_send_type  ahb_master_sample;
+  //AHB_package::mas_send_type  ahb_master_sample;
   AHB_package::mas_send_type  apb_master_sample;
   apb_package::master_s_type  apb_trans_out;
   apb_package::slave_s_type   apb_trans_in;
@@ -69,24 +70,28 @@ module x2p_top
   always_ff @(posedge ahb_clk, negedge rst_n) 
   begin
     if(!rst_n) begin
-      ahb_master_sample <= '0;
+      //ahb_master_sample <= '0;
       ahb_hsel <= 1'b0;
       sample_ena <= 1'b1;
     end
     else begin
-      ahb_master_sample <= slave_peri_out;
+      //ahb_master_sample <= slave_peri_out;
       if(ahb_hsel == 1'b1) 
         ahb_hsel <= !apb_sample_ack;
       else if (sample_ena)
         ahb_hsel <= hsel_slave_peri;
       
-      if(apb_sample_ack)
+      //Hung_mod_05.20.2021 if(apb_sample_ack)
+      if(apb_sample_ack && !trans_done)
         sample_ena <= 1'b0;
       else if(trans_done)
         sample_ena <= 1'b1;
     end
   end
 
+  //Hung_db_05.20.2021
+  assign trans_done = trans_end_dl; //trans_end; //trans_end_dl ???
+  //Hung_db_05.20.2021
   always_ff @(posedge apb_clk, negedge rst_n)
   begin
     if(!rst_n) begin
