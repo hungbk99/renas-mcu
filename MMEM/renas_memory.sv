@@ -10,6 +10,7 @@
 // v0.1   19.04.2021  hungbk99  Modify from Single-RAM => Dual RAM
 // v0.2   26.04.2021  hungbk99  Modify to map with RVS192 cpu
 //////////////////////////////////////////////////////////////////////////////////
+
 `define MEM_SIM
 `ifndef TEST
   `ifndef TOP

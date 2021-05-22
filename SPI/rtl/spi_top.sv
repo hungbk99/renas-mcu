@@ -64,13 +64,14 @@ module spi_top
                                 shift_clock;
 // SPI Shift
   logic                         mstr;
-
+  logic                         transfer_start;
 // Other signals
   
 //=================================================================
 // Sub-module
   assign as2sd_control = data_req;  //Hung_add_03.10_2021
-  
+  assign transfer_start = sc2scc_control.transfer_start;
+
   spi_apb_slave APBS_U
   (
     .control_req(as2sc_wen),
@@ -521,7 +522,7 @@ module	spi_control
 	end		
 
 	assign 	pos_edge_complete = ~sync_3 & sync_2;
-	assign 	sc2sd_control.tfifo_ren = pos_edge_complete & tfifo_interrupt.fifo_empty; //The empty flag ensures that SPI won't read the tfifo after all data has been transferd
+	assign 	sc2sd_control.tfifo_ren = pos_edge_complete & ~tfifo_interrupt.fifo_empty; //The empty flag ensures that SPI won't read the tfifo after all data has been transferd
 	assign	sc2sd_control.rfifo_wen = pos_edge_complete;
   assign  transfer_complete_ack = sync_2;
 
@@ -552,8 +553,14 @@ module	spi_control
 		end
 		DELAY:
 		begin
-			if(count_done)
-				transfer_next_state = INITIAL;
+			//if(count_done)
+			//	transfer_next_state = INITIAL;
+			//else	
+			//	transfer_next_state = transfer_state;
+      if(count_done) begin
+				if(!tfifo_interrupt.fifo_empty) transfer_next_state = INITIAL;
+        else  transfer_next_state = IDLE;
+      end
 			else	
 				transfer_next_state = transfer_state;
 		end
@@ -766,7 +773,8 @@ endmodule: spi_data
 // Project name:  VG_SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design   
+//          05.22.2021  hungbk99  Mod: add transfer_start_ack
 //============================================================================
 
 
@@ -779,6 +787,7 @@ module spi_clock
                 pclk,
                 preset_n,
                 transfer_complete_ack,
+  output logic  transfer_start_ack,              
 //  Slave connect
   input         s_clock,
   
@@ -818,6 +827,8 @@ module spi_clock
 // Clock select
   assign  pre_clock = sc2scc_control.mclk_sel ? fclk : pclk;
   assign  transfer_req = sc2scc_control.mclk_sel ? sync_req : sc2scc_control.transfer_start; 
+  //Hung_add_05.22.2021
+  assign  transfer_start_ack = req_detect; 
 
 // Synchronous logic
   always_ff @(posedge fclk, negedge preset_n) 
@@ -918,33 +929,87 @@ module spi_clock
 
 //  precede generated clock
   //always_ff @(posedge pre_clock, negedge preset_n)
-  always_ff @(negedge shift_clock, negedge preset_n)
+  //always_ff @(negedge shift_clock, negedge preset_n)
+  //begin
+  //  if(!preset_n)
+  //    pulse_count_h <= '0;
+  //  else if(clock_enable)
+  //    pulse_count_h <= pulse_count_h + 1;
+  //  else if(transfer_done_h)
+  //    pulse_count_h <= '0;
+  //end
+ 
+  always_ff @(posedge shift_clock, negedge preset_n)
   begin
     if(!preset_n)
       pulse_count_h <= '0;
     else if(clock_enable)
-      pulse_count_h <= pulse_count_h + 1;
-    else if(transfer_done_h)
-      pulse_count_h <= '0;
+    begin
+      if(transfer_done_h)
+        pulse_count_h <= '0;
+      else  
+        pulse_count_h <= pulse_count_h + 1;
+    end
   end
- 
 //  following generated clock    
   //always_ff @(negedge pre_clock, negedge preset_n)
+  //always_ff @(negedge shift_clock, negedge preset_n)
+  //begin
+  //  if(!preset_n)
+  //    pulse_count_l <= '0;
+  //  else if(current_state == TRANS)
+  //    pulse_count_l <= pulse_count_l + 1;
+  //  else if(transfer_done_l)
+  //    pulse_count_l <= '0;
+  //end
+  
   always_ff @(negedge shift_clock, negedge preset_n)
   begin
     if(!preset_n)
       pulse_count_l <= '0;
-    else if(current_state == TRANS)
-      pulse_count_l <= pulse_count_l + 1;
-    else if(transfer_done_l)
-      pulse_count_l <= '0;
+    else if(clock_enable)
+    begin
+      if(transfer_done_l)
+        pulse_count_l <= '0;
+      else  
+        pulse_count_l <= pulse_count_l + 1;
+    end
   end
 
   assign single_pulse_done = (invert_count == sc2scc_control.spi_br) ? 1'b1 : 1'b0;
+  //assign transfer_done_h = (pulse_count_h == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
+  //assign transfer_done_l = (pulse_count_l == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
   assign transfer_done_h = (pulse_count_h == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
   assign transfer_done_l = (pulse_count_l == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
-  assign transfer_done = (sc2scc_control.cpol == 1'b1) ? transfer_done_h : transfer_done_l;
+  //Hung_mod assign transfer_done = (sc2scc_control.cpol == 1'b1) ? transfer_done_h : transfer_done_l;
+  logic transfer_done_h_d, transfer_done_l_d;
+  
+  always_ff @(posedge pre_clock, negedge preset_n)
+  begin
+    if(!preset_n)
+      transfer_done_h_d <= 1'b0;
+    else
+      transfer_done_h_d <= transfer_done_h; 
+  end
 
+  always_ff @(posedge pre_clock, negedge preset_n)
+  begin
+    if(!preset_n)
+      transfer_done_l_d <= 1'b0;
+    else
+      transfer_done_l_d <= transfer_done_l; 
+  end
+  
+  assign transfer_done = (sc2scc_control.cpol == 1'b1) ? (~transfer_done_h & transfer_done_h_d) : (~transfer_done_l & transfer_done_l_d);
+  //always_ff @(posedge pre_clock, negedge preset_n)
+  //begin
+  //  if(!preset_n)
+  //    transfer_done <= 1'b0;
+  //  else if(sc2scc_control.cpol == 1'b1)
+  //    transfer_done <= ~transfer_done_h & transfer_done_h_d;
+  //  else
+  //    transfer_done <= ~transfer_done_l & transfer_done_l_d;
+  //end
 endmodule: spi_clock
 
 
@@ -953,7 +1018,8 @@ endmodule: spi_clock
 // Project name:  VG_SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
+// v0.0     10.03.2021  hungbk99  Merge rtl from previous design   
+//          05.22.2021  hungbk99  Modify: add transfer_start
 //======================================================================
 
 module spi_shift
@@ -968,6 +1034,7 @@ module spi_shift
   inout           sclk,
 //  Control signals
   input           transfer_complete,
+  input           transfer_start,
 //                  cpha,
                   shift_clock,
                   slave_ena,
@@ -988,13 +1055,32 @@ module spi_shift
   logic           serial_in,
                   serial_out;
 
+  logic           transfer_trigger,
+                  transfer_trigger1,
+                  transfer_sample;               
+
   bus             spi_shift_reg,
                   spi_receive_reg;
 //======================================================================
 //  SPI Shift Register
-  always_ff @(posedge pclk, posedge transfer_complete)
+  always_ff @(posedge pclk, negedge preset_n)
   begin
-      if (transfer_complete)
+    if(!preset_n)
+    begin
+      transfer_trigger <= 1'b0;
+      transfer_trigger1 <= 1'b0;
+    end
+    else begin
+      transfer_trigger <= transfer_start;
+      transfer_trigger1 <= transfer_trigger;
+    end
+  end
+
+  assign transfer_sample = transfer_complete | (transfer_trigger & !transfer_trigger1);
+
+  always_ff @(posedge shift_clock, posedge transfer_sample)
+  begin
+      if (transfer_sample)
         spi_shift_reg <= transfer_data;      
       else   
         spi_shift_reg <= {spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1, serial_in}; 
