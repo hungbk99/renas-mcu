@@ -27,8 +27,16 @@ module renas_testbench();
   logic   miso_simo;
   wire    sclk;    
 
+  logic   gen_data;
+
+  initial begin
+    gen_data = 0;
+    forever @(negedge sclk) gen_data = $urandom_range(0,1);
+  end
+
   renas_mcu_top dut
   (
+    .miso_simo(gen_data),
     .*
   );
 

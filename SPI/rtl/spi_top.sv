@@ -65,13 +65,16 @@ module spi_top
 // SPI Shift
   logic                         mstr;
   logic                         transfer_start;
+  logic                         cpha;
+  logic                         cpol;
 // Other signals
   
 //=================================================================
 // Sub-module
   assign as2sd_control = data_req;  //Hung_add_03.10_2021
   assign transfer_start = sc2scc_control.transfer_start;
-
+  assign cpha = sc2scc_control.cpha;
+  assign cpol = sc2scc_control.cpol;
   spi_apb_slave APBS_U
   (
     .control_req(as2sc_wen),
@@ -617,7 +620,8 @@ module	spi_control
 			count <= '0;
 		else if(c_reg.SWR == 1'b1)
 			count <= '0;
-		else if(delay_state == COUNT)
+		//Hung_db else if(delay_state == COUNT)
+		else if((delay_state == COUNT) && !count_done)
 			count <= count + 1;
 		else if(count_done)
 			count <= '0;
@@ -814,7 +818,7 @@ module spi_clock
             pulse_count_l;
  
   logic [7:0] invert_count;
-  logic [4:0] count;
+  //logic [4:0] count;
   
   enum logic [1:0]
   {
@@ -856,7 +860,8 @@ module spi_clock
 
 // Clock generator   
   assign  shift_clock = sc2scc_control.mstr ? gen_clock : s_clock;
-  assign  gen_clock = (sc2scc_control.cpol ^ sc2scc_control.cpha) ? pre_gen_clock : ~pre_gen_clock; 
+  //Hung_mod assign  gen_clock = (sc2scc_control.cpol ^ sc2scc_control.cpha) ? pre_gen_clock : ~pre_gen_clock; 
+  assign  gen_clock = sc2scc_control.cpol ? ~pre_gen_clock : pre_gen_clock; 
 // FSM    
   always_comb begin
     clock_enable = 1'b0;
@@ -979,8 +984,8 @@ module spi_clock
   assign single_pulse_done = (invert_count == sc2scc_control.spi_br) ? 1'b1 : 1'b0;
   //assign transfer_done_h = (pulse_count_h == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
   //assign transfer_done_l = (pulse_count_l == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
-  assign transfer_done_h = (pulse_count_h == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
-  assign transfer_done_l = (pulse_count_l == sc2scc_control.datalen + 1) ? 1'b1 : 1'b0;
+  assign transfer_done_h = (pulse_count_h == sc2scc_control.datalen - 1) ? 1'b1 : 1'b0;
+  assign transfer_done_l = (pulse_count_l == sc2scc_control.datalen - 1) ? 1'b1 : 1'b0;
   //Hung_mod assign transfer_done = (sc2scc_control.cpol == 1'b1) ? transfer_done_h : transfer_done_l;
   logic transfer_done_h_d, transfer_done_l_d;
   
@@ -1035,7 +1040,8 @@ module spi_shift
 //  Control signals
   input           transfer_complete,
   input           transfer_start,
-//                  cpha,
+                  cpol,
+                  cpha,
                   shift_clock,
                   slave_ena,
                   talk_ena,
@@ -1061,7 +1067,26 @@ module spi_shift
 
   bus             spi_shift_reg,
                   spi_receive_reg;
+  logic           sample_clock;
 //======================================================================
+  
+  assign  sample_clock = (cpol ^ cpha) ? shift_clock : ~shift_clock; 
+  //always_comb begin
+  //  if(cpol == 0)
+  //  begin
+  //    if(cpha = 1)
+  //      sample_clock = shift_clock;
+  //    else
+  //      sample_clock = ~shift_clock;
+  //  end
+  //  else begin
+  //    if(cpha = 1)
+  //      sample_clock = ~shift_clock;
+  //    else
+  //      sample_clock = shift_clock;
+  //  end
+  //end
+
 //  SPI Shift Register
   always_ff @(posedge pclk, negedge preset_n)
   begin
@@ -1076,26 +1101,38 @@ module spi_shift
     end
   end
 
-  assign transfer_sample = transfer_complete | (transfer_trigger & !transfer_trigger1);
+  //Hung_mod assign transfer_sample = transfer_complete | (transfer_trigger & !transfer_trigger1);
+  assign transfer_sample = transfer_trigger & !transfer_trigger1;
 
-  always_ff @(posedge shift_clock, posedge transfer_sample)
+  always_ff @(posedge sample_clock, posedge transfer_sample)
   begin
       if (transfer_sample)
         spi_shift_reg <= transfer_data;      
       else   
-        spi_shift_reg <= {spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1, serial_in}; 
+        //spi_shift_reg <= {spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1, 1'b0}; 
+        spi_shift_reg <= spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1; 
   end
   
   assign serial_out = spi_shift_reg[SPI_DATA_WIDTH-1];
 //  SPI Receive Register
-  always_ff @(posedge pclk, negedge preset_n)
+  //always_ff @(posedge pclk, negedge preset_n)
+  //begin
+  //  if(!preset_n)
+  //      spi_receive_reg <= '0;
+  //  else if(transfer_complete) 
+  //      spi_receive_reg <= spi_shift_reg;
+  //  else 
+  //      spi_receive_reg <= spi_receive_reg;
+  //end
+  always_ff @(negedge sample_clock, negedge preset_n)
   begin
     if(!preset_n)
         spi_receive_reg <= '0;
-    else if(transfer_complete) 
-        spi_receive_reg <= spi_shift_reg;
+    //else if(transfer_complete) 
+    //    spi_receive_reg <= spi_shift_reg;
     else 
-        spi_receive_reg <= spi_receive_reg;
+        //spi_receive_reg <= {spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1, serial_in};
+        spi_receive_reg <= (spi_receive_reg << 1) | serial_in;
   end
 //  SPI Interface
   assign mosi_somi = talk_ena ? serial_out : 1'b0;
