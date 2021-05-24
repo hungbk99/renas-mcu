@@ -216,7 +216,8 @@ endmodule: spi_sync_fifo
 // Page:          VLSI Technology
 // Version  Date        Author    Description
 // v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
-//          05.16.2021  hungbk99  seperate psel from apb_slave_in  
+//          05.16.2021  hungbk99  seperate psel from apb_slave_in 
+//          05.25.2021  hungbk99  Debug rfifo_ren
 //////////////////////////////////////////////////////////////////////////////////
 
 module	spi_apb_slave	
@@ -264,7 +265,8 @@ module	spi_apb_slave
 	
 	//Hung_mod assign	prdata_buf2 = (apb_slave_in.psel && (~apb_slave_in.pwrite))	? 	prdata_buf1 : apb_slave_out.prdata;
 	assign	prdata_buf2 = (psel && (~apb_slave_in.pwrite))	? 	prdata_buf1 : apb_slave_out.prdata;
-	assign 	data_req.rfifo_ren = &apb_slave_in.paddr[4:2] && (!error);
+	//Hung_db assign 	data_req.rfifo_ren = &apb_slave_in.paddr[4:2] && (!error);
+	assign 	data_req.rfifo_ren = &apb_slave_in.paddr[4:2] && (!error) && psel && apb_slave_in.penable;
 	
 	//always_ff @(posedge apb_slave_in.pclk, negedge rst_n_sync)
 	always_ff @(posedge pclk, negedge rst_n_sync)
