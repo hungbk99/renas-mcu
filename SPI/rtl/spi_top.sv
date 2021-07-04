@@ -1105,14 +1105,21 @@ module spi_shift
 
   //Hung_mod assign transfer_sample = transfer_complete | (transfer_trigger & !transfer_trigger1);
   assign transfer_sample = transfer_trigger & !transfer_trigger1;
+  logic fix_mosi;
 
   always_ff @(posedge sample_clock, posedge transfer_sample)
   begin
-      if (transfer_sample)
-        spi_shift_reg <= transfer_data;      
-      else   
+    if (transfer_sample) begin
+      spi_shift_reg <= transfer_data;    
+      fix_mosi <= 1'b1;
+    end
+    else begin   
         //spi_shift_reg <= {spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1, 1'b0}; 
+      if(cpha && fix_mosi)
+        fix_mosi <= 1'b0;
+      else
         spi_shift_reg <= spi_shift_reg[SPI_DATA_WIDTH-1:0] << 1; 
+    end
   end
   
   assign serial_out = spi_shift_reg[SPI_DATA_WIDTH-1];

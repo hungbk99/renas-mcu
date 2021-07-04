@@ -16,16 +16,16 @@ module Branch_Handling
 (
 	output 	br_update_type		br_update_ex,
 	output 	[PC_LENGTH-1:0]		branch_cal_out,
-								actual_pc,
+								            actual_pc,
 	input 	br_check_type 		br_check_ex,
-	input 						ge,
-								eq,
+	input 						        ge,
+								            eq,
 //								swap_j,
-								branch_capture,
-								non_condition,
+								            branch_capture,
+								            non_condition,
 	input 	branch_kind_type	branch_kind,							
-	input	[DATA_LENGTH-1:0]	imm_ex,
-								add_result,
+	input	[DATA_LENGTH-1:0]	  imm_ex,
+								            add_result,
 	input 	[PC_LENGTH-1:0]		pc_ex
 );
 
@@ -136,8 +136,8 @@ module Branch_Handling
 			unique case(branch_kind)
 			EQUAL:		condition_check = eq;			
 			N_EQUAL:	condition_check = !eq;
-			LT:			condition_check = !ge;
-			GE:			condition_check = ge;
+			LT:			  condition_check = !ge;
+			GE:			  condition_check = ge;
 			endcase  
 		end	
 	end

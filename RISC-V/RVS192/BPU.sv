@@ -21,16 +21,16 @@ module	BPU
 //	#(//`include"RVS192_user_parameters.h")
 //	import	RVS192_user_parameters::*;	
 (
-	output	br_check_type	br_check_fetch,
-	output 	logic			pc_sel,
-							pc_fix,
+	output	br_check_type	  br_check_fetch,
+	output 	logic			      pc_sel,
+							            pc_fix,
 	output	[PC_LENGTH-1:0]	target_predict,
 	input 	br_update_type	br_update_ex,
 	input 	[PC_LENGTH-1:0]	pc_ex,
-							pc_in,
-							target_pc,
-	input 					clk,
-							rst_n
+							            pc_in,
+				            			target_pc,
+	input 					        clk,
+							            rst_n
 );
 
 //================================================================================	
