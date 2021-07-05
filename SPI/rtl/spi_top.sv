@@ -863,7 +863,8 @@ module spi_clock
 // Clock generator   
   assign  shift_clock = sc2scc_control.mstr ? gen_clock : s_clock;
   //Hung_mod assign  gen_clock = (sc2scc_control.cpol ^ sc2scc_control.cpha) ? pre_gen_clock : ~pre_gen_clock; 
-  assign  gen_clock = sc2scc_control.cpol ? ~pre_gen_clock : pre_gen_clock; 
+  //assign  gen_clock = sc2scc_control.cpol ? ~pre_gen_clock : pre_gen_clock; 
+  assign  gen_clock = pre_gen_clock; 
 // FSM    
   always_comb begin
     clock_enable = 1'b0;
@@ -1147,7 +1148,7 @@ module spi_shift
   assign mosi_somi = talk_ena ? serial_out : 1'b0;
   assign serial_in = talk_ena ? miso_simo : 1'b0;
   assign s_clock = sclk;
-  assign sclk = mstr ? shift_clock : 1'bz;
+  assign sclk = mstr ? ((cpol ^ cpha) ? sample_clock : ~sample_clock) : 1'bz;
   assign receive_data = spi_receive_reg;
   
   always_comb begin
