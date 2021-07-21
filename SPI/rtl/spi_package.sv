@@ -3,6 +3,14 @@
 // Project Name:	VG SoC
 // Author:	 	  	hungbk99
 // Page:     		  VLSI Technology
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+// Version  Date        Author    Description
+// v0.1     07.07.2021  hungbk99  Add support for trasfer limitation
+//                                Upto 32 word
+//                                Mod: SPICR[13:10] Reserved -> SPITXLM
+//                                     SPIINTER[23] Reserved -> SPITXLME
+//                                     SPIRINTR[23] Reserved -> SPITXLMRINT
+//                                     SPIINTR[23]  Reserved -> SPITXLMINT
 //////////////////////////////////////////////////////////////////////////////////
 
 package	spi_package;
@@ -90,7 +98,9 @@ package	spi_package;
 	logic 		TALK;
 	logic 	[7:0]	SPITXDL;
 	logic 	[1:0]	SS;
-	logic 	[3:0]	REV_1;
+	//[v0.0]logic 	[3:0]	REV_1;
+	//[v0.1]
+  logic 	[3:0]	SPITXLM;
 	logic 		SPITXRST;
 	logic 		SPIRXRST;
 	logic 	[2:0]	REV_2;
@@ -104,12 +114,19 @@ package	spi_package;
 	
 	typedef struct packed	{
 	logic		SPITRCINTE;
-	logic	[18:0]	REV_1;
+	//[v0.0] logic	[18:0]	REV_1;
+  //[v0.1]---------------------
+  logic   [6:0] REV_1;
+  logic   SPITXLME;
+  logic   [10:0] REV_2;
+  //---------------------------
 	logic		SPITXFINTE;
 	logic		SPITXOINTE;
 	logic		SPITXEINTE;
 	logic		SPITXUINTE;
-	logic 	[3:0]	REV_2;
+	//[v0.0] logic 	[3:0]	REV_2;
+  //[v0.1]
+  logic   [3:0] REV_3;
 	logic 		SPIRXFINTE;
 	logic 		SPIRXOINTE;
 	logic 		SPIRXEINTE;
@@ -125,12 +142,19 @@ package	spi_package;
 	
 	typedef struct packed	{
 	logic 		SPITRCRINT;
-	logic 	[18:0]	REV_1;
+	//[v0.0] logic 	[18:0]	REV_1;
+  //[v0.1]---------------------
+  logic   [6:0] REV_1;
+  logic   SPITXLMRINT;
+  logic   [10:0] REV_2;
+  //---------------------------
 	logic 		SPITXFRINT;
 	logic 		SPITXORINT;
 	logic 		SPITXERINT;
 	logic 		SPITXURINT;
-	logic 	[3:0]	REV_2;
+	//[v0.0] logic 	[3:0]	REV_2;
+  //[v0.1]
+  logic   [3:0] REV_3;
 	logic 		SPIRXFRINT;
 	logic 		SPIRXORINT;
 	logic 		SPIRXERINT;
@@ -139,12 +163,19 @@ package	spi_package;
 	
 	typedef struct packed	{
 	logic 		SPITRCINT;
-	logic 	[18:0]	REV_1;
+	//[v0.0] logic 	[18:0]	REV_1;
+  //[v0.1]---------------------
+  logic   [6:0] REV_1;
+  logic   SPITXLMINT;
+  logic   [10:0] REV_2;
+  //---------------------------
 	logic 		SPITXFINT;
 	logic 		SPITXOINT;
 	logic 		SPITXEINT;
 	logic 		SPITXUINT;
-	logic 	[3:0]	REV_2;
+	//[v0.0] logic 	[3:0]	REV_2;
+  //[v0.1]
+  logic   [3:0] REV_3;
 	logic 		SPIRXFINT;
 	logic 		SPIRXOINT;
 	logic 		SPIRXEINT;

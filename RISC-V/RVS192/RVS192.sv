@@ -18,7 +18,7 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Ver    Date        Author    Description
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-// v0.1   04.25.2021  hungbk99  Mod: AHP Interface  
+// v0.0   04.25.2021  hungbk99  Mod: AHP Interface  
 //                                   Read Mem                     -> AHB-INST Interface
 //                                   Merge: Read Mem || Write Mem -> AHB-DATA Interface
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -27,7 +27,10 @@
 //        05.18.2021  hungbk99  Mod: Solve bug: sw after a register type instruction
 //                                   ex: addi x0, x0, 0x10 -> sw x0, 0x00(zero)
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// v0.1   07.06.2021  hungbk99  Add OCM to support ISR
+//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //////////////////////////////////////////////////////////////////////////////////
+`define OCM_SIM
 `ifndef TEST
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"
@@ -55,19 +58,31 @@ module 	RVS192
     input   slv_send_type                           peri_in,
   	//Interrupt Handler
     output logic                                    peri_dec_err,
+    //ISR
+    input                                           spi_isr,
+    output logic                                    spi_clr,
 	//Hung_add_25.04.2021
-
-	input 											external_halt,
-			    									clk,
-			    									clk_l1,
-			    									clk_l2,
-			    									clk_mem,
-			    									rst_n
+	  input 											external_halt,
+		    	    									clk,
+			         									clk_l1,
+			         									clk_l2,
+			         									clk_mem,
+			         									rst_n
 );
 
 //====================================================================
 //						    Pipelined RVS192
-//====================================================================		
+//====================================================================	
+  //OCM
+  //--------------------------------------------------
+  logic                       isr_handle, spi_isr_sync;
+  logic 	[PC_LENGTH-1:0]			pc_isr_i, pc_isr_o;
+  logic                       stack_read, stack_write;
+  logic                       pc_isr_rd;
+  logic   [DATA_LENGTH-1:0]   stack_out, isr_out;
+  logic                       push_pc, pop_pc;
+  //--------------------------------------------------
+
 	logic 	[PC_LENGTH-1:0]			pc_in,
 									            pc_fetch,
 									            target_predict,
@@ -134,7 +149,7 @@ module 	RVS192
   logic                                             peri_halt_raw;
   //Hung_mod_peri
 //	CPU
-	logic												                      ICC_halt;
+	logic												                      ICC_halt, ICC_halt_v0_1;
 	logic												                      DCC_halt;
 //	Replace handshake	
 	logic												                      inst_replace_req,
@@ -197,13 +212,15 @@ module 	RVS192
 	//Hung_mod_peri assign 	dec_ex_flush = ICC_halt;
 	//Hung_mod_peri assign 	ex_mem_halt =  DCC_halt || external_halt;
 	//Hung_mod_peri assign 	ex_mem_flush = FW_halt;
-	assign 	pc_halt = (DCC_halt || peri_halt) || ICC_halt || FW_halt || external_halt;
+	assign 	pc_halt = (DCC_halt || peri_halt) || ICC_halt_v0_1 || FW_halt || external_halt;
 	assign 	fetch_dec_halt = pc_halt;
 	assign 	dec_ex_halt = FW_halt || (DCC_halt || peri_halt) || external_halt;
-	assign 	dec_ex_flush = ICC_halt;
+	assign 	dec_ex_flush = ICC_halt_v0_1 || push_pc;
 	assign 	ex_mem_halt =  (DCC_halt || peri_halt) || external_halt;
-	assign 	ex_mem_flush = FW_halt;
-	
+	assign 	ex_mem_flush = FW_halt || push_pc;
+
+  assign  ICC_halt_v0_1 = ICC_halt & ~isr_handle;
+
 	always_ff @(posedge clk or negedge rst_n)
 	begin
 		if(!rst_n)
@@ -233,6 +250,12 @@ module 	RVS192
       o_pp_fetch_dec.br_check <= '0;
       o_pp_fetch_dec.inst <= 32'h00007033;
 
+    end
+    //[v0.1]
+    else if(push_pc) begin
+      o_pp_fetch_dec.pc <= '0;
+      o_pp_fetch_dec.br_check <= '0;
+      o_pp_fetch_dec.inst <= 32'h00007033;
     end
 		else if(fetch_dec_halt) 
 			o_pp_fetch_dec <= o_pp_fetch_dec;
@@ -279,7 +302,7 @@ module 	RVS192
 	(
 	.br_check_fetch(i_pp_fetch_dec.br_check),
 	.pc_ex(o_pp_dec_ex.pc),
-	.pc_in(pc_fetch),
+	.pc_in(isr_handle ? pc_isr_o : pc_fetch),
 	.*
 	);
 	
@@ -291,14 +314,16 @@ module 	RVS192
 			//pc_fetch <= 32'h0000_03fc;
 			pc_fetch <= 32'h0000_8000;
 		end
-		else if(pc_halt)
+		else if(pc_halt || (spi_isr && !pop_pc && !(isr_handle && (isr_out == 32'hFFFF_FFFF))))
 			pc_fetch <= pc_fetch;
 		else
 			pc_fetch <= pc_in_fix;
 	end
 	
 	assign	pc_in = pc_sel ? (pc_fetch + 32'h4) : target_predict;
-	assign 	pc_in_fix = pc_fix ? actual_pc : pc_in;	
+	//[v0.0]assign 	pc_in_fix = pc_fix ? actual_pc : pc_in;	
+	//[v0.1]
+  assign 	pc_in_fix = (isr_handle && (isr_out == 32'hFFFF_FFFF)) ? stack_out : (pc_fix ? actual_pc : pc_in);	
 /*	
 	IMEM	IMEM_U
 	(
@@ -306,17 +331,129 @@ module 	RVS192
 	.*
 	);
 */
+
+  //----------------------------------------------------------
+  //OCM
+  
+  //assign spi_clr = (isr_handle && (isr_out == 32'hFFFF_FFFF)) ? 1'b1 : 1'b0;
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if(!rst_n)
+      spi_clr <= 1'b0;
+    else if(spi_isr == 0)
+      spi_clr <= 1'b0;
+    else 
+      spi_clr <= (isr_handle && (isr_out == 32'hFFFF_FFFF)) ? 1'b1 : 1'b0;
+  end
+  assign pop_pc = spi_clr;
+  //assign push_pc = spi_isr & ~isr_handle;
+  always_ff @(negedge clk, negedge rst_n)
+  begin
+    if(!rst_n)
+      spi_isr_sync <= 1'b0;
+    else  
+      spi_isr_sync <= spi_isr;
+  end
+
+  assign push_pc = spi_isr & ~spi_isr_sync;
+
+  always_ff @(posedge clk or negedge rst_n)
+	begin
+		if(rst_n == 1'b0)
+      isr_handle <= 1'b0;
+    else if(spi_isr)
+      isr_handle <= 1'b1;
+    else if(spi_clr) 
+      isr_handle <= 1'b0;
+  end
+
+  always_ff @(posedge clk or negedge rst_n)
+	begin
+		if(rst_n == 1'b0)
+      pc_isr_o <= 32'h2_07FC;
+    else if(!spi_isr)
+      pc_isr_o <= 32'h2_07FC;
+    else if(spi_clr || pc_halt)
+      pc_isr_o <= pc_isr_o;
+    else
+      pc_isr_o <= pc_isr_i;
+  end
+	
+	
+	assign 	pc_isr_i = pc_fix ? actual_pc : (pc_sel ? (pc_isr_o + 32'h4) : target_predict);	
+  //[FIXME]
+  logic [PC_LENGTH-1:0] return_pc;
+
+  always_ff @(posedge clk, negedge rst_n)
+  begin
+    if(!rst_n)
+      return_pc <= '0;
+    else
+      return_pc <= o_pp_ex_mem.pc;
+  end
+
+  //OCM: support STACK & ISR
+  OCM_ISR
+  #(
+    .SRAM_LENGTH(32),
+    .SRAM_DEPTH(2**12)
+  )
+  ISR
+  (
+    .data_out(isr_out),
+    .data_in('0),
+    .w_addr('0),
+    .r_addr((isr_handle && !pop_pc) ? (pc_isr_o & 32'h7FF) : '0),
+    .wen('0),
+    .clk(clk_l1)
+  );
+
+  SinglePort_SRAM  
+  #(
+    .SRAM_LENGTH(32),
+    .SRAM_DEPTH(2**12)
+  )
+  STACK
+  (
+    .data_out(stack_out),
+    .data_in((push_pc == 0) ? i_pp_mem_wb.mem_out : return_pc),//[FIXME] o_pp_ex_mem.pc),
+    .w_addr((push_pc == 0) ? o_pp_ex_mem.alu_out[31:2] : '0),
+    //[FIXME].r_addr((pop_pc == 1) ? o_pp_ex_mem.alu_out[31:2] : '0),
+    .r_addr((isr_handle && (isr_out == 32'hFFFF_FFFF)) ? '0 : o_pp_ex_mem.alu_out[31:2]),
+    .wen(stack_write || push_pc),
+    .clk(clk_l1)
+  );
+
+  //stack stack_m
+	//(
+  ////[v0.1]
+  //.w_ptr_info(),
+	//.data_out(stack_out),
+	//.fifo_status(),
+	//.data_in((push_pc == 0) ? i_pp_mem_wb.mem_out : return_pc),
+	//.clear(1'b0),
+	//.push(stack_write || push_pc),
+	//.pop(stack_read || (isr_handle && (isr_out == 32'hFFFF_FFFF))),
+	//.clk(clk_l1),
+	//.rst_n(rst_n));
+  //OCM
+  //----------------------------------------------------------
+
 	IL1_Cache	IL1_DUT
 	(
 	.*,
-	.pc(pc_fetch),
+	//[v0.0].pc(pc_fetch),
+  //[v0.1]
+  .pc(pop_pc ? stack_out : pc_fetch),
 	.inst_fetch(inst),
 	.inst_replace_req(inst_replace_check),
 	.data_replace_req(data_replace_check)	
 	);
 	
-	assign	i_pp_fetch_dec.pc = pc_fetch;
-	assign 	i_pp_fetch_dec.inst = br_update_ex.wrong ? 32'h00007033 : inst;
+	assign	i_pp_fetch_dec.pc = (isr_handle && !pop_pc) ? pc_isr_o : pc_fetch;
+	//[v0.0] assign 	i_pp_fetch_dec.inst = br_update_ex.wrong ? 32'h00007033 : inst;
+	//[v0.1]
+  assign 	i_pp_fetch_dec.inst = br_update_ex.wrong ? 32'h00007033 : (((push_pc || isr_handle) && !pop_pc) ? isr_out : inst);
 
 //=============================Decode Stage============================	
 //=====================================================================	
@@ -425,7 +562,9 @@ module 	RVS192
 		else if(mem_fix == 2'b10)
 			i_pp_ex_mem.rs2_out_fix = o_pp_ex_mem.alu_out;
 	end
-		
+	
+  //[v0.1]
+  assign i_pp_ex_mem.pc = o_pp_dec_ex.pc;
 //=============================Memory Stage============================	
 //=====================================================================		
 	assign 	i_pp_mem_wb.control_signals = o_pp_ex_mem.control_signals.control_wb;
@@ -487,18 +626,36 @@ module 	RVS192
 
   always_comb begin
     if(o_pp_ex_mem.control_signals.cpu_write && (o_pp_ex_mem.alu_out >= 32'h8000))
-      peri_write = 1'b1;
-    else
+    begin
+      if(o_pp_ex_mem.alu_out >= 32'h20000) begin
+        peri_write = 1'b0;
+        stack_write = 1'b1;
+      end else begin
+        stack_write = 1'b0;
+        peri_write = 1'b1;
+      end
+    end else begin
       peri_write = 1'b0;
+      stack_write = 1'b0;
+    end
 
     if(o_pp_ex_mem.control_signals.cpu_read && (o_pp_ex_mem.alu_out >= 32'h8000))
-      peri_read = 1'b1;
-    else
+    begin
+      if(o_pp_ex_mem.alu_out >= 32'h20000) begin
+        peri_read = 1'b0;
+        stack_read = 1'b1;
+      end else begin
+        stack_read = 1'b0;
+        peri_read = 1'b1;
+      end
+    end else begin
       peri_read = 1'b0;
+      stack_read = 1'b0;
+    end
   end
 
   assign peri_halt_raw = peri_read | peri_write;
-  assign peri_halt = peri_halt_raw & ~peri_ena;
+  assign peri_halt = peri_halt_raw & ~peri_ena & ~push_pc;
   //-------------------------------------------------------------------
  
   //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -547,7 +704,8 @@ module 	RVS192
 	//Hung_mod_peri assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? data_r : o_pp_ex_mem.rs2_out_fix;
 	//assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? datar_peri : data_r) : o_pp_ex_mem.rs2_out_fix;
 	//assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (peri_write ? peri_write_data : o_pp_ex_mem.rs2_out_fix);
-	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : data_r) : (addi_li_fix ? o_pp_mem_wb.alu_out : o_pp_ex_mem.rs2_out_fix);
+  //Hung_mod_ocm
+	assign 	data_in = o_pp_ex_mem.control_signals.cpu_read ? (peri_read ? peri_read_data : (stack_read ? stack_out : data_r)) : (addi_li_fix ? o_pp_mem_wb.alu_out : o_pp_ex_mem.rs2_out_fix);
 	
   ahb_peri_itf  
   //#(
@@ -602,6 +760,8 @@ endmodule
   	`include "D:/Project/renas-mcu/RISC-V/RVS192/ALRU.sv"
   	`include "D:/Project/renas-mcu/RISC-V/RVS192/Victim_Cache.sv"
   	`include "D:/Project/renas-mcu/RISC-V/RVS192/DualPort_SRAM.sv"	
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/SinglePort_SRAM.sv"	
+  	`include "D:/Project/renas-mcu/RISC-V/RVS192/OCM_ISR.sv"	
   	`include "D:/Project/renas-mcu/RISC-V/RVS192/IL1_Controller.sv" 
 		`include "D:/Project/renas-mcu/RISC-V/RVS192/IL1_Cache.sv"
   	`include "D:/Project/renas-mcu/RISC-V/RVS192/DL1_Controller.sv" 
@@ -623,6 +783,7 @@ parameter	DATA_LENGTH = 32,
 parameter 	ADDR_LENGTH = 32
 )
 (
+  input                                           push_pc,
   //AHB-ITF
   output  mas_send_type                           peri_out,
   input   slv_send_type                           peri_in,
@@ -696,7 +857,9 @@ parameter 	ADDR_LENGTH = 32
     unique case(state)
     IDLE_D: begin
       peri_out.htrans = IDLE;
-      if(peri_read || peri_write) begin
+      if(push_pc)
+        n_state = IDLE_D;
+      else if(peri_read || peri_write) begin
         //Hung_mod peri_out.htrans = NONSEQ;
         n_state = NONSEQ_D;
       end
@@ -705,7 +868,9 @@ parameter 	ADDR_LENGTH = 32
     end
     NONSEQ_D: begin
       peri_out.htrans = NONSEQ;
-      if((peri_read && read_res) || (peri_write && write_res)) 
+      if(push_pc)
+        n_state = IDLE_D;
+      else if((peri_read && read_res) || (peri_write && write_res)) 
       begin
 		    n_state = IDLE_D;
         peri_ena = 1'b1;
@@ -718,3 +883,106 @@ parameter 	ADDR_LENGTH = 32
   end
 
 endmodule: ahb_peri_itf
+
+////=====================================================================	
+////=====================================================================	
+//
+////////////////////////////////////////////////////////////////////////////////////
+//// Module Name:	  STACK
+//// Project Name:	VG CPU
+//// Page:     		  VLSI Technology
+//// Version  Date        Author    Description
+//// v0.0     03.10.2021  hungbk99  Modify from async_fifo 
+////////////////////////////////////////////////////////////////////////////////////
+//
+//module stack
+//  #(
+//    parameter STACK_
+//  )
+//	(
+//  //[v0.1]
+//  output  logic [SPI_POINTER_WIDTH:0] w_ptr_info,
+//  //output	fifo_interrupt interrupt,
+//	output 	bus	data_out,
+//	output	logic	[SPI_POINTER_WIDTH-1:0]	fifo_status,
+//	input 	bus	data_in,
+//	input 	logic clear,
+//	input 	logic push,
+//	input 	logic pop,
+//	input 	logic clk,
+//	input 	logic rst_n);
+//	
+////================================================================================	
+////	Internal Signals
+//	logic [SPI_POINTER_WIDTH:0] w_ptr;
+//	logic [SPI_POINTER_WIDTH:0] r_ptr;
+//	logic [SPI_POINTER_WIDTH-1:0] w_addr;
+//	logic [SPI_POINTER_WIDTH-1:0] r_addr;
+//	logic write_en;
+//	logic read_en;
+//	logic [SPI_DATA_WIDTH-1:0] RAM [SPI_FIFO_DEPTH-1:0];
+//	
+//	typedef struct packed	{
+//	logic	fifo_full;
+//	logic 	fifo_empty;
+//	logic 	fifo_overflow;
+//	logic 	fifo_underflow;
+//	}	fifo_interrupt;
+//  
+//  fifo_interrupt interrupt;
+////================================================================================
+////[v0.1]
+//  assign w_ptr_info = w_ptr;
+//
+////	Write Counter
+//	always_ff @(posedge clk or negedge rst_n)
+//	begin
+//		if(!rst_n)
+//			w_ptr <= '0;
+//		else if(clear)
+//			w_ptr <= '0;
+//		else if(write_en)
+//			w_ptr <= w_ptr + 1'b1;
+//		else
+//			w_ptr <= w_ptr;
+//	end
+//	
+//	assign 	write_en = push && !interrupt.fifo_full;
+//	
+////	Read Counter
+//	always_ff @(posedge clk or negedge rst_n)
+//	begin
+//		if(!rst_n)
+//			r_ptr <= '0;
+//		else if(clear)
+//			r_ptr <= '0;
+//		else if(read_en)
+//			r_ptr <= r_ptr + 1'b1;
+//		else
+//			r_ptr <= r_ptr;
+//	end		
+//	
+//	assign	read_en = pop && !interrupt.fifo_empty;
+//	
+////	Sync RAM with sync read, write, reset
+//	assign	w_addr = w_ptr[SPI_POINTER_WIDTH-1:0];
+//	assign	r_addr = r_ptr[SPI_POINTER_WIDTH-1:0];
+//	
+//	always_ff @(posedge clk)
+//	begin
+//		if(write_en)
+//			RAM[w_addr] <= data_in;
+//	end
+//	
+//	assign 	data_out = RAM[r_addr];
+//	
+////	Interrupt Flag Generator
+//	assign	interrupt.fifo_full = (w_ptr[SPI_POINTER_WIDTH-1:0] == r_ptr[SPI_POINTER_WIDTH-1:0]) && (w_ptr[SPI_POINTER_WIDTH] != r_ptr[SPI_POINTER_WIDTH]);
+//	assign 	interrupt.fifo_empty = w_ptr[SPI_POINTER_WIDTH:0] == r_ptr[SPI_POINTER_WIDTH:0];
+//	assign 	interrupt.fifo_overflow = interrupt.fifo_full && push;
+//	assign 	interrupt.fifo_underflow = interrupt.fifo_empty && pop;
+//	
+////	Status Gen
+////	assign 	fifo_status = '{w_ptr - r_ptr};
+//	assign	fifo_status = w_ptr - r_ptr;
+//endmodule: stack

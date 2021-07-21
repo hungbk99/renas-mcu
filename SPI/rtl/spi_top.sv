@@ -2,9 +2,19 @@
 // Module name:   spi_top
 // Project name:  VG SoC 
 // Page:          VLSI Technology
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 // Version  Date        Author    Description
 // v0.0     03.10.2021  hungbk99  Merge rtl from previous design   
-//          05.16.2021  hungbk99  seperate psel from apb_slave_in  
+//          05.16.2021  hungbk99  seperate psel from apb_slave_in 
+//          07.07.2021  hungbk99  Add support for isr
+// v0.1     07.07.2021  hungbk99  Add support for trasfer limitation
+//                                Upto 32 word
+//                                Mod: SPICR[13:10] Reserved -> SPITXLM
+//                                     SPIINTER[23] Reserved -> SPITXLME
+//                                     SPIRINTR[23] Reserved -> SPITXLMRINT
+//                                     SPIINTR[23]  Reserved -> SPITXLMINT
+//                                [TODO] Should add support for backpressure when 
+//                                       interrupt occurs
 //=================================================================
 
 `define SIM
@@ -12,6 +22,9 @@
 import spi_package::*;
 module spi_top
 (
+//ISR
+  input                                 spi_clr,
+  output logic                          spi_isr,
 // spi APB interface
   output  apb_package::slave_s_type     apb_slave_out,
   input   apb_package::master_s_type    apb_slave_in,
@@ -68,13 +81,27 @@ module spi_top
   logic                         cpha;
   logic                         cpol;
 // Other signals
-  
+  logic [SPI_POINTER_WIDTH:0]   tx_ptr;                  
+  logic                         int_map_1, int_map_2;
 //=================================================================
 // Sub-module
   assign as2sd_control = data_req;  //Hung_add_03.10_2021
   assign transfer_start = sc2scc_control.transfer_start;
   assign cpha = sc2scc_control.cpha;
   assign cpol = sc2scc_control.cpol;
+
+  //[FIXME]
+  always_ff @(posedge pclk, negedge rst_n_sync) 
+  begin
+    if(!rst_n_sync) begin
+      int_map_1 <= 1'b0;
+      int_map_2 <= 1'b0;
+    end else begin
+      int_map_1 <= spi_clr;
+      int_map_2 <= int_map_1;
+    end
+  end
+
   spi_apb_slave APBS_U
   (
     .control_req(as2sc_wen),
@@ -122,6 +149,8 @@ module spi_top
 //  assign preset_n = apb_slave_in.preset_n;
 //  assign control_req = as2sc_wen;
 
+  //[FIXME]
+  assign spi_isr = |reg_out.intr_out & ~int_map_1 & ~int_map_2;
 
 
 endmodule
@@ -136,7 +165,10 @@ endmodule
 //////////////////////////////////////////////////////////////////////////////////
 
 module spi_sync_fifo
-	(output	fifo_interrupt interrupt,
+	(
+  //[v0.1]
+  output  logic [SPI_POINTER_WIDTH:0] w_ptr_info,
+  output	fifo_interrupt interrupt,
 	output 	bus	data_out,
 	output	logic	[SPI_POINTER_WIDTH-1:0]	fifo_status,
 	input 	bus	data_in,
@@ -157,6 +189,9 @@ module spi_sync_fifo
 	logic [SPI_DATA_WIDTH-1:0] RAM [SPI_FIFO_DEPTH-1:0];
 	
 //================================================================================
+//[v0.1]
+  assign w_ptr_info = w_ptr;
+
 //	Write Counter
 	always_ff @(posedge clk or negedge rst_n)
 	begin
@@ -341,20 +376,25 @@ endmodule: spi_apb_slave
 // Project Name:	VG SoC
 // Page:          VLSI Technology
 // Version  Date        Author    Description
-// v0.0     03.10.2021  hungbk99  Merge rtl from previous design    
+// v0.0     03.10.2021  hungbk99  Merge rtl from previous design   
+//          07.07.2021  hungbk99  Add support for isr
 //////////////////////////////////////////////////////////////////////////////////
 
 
 module	spi_control
 (
+//ISR 
+//[v0.1]
+  input                        spi_clr,
+  input [SPI_POINTER_WIDTH:0]  tx_ptr,                    
 //	APB_slave::spi_control
-	output	spicr_type			  cr_out,
-	output	spibr_type			  br_out,
-	output	spiinter_type			inter_out,
-	output 	spisr_type			  sr_out,
-	output 	spirintr_type			rintr_out,
-	output	spiintr_type			intr_out,
-	input 	as2sc				      as2sc_wen,
+	output	spicr_type			     cr_out,
+	output	spibr_type			     br_out,
+	output	spiinter_type			   inter_out,
+	output 	spisr_type			     sr_out,
+	output 	spirintr_type			   rintr_out,
+	output	spiintr_type			   intr_out,
+	input 	as2sc				         as2sc_wen,
 //	input 	as2sd				      as2sd_wen,
 //	input					clk,
 //						rst_n,
@@ -446,16 +486,23 @@ module	spi_control
 		//	rint_reg <= '0;
 		//	int_reg <= '0;
 		//end
-		else 
-		begin
+    else if(spi_clr) begin
+			rint_reg <= '0;
+			int_reg <= '0;
+      c_reg.SPITXRST <= 1'b0;
+    end 
+    else begin
 			if(as2sc_wen.cr_wen)
-				c_reg <= {wdata[31:14], 4'b0, wdata[9:8], 3'b0, wdata[4:0]};
-			
+				//[v0.0] c_reg <= {wdata[31:14], 4'b0, wdata[9:8], 3'b0, wdata[4:0]};
+			  //[v0.1]
+        c_reg <= {wdata[31:8], 3'b0, wdata[4:0]};
 			if(as2sc_wen.br_wen)
 				b_reg <= {24'b0, wdata[7:0]};
 			
 			if(as2sc_wen.inter_wen)
-				inte_reg <= {wdata[31], 19'b0, wdata[11:8], 4'b0, wdata[3:0]};
+				//[v0.0] inte_reg <= {wdata[31], 19'b0, wdata[11:8], 4'b0, wdata[3:0]};
+				//[v0.1] 
+        inte_reg <= {wdata[31], 7'b0, wdata[23], 11'b0, wdata[11:8], 4'b0, wdata[3:0]};
 			//	Status register
 			s_reg.SPIRXST <= rfifo_status;
 			s_reg.SPITXST <= tfifo_status;
@@ -468,7 +515,10 @@ module	spi_control
 			rint_reg.SPITXERINT <= tfifo_interrupt.fifo_empty;
 			rint_reg.SPITXORINT <= tfifo_interrupt.fifo_overflow;
 			rint_reg.SPITXFRINT <= tfifo_interrupt.fifo_full;			
-	
+
+      //[v0.1]
+      rint_reg.SPITXLMRINT <= (tx_ptr == c_reg.SPITXLM);
+
 			//	Interrupt register	
 			int_reg.SPIRXUINT <= rfifo_interrupt.fifo_underflow & inte_reg.SPIRXUINTE;
 			int_reg.SPIRXEINT <= rfifo_interrupt.fifo_empty & inte_reg.SPIRXEINTE;
@@ -479,6 +529,7 @@ module	spi_control
 			int_reg.SPITXOINT <= tfifo_interrupt.fifo_overflow & inte_reg.SPITXOINTE;
 			int_reg.SPITXFINT <= tfifo_interrupt.fifo_full & inte_reg.SPITXFINTE;			
 			
+			int_reg.SPITXLMINT <= (tx_ptr == c_reg.SPITXLM) & inte_reg.SPITXLME;			
 		end
 	end
 
@@ -500,8 +551,8 @@ module	spi_control
 	assign	sc2scc_control.datalen = c_reg.DATALEN;	 
 	assign	sc2scc_control.spi_br = b_reg.SPIBR;
 
-	assign 	sc2sd_control.tfifo_clear = c_reg.SWR;
-	assign	sc2sd_control.rfifo_clear = c_reg.SWR;
+	assign 	sc2sd_control.tfifo_clear = c_reg.SWR | ~c_reg.SPITXRST;  //Hung_db
+	assign	sc2sd_control.rfifo_clear = c_reg.SWR | ~c_reg.SPIRXRST;  //Hung_db
 	
 //	Transfer Control
 	always_ff @(posedge pclk, negedge preset_n)
@@ -643,6 +694,9 @@ endmodule: spi_control
 
 module	spi_data
 (
+  //[v0.1]
+  output  logic [SPI_POINTER_WIDTH:0]   tx_ptr,
+
 	output 	bus                           rfifo_out,
 	output	fifo_interrupt	              rfifo_interrupt,
 	output 	fifo_interrupt	              tfifo_interrupt,
@@ -748,6 +802,7 @@ module	spi_data
 //	Transfer FIFO
 	spi_sync_fifo	T_FIFO
 	(
+  .w_ptr_info(tx_ptr),
 	.interrupt(tfifo_interrupt),
 	.data_out(transfer_data),
 	.fifo_status(tfifo_status),
@@ -761,6 +816,7 @@ module	spi_data
 //	Receive FIFO
 	spi_sync_fifo	R_FIFO
 	(
+  .w_ptr_info(),
 	.interrupt(rfifo_interrupt),
 	.data_out(pre_data),
 	.fifo_status(rfifo_status),

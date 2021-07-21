@@ -7,8 +7,9 @@
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Ver    Date        Author    Description
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-//        05.18.2021  hungbk99  Mod: Solve bug: sw after a register type instruction
+// v0.0   05.18.2021  hungbk99  Mod: Solve bug: sw after a register type instruction
 //                                   ex: addi x0, x0, 0x10 -> sw x0, 0x00(zero)
+// v0.1   07.09.2021  hungbk99  Add pc in pp_ex_mem_type to support ISR
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -214,6 +215,8 @@ package	RVS192_package;
 		logic 	[DATA_LENGTH-1:0]	alu_out;
 		logic 	[DATA_LENGTH-1:0]	rs2_out_fix;
 		control_type_mem			control_signals;
+		//v[0.1]
+    logic	[PC_LENGTH-1:0]		pc;
 	}	pp_ex_mem_type;
 	
 	typedef struct packed	{

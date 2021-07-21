@@ -10,8 +10,9 @@
 // v0.1   19.04.2021  hungbk99  Modify from Single-RAM => Dual RAM
 // v0.2   26.04.2021  hungbk99  Modify to map with RVS192 cpu
 //////////////////////////////////////////////////////////////////////////////////
-
-//`define MEM_SIM
+`ifdef OCM_SIM
+  `define MEM_SIM
+`endif
 `ifndef TEST
   `ifndef TOP
     `include "D:/Project/renas-mcu/RISC-V/RVS192/DualPort_SRAM.sv"  
@@ -195,6 +196,7 @@ MEM
 	    //parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
       //parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
       parameter INST = "D:/Project/renas-mcu/MMEM/spi_test.txt";
+      //parameter INST = "D:/Project/renas-mcu/MMEM/ocm_test.txt";
       initial begin
       	$readmemh(INST, MEM.SRAM, 32'h0000_2000, 32'h0000_3fff);
       	$readmemh("D:/Project/renas-mcu/RISC-V/renas_cpu/src/rtl/data_memory_file.txt", MEM.SRAM, 32'h0000_0000, 32'h0000_1fff);

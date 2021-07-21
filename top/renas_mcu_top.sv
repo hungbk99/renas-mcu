@@ -99,6 +99,9 @@ module renas_mcu_top
   assign hprior_master_inst = '0;
   assign hprior_master_data = '0;
   //-------------------------------------------------------------------
+  logic spi_isr;
+  logic spi_clr;
+  //-------------------------------------------------------------------
 
   RVS192 renas_cpu_202
   (
