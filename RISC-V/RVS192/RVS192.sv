@@ -30,7 +30,7 @@
 // v0.1   07.06.2021  hungbk99  Add OCM to support ISR
 //=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 //////////////////////////////////////////////////////////////////////////////////
-`define OCM_SIM
+//`define OCM_SIM
 `ifndef TEST
   `include "D:/Project/renas-mcu/AMBA_BUS/AHB_GEN_202/Gen_Result/AHB_package.sv"
   `include "D:/Project/renas-mcu/RISC-V/RVS192/RVS192_user_define.h"

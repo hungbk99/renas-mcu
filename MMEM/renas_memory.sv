@@ -194,8 +194,8 @@ MEM
 	    //parameter INST = "D:/RISC-V/testbench/larger_inner_loop.txt";
 	    //parameter INST = "D:/RISC-V/testbench/inner_loop1.txt";
 	    //parameter INST = "D:/RISC-V/testbench/larger_inner_loop1.txt";
-      //parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
-      parameter INST = "D:/Project/renas-mcu/MMEM/spi_test.txt";
+      parameter INST = "D:/RISC-V/testbench/arrangement_cache_test1.txt";
+      //parameter INST = "D:/Project/renas-mcu/MMEM/spi_test.txt";
       //parameter INST = "D:/Project/renas-mcu/MMEM/ocm_test.txt";
       initial begin
       	$readmemh(INST, MEM.SRAM, 32'h0000_2000, 32'h0000_3fff);
